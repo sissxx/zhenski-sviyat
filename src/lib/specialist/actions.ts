@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import type { AdminResult } from "@/lib/admin/actions";
 import { adminErrorMessage, genericAdminError } from "@/lib/admin/errors";
+import { notifyConsultationCancelled, notifyLater } from "@/lib/email/notifications";
 import { availabilityRows, availabilitySchema, timeOffRow, timeOffSchema, type AvailabilityInput, type TimeOffInput } from "@/lib/admin/schedule";
 import { createClient } from "@/lib/supabase/server";
 import { routes } from "@/lib/routes";
@@ -66,6 +67,7 @@ export async function cancelMyBooking(bookingId: string, reason: string): Promis
       p_booking_id: bookingId,
       p_reason: reason.trim().slice(0, 500) || "Отказано от специалиста",
     });
+    if (!error) notifyLater(() => notifyConsultationCancelled(bookingId));
     return error;
   });
 }

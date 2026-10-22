@@ -4,6 +4,12 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { getCurrentUser } from "@/lib/auth/session";
+import {
+  notifyConsultationBooked,
+  notifyConsultationCancelled,
+  notifyConsultationRescheduled,
+  notifyLater,
+} from "@/lib/email/notifications";
 import { dbErrorMessage } from "@/lib/db-errors";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
@@ -74,6 +80,7 @@ export async function bookConsultation(input: z.infer<typeof bookSchema>): Promi
   const booking = data?.[0];
   if (!booking) return { ok: false, error: dbErrorMessage(null) };
 
+  notifyLater(() => notifyConsultationBooked(booking.booking_id));
   revalidatePath(routes.accountConsultations);
   redirect(consultationConfirmationPath(booking.booking_id));
 }
@@ -86,6 +93,8 @@ export async function cancelConsultation(bookingId: string): Promise<Consultatio
   const { error } = await supabase.rpc("cancel_consultation", { p_booking_id: bookingId });
   if (error) return { ok: false, error: dbErrorMessage(error) };
 
+  notifyLater(() => notifyConsultationCancelled(bookingId));
+
   revalidatePath(routes.accountConsultations);
   return { ok: true };
 }
@@ -96,9 +105,12 @@ export async function rescheduleConsultation(bookingId: string, startsAt: string
   if (!isSupabaseConfigured()) return notConnected;
 
   const supabase = await createClient();
+  // The old time goes into the emails; RLS lets the client read only their own booking.
+  const { data: before } = await supabase.from("consultation_bookings").select("starts_at").eq("id", bookingId).maybeSingle();
   const { error } = await supabase.rpc("reschedule_consultation", { p_booking_id: bookingId, p_new_starts_at: startsAt });
   if (error) return { ok: false, error: dbErrorMessage(error) };
 
+  if (before) notifyLater(() => notifyConsultationRescheduled(bookingId, before.starts_at));
   revalidatePath(routes.accountConsultations);
   redirect(`${routes.accountConsultations}?premestena=1`);
 }

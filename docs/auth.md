@@ -35,4 +35,4 @@ and the recommended templates that link straight to the site, which work on any 
 ```
 
 (`type=recovery` for the reset template, `type=email_change` for email change). The built-in Supabase mailer sends only a
-few emails an hour; production should send through Brevo SMTP (Authentication → SMTP Settings), with Bulgarian templates.
+few emails an hour; production should send through Brevo SMTP with the Bulgarian templates in `supabase/templates/`; the exact settings are in `docs/emails.md`.

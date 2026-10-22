@@ -21,5 +21,5 @@ status are always current.
   `NSJS-…` reference, the deadline and the bank account from `app_settings`; until an admin fills in the IBAN a
   placeholder is shown. Card payment (Stripe Checkout) is shown as "скоро"; paid events without bank transfer
   ask people to get in touch.
-- Confirmation emails (Brevo) aren't sent yet, so the pages don't promise one.
+- Sign-up sends a confirmation or bank transfer email, and confirming the transfer sends "payment confirmed" (see `docs/emails.md`).
 - No category column: the Figma category filter was replaced by a format filter.
