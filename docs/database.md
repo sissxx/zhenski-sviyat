@@ -1,7 +1,8 @@
 # Database
 
 Supabase (Postgres) schema for the Women's World / NSJS platform. Everything is in
-`supabase/migrations/`, applied in filename order. Nothing has been applied to a live Supabase project yet.
+`supabase/migrations/`, applied in filename order. They are applied to the hosted Supabase project `zhenski-sviyat`
+(ref `yxkwpzihfuekffbpsbts`, Frankfurt `eu-central-1`, Free plan); `seed.sql` is not, so that database starts empty.
 
 | Migration | What it adds |
 | --- | --- |
@@ -15,6 +16,7 @@ Supabase (Postgres) schema for the Women's World / NSJS platform. Everything is 
 | `…100700_business_functions` | all write operations (register, book, pay, subscribe…) |
 | `…100800_rls` | Row Level Security policies and table privileges |
 | `…100900_storage` | public `media` bucket for images, admin-only uploads |
+| `…101000_foreign_key_indexes` | indexes on foreign keys flagged by the Supabase performance advisor |
 
 `supabase/seed.sql` holds development data only (the provisional €8 / €21 plans, two Viber groups).
 `supabase/checks/database_checks.sql` checks RLS isolation, double-booking protection, payments and Viber access.
@@ -192,5 +194,5 @@ supabase start
 supabase db reset        # applies migrations + seed.sql
 psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -v ON_ERROR_STOP=1 \
   -f supabase/checks/database_checks.sql   # prints ALL DATABASE CHECKS PASSED
-supabase gen types typescript --local > src/types/database.ts
+supabase gen types typescript --local > src/lib/supabase/database.types.ts
 ```

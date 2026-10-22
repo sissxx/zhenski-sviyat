@@ -21,6 +21,15 @@ npm run typecheck
 
 Node 22 (see `.nvmrc`).
 
+### Supabase
+
+Copy `.env.example` to `.env.local` and fill in the values from the Supabase dashboard
+(project `zhenski-sviyat` → Project Settings → API Keys). Never commit `.env.local`.
+On Vercel, add the same three variables under Project → Settings → Environment Variables.
+Public pages still work without them; anything that reads the database needs them.
+
+After a schema change, regenerate the types with `npm run db:types` (needs `npx supabase login` once).
+
 ## Layout
 
 | Path | What lives there |
@@ -32,6 +41,8 @@ Node 22 (see `.nvmrc`).
 | `src/content/` | Static copy and sample data until the admin panel exists |
 | `src/lib/locale.ts` | `bg-BG` / `Europe/Sofia` / EUR formatting helpers |
 | `src/lib/routes.ts` | Public URLs and navigation menus |
+| `src/lib/supabase/` | Supabase clients: `client.ts` (browser), `server.ts` (Server Components/Actions), `admin.ts` (secret key, server only), `proxy.ts` (session refresh); generated `database.types.ts` |
+| `src/proxy.ts` | Refreshes the Supabase session cookie on each request |
 | `src/theme/` | Brand tokens, fonts and the MUI theme |
 | `public/brand/` | Final logos (horizontal, full, wordmark, icon) as SVG and PNG; favicon lives in `src/app/icon.svg` |
 

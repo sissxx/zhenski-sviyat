@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "db:types": "npx supabase gen types typescript --project-id yxkwpzihfuekffbpsbts --schema public > src/lib/supabase/database.types.ts"
   },
   "dependencies": {
     "@emotion/cache": "^11.14.0",
@@ -17,10 +18,13 @@
     "@hookform/resolvers": "^5.9.2",
     "@mui/material": "^9.5.0",
     "@mui/material-nextjs": "^9.5.0",
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.118.0",
     "next": "^16.4.2",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "react-hook-form": "^7.90.0",
+    "server-only": "^0.0.1",
     "zod": "^4.6.7"
   },
   "devDependencies": {
