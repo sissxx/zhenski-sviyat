@@ -1,5 +1,6 @@
 import "server-only";
 import Stripe from "stripe";
+import { isSecretKey } from "@/lib/supabase/admin";
 
 /**
  * Stripe client and settings. Card payments need STRIPE_SECRET_KEY and, because the server records
@@ -24,7 +25,12 @@ function secretKey(): string | null {
 
 /** True when card payments can be offered. */
 export function isStripeConfigured(): boolean {
-  return Boolean(secretKey() && process.env.SUPABASE_SECRET_KEY);
+  const supabaseKey = process.env.SUPABASE_SECRET_KEY;
+  if (supabaseKey && !isSecretKey(supabaseKey)) {
+    console.error("SUPABASE_SECRET_KEY is not a secret key (sb_secret_...); card payments are off.");
+    return false;
+  }
+  return Boolean(secretKey() && supabaseKey);
 }
 
 export function stripe(): Stripe {
