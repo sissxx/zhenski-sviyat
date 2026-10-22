@@ -15,6 +15,7 @@ import ListItemText from "@mui/material/ListItemText";
 import SvgIcon from "@mui/material/SvgIcon";
 import Toolbar from "@mui/material/Toolbar";
 import { WomensWorldLogo } from "@/components/brand/Logo";
+import { useSignedIn } from "@/components/auth/useSignedIn";
 import { mainNav, routes } from "@/lib/routes";
 
 function MenuIcon() {
@@ -39,6 +40,7 @@ const isActive = (pathname: string, href: string) =>
 export function SiteHeader() {
   const pathname = usePathname() ?? "/";
   const [open, setOpen] = useState(false);
+  const signedIn = useSignedIn();
 
   return (
     <AppBar
@@ -84,13 +86,28 @@ export function SiteHeader() {
         </Box>
 
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <Button
-            variant="contained"
-            href={routes.register}
-            sx={{ display: { xs: "none", md: "inline-flex" } }}
-          >
-            Стани част от нас
-          </Button>
+          {signedIn ? (
+            <Button variant="contained" href={routes.account} sx={{ display: { xs: "none", md: "inline-flex" } }}>
+              Моят профил
+            </Button>
+          ) : (
+            <>
+              <Button
+                variant="text"
+                href={routes.login}
+                sx={{ display: { xs: "none", md: "inline-flex" }, whiteSpace: "nowrap" }}
+              >
+                Вход
+              </Button>
+              <Button
+                variant="contained"
+                href={routes.register}
+                sx={{ display: { xs: "none", md: "inline-flex" } }}
+              >
+                Стани част от нас
+              </Button>
+            </>
+          )}
           <IconButton
             aria-label="Отвори менюто"
             aria-expanded={open}
@@ -136,10 +153,21 @@ export function SiteHeader() {
             );
           })}
         </List>
-        <Box sx={{ p: 2 }}>
-          <Button variant="contained" fullWidth href={routes.register} onClick={() => setOpen(false)}>
-            Стани част от нас
-          </Button>
+        <Box sx={{ p: 2, display: "grid", gap: 1 }}>
+          {signedIn ? (
+            <Button variant="contained" fullWidth href={routes.account} onClick={() => setOpen(false)}>
+              Моят профил
+            </Button>
+          ) : (
+            <>
+              <Button variant="contained" fullWidth href={routes.register} onClick={() => setOpen(false)}>
+                Стани част от нас
+              </Button>
+              <Button variant="outlined" fullWidth href={routes.login} onClick={() => setOpen(false)}>
+                Вход
+              </Button>
+            </>
+          )}
         </Box>
       </Drawer>
     </AppBar>

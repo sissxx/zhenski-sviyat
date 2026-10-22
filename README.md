@@ -42,7 +42,9 @@ After a schema change, regenerate the types with `npm run db:types` (needs `npx 
 | `src/lib/locale.ts` | `bg-BG` / `Europe/Sofia` / EUR formatting helpers |
 | `src/lib/routes.ts` | Public URLs and navigation menus |
 | `src/lib/supabase/` | Supabase clients: `client.ts` (browser), `server.ts` (Server Components/Actions), `admin.ts` (secret key, server only), `proxy.ts` (session refresh); generated `database.types.ts` |
-| `src/proxy.ts` | Refreshes the Supabase session cookie on each request |
+| `src/lib/auth/` | Account forms' schemas, server actions, Bulgarian auth errors, `requireUser` (see `docs/auth.md`) |
+| `src/components/auth/`, `src/components/account/` | Login, sign-up and password forms; account area navigation and forms |
+| `src/proxy.ts` | Refreshes the Supabase session cookie on each request and guards `/profil` |
 | `src/theme/` | Brand tokens, fonts and the MUI theme |
 | `public/brand/` | Final logos (horizontal, full, wordmark, icon) as SVG and PNG; favicon lives in `src/app/icon.svg` |
 
