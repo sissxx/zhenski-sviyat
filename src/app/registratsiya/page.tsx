@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { AuthCard } from "@/components/auth/AuthCard";
 import { RegisterForm } from "@/components/auth/RegisterForm";
-import { AppLink } from "@/components/ui/AppLink";
+import { TextLink } from "@/components/ui/AppLink";
 import { membershipPlans } from "@/content/plans";
 import { loginPath, routes, safeNextPath } from "@/lib/routes";
 
@@ -32,7 +32,7 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
       }
       footer={
         <span>
-          Вече имаш профил? <AppLink href={loginPath(typeof next === "string" ? next : undefined)}>Влез</AppLink>
+          Вече имаш профил? <TextLink href={loginPath(typeof next === "string" ? next : undefined)}>Влез</TextLink>
         </span>
       }
     >

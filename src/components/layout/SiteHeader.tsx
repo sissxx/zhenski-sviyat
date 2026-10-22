@@ -17,6 +17,7 @@ import Toolbar from "@mui/material/Toolbar";
 import { WomensWorldLogo } from "@/components/brand/Logo";
 import { useSignedIn } from "@/components/auth/useSignedIn";
 import { mainNav, routes } from "@/lib/routes";
+import { site } from "@/lib/site";
 
 function MenuIcon() {
   return (
@@ -56,7 +57,7 @@ export function SiteHeader() {
         <AppLink
           href={routes.home}
           underline="none"
-          aria-label="Начало"
+          aria-label={`${site.name}, начална страница`}
           sx={{ display: "flex", alignItems: "center", color: "inherit" }}
         >
           <WomensWorldLogo />

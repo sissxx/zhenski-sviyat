@@ -9,7 +9,10 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "db:types": "npx supabase gen types typescript --project-id yxkwpzihfuekffbpsbts --schema public > src/lib/supabase/database.types.ts",
-    "email:auth-templates": "node --experimental-strip-types --no-warnings scripts/build-auth-email-templates.mjs"
+    "email:auth-templates": "node --experimental-strip-types --no-warnings scripts/build-auth-email-templates.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@emotion/cache": "^11.14.0",
@@ -30,11 +33,14 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@playwright/test": "^1.64.1",
     "@types/node": "^22.20.5",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "eslint": "^9.39.5",
     "eslint-config-next": "^16.4.2",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^5.0.5"
   }
 }

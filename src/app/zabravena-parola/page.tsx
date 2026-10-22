@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { AuthCard } from "@/components/auth/AuthCard";
 import { ForgotPasswordForm } from "@/components/auth/ForgotPasswordForm";
-import { AppLink } from "@/components/ui/AppLink";
+import { TextLink } from "@/components/ui/AppLink";
 import { routes } from "@/lib/routes";
 
 export const metadata: Metadata = {
@@ -18,7 +18,7 @@ export default function ForgotPasswordPage() {
       lead="Въведи имейла на профила си и ще ти изпратим линк, с който да зададеш нова парола."
       footer={
         <span>
-          Спомни си паролата? <AppLink href={routes.login}>Влез</AppLink>
+          Спомни си паролата? <TextLink href={routes.login}>Влез</TextLink>
         </span>
       }
     >

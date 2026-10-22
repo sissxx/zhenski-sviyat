@@ -9,7 +9,7 @@ import Typography from "@mui/material/Typography";
 import { ChoiceCards } from "@/components/forms/ChoiceCards";
 import { FormAlert } from "@/components/forms/FormAlert";
 import { PaymentMethodField, type PaymentMethod } from "@/components/forms/PaymentMethodField";
-import { AppLink } from "@/components/ui/AppLink";
+import { TextLink } from "@/components/ui/AppLink";
 import { bookConsultation } from "@/lib/consultations/actions";
 import {
   paymentModeOf,
@@ -252,7 +252,7 @@ export function ConsultationBooking({ services, viewer, cardAvailable, initialSe
           <>
             <Facts rows={[["Име", viewer.name || "—"], ["Имейл", viewer.email], ["Телефон", viewer.phone || "—"]]} />
             <Typography variant="body2" sx={{ color: "text.secondary" }}>
-              Данните са от профила ти. <AppLink href={routes.accountDetails}>Промени ги</AppLink>, ако нещо не е вярно.
+              Данните са от профила ти. <TextLink href={routes.accountDetails}>Промени ги</TextLink>, ако нещо не е вярно.
             </Typography>
             <TextField
               label="Бележка (по желание)"

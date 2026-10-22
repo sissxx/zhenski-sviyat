@@ -25,7 +25,7 @@ export default function FaqPage() {
 
       <Section bg="brand.mintLight" aria-label="Въпроси и отговори">
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
-          <FaqList items={faqs} idPrefix="faq-page" striped />
+          <FaqList items={faqs} idPrefix="faq-page" striped headingLevel="h2" />
           <Placeholder label="Чернова">Отговорите ще бъдат заменени с подготвените от екипа на сдружението.</Placeholder>
         </Box>
       </Section>

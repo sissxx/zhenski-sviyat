@@ -7,7 +7,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import { FormAlert } from "@/components/forms/FormAlert";
 import { PasswordField } from "@/components/forms/PasswordField";
-import { AppLink } from "@/components/ui/AppLink";
+import { TextLink } from "@/components/ui/AppLink";
 import { updatePassword } from "@/lib/auth/actions";
 import { newPasswordSchema, type NewPasswordValues } from "@/lib/auth/schemas";
 import { routes } from "@/lib/routes";
@@ -54,7 +54,7 @@ export function NewPasswordForm() {
         <FormAlert severity="error">
           {serverError.message}{" "}
           {serverError.code === "session_not_found" && (
-            <AppLink href={routes.forgotPassword}>Поискай нов линк.</AppLink>
+            <TextLink href={routes.forgotPassword}>Поискай нов линк.</TextLink>
           )}
         </FormAlert>
       )}

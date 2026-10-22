@@ -110,7 +110,7 @@ const theme = createTheme(
       },
       MuiTypography: {
         defaultProps: {
-          variantMapping: { eyebrow: "p" },
+          variantMapping: { eyebrow: "p", subtitle1: "p", subtitle2: "p" },
         },
       },
       // Form inputs as in the Figma forms: cream fill, light border, 8px corners.
