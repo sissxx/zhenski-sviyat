@@ -35,6 +35,9 @@ export const eventPath = (slug: string) => `${routes.events}/${slug}`;
 export const eventRegistrationPath = (slug: string) => `${eventPath(slug)}/zapisvane`;
 export const eventConfirmationPath = (slug: string) => `${eventPath(slug)}/potvarzhdenie`;
 
+export const consultationConfirmationPath = (bookingId: string) => `${routes.consultations}/potvarzhdenie?zapis=${bookingId}`;
+export const consultationReschedulePath = (bookingId: string) => `${routes.accountConsultations}/${bookingId}/premesti`;
+
 /** Contact page with the subject field filled in, e.g. from a package's "Запитване" button. */
 export const contactPath = (subject: string) => `${routes.contacts}?tema=${encodeURIComponent(subject)}`;
 
