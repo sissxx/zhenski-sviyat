@@ -3,6 +3,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { ConsultationBooking, type BookableService, type BookingViewer } from "@/components/consultations/ConsultationBooking";
+import { isStripeConfigured } from "@/lib/stripe/server";
 import { PageIntro } from "@/components/ui/PageIntro";
 import { Panel } from "@/components/ui/Panel";
 import { Section } from "@/components/ui/Section";
@@ -65,7 +66,7 @@ export default async function ConsultationsPage({ searchParams }: ConsultationsP
             )}
             <Box component="ol" sx={{ m: 0, pl: 2.5, fontSize: 14, display: "flex", flexDirection: "column", gap: 0.75 }}>
               <li>Избираш направление, специалист и свободен час.</li>
-              <li>Потвърждаваш с профила си. За платените консултации получаваш данни за банков превод.</li>
+              <li>Потвърждаваш с профила си. Платените консултации плащаш с карта или по банков път.</li>
               <li>Часът се вижда в „Моят профил“ → „Моите консултации“, откъдето можеш да го преместиш или откажеш.</li>
             </Box>
             <Typography variant="h6" component="h3" sx={{ color: "primary.main", mt: 1 }}>
@@ -80,7 +81,10 @@ export default async function ConsultationsPage({ searchParams }: ConsultationsP
                 {rules.maxReschedules > 0 ? ` (до ${rules.maxReschedules} премествания).` : "."} Неплатена заявка можеш да
                 откажеш по всяко време.
               </li>
-              <li>При заявка с банков превод часът се пази, докато преводът пристигне и екипът го потвърди.</li>
+              <li>
+                При плащане с карта часът се потвърждава веднага. При банков превод часът се пази, докато преводът
+                пристигне и екипът го потвърди.
+              </li>
             </Box>
           </Panel>
 
@@ -101,6 +105,7 @@ export default async function ConsultationsPage({ searchParams }: ConsultationsP
               <ConsultationBooking
                 services={services}
                 viewer={viewer}
+                cardAvailable={isStripeConfigured()}
                 initialServiceSlug={typeof usluga === "string" ? usluga : undefined}
                 initialSpecialistSlug={typeof spetsialist === "string" ? spetsialist : undefined}
               />

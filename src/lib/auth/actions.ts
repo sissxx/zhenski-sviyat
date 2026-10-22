@@ -1,7 +1,7 @@
 "use server";
 
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { siteOrigin } from "@/lib/site-origin";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { routes, safeNextPath } from "@/lib/routes";
@@ -29,16 +29,6 @@ export type ActionResult<T = undefined> =
   | { ok: false; error: string; code?: string };
 
 const invalidInput = { ok: false, error: "Моля, провери въведените данни." } as const;
-
-/** The site's own origin for links in emails. NEXT_PUBLIC_SITE_URL wins; otherwise the request's host. */
-async function siteOrigin(): Promise<string> {
-  const configured = process.env.NEXT_PUBLIC_SITE_URL;
-  if (configured) return configured.replace(/\/+$/, "");
-  const headerList = await headers();
-  const host = headerList.get("x-forwarded-host") ?? headerList.get("host") ?? "localhost:3000";
-  const proto = headerList.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https");
-  return `${proto}://${host}`;
-}
 
 /** Where email links land: /auth/confirm, which signs the user in and continues to `next`. */
 async function emailLink(next: string): Promise<string> {

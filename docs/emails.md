@@ -12,7 +12,7 @@ All emails are Bulgarian, one column, readable on phones. Two kinds:
 | --- | --- | --- |
 | Free event sign-up | participant | `event_registration_confirmed` (includes the online link / attendee notes) |
 | Paid event sign-up (bank transfer) | participant | `event_registration_bank_transfer` (amount, `NSJS-…` reference, IBAN, deadline) |
-| Admin confirms a bank transfer (later also Stripe) | payer | `payment_confirmed` (event, consultation or membership) |
+| Admin confirms a bank transfer, or Stripe reports a card payment or paid plan invoice | payer | `payment_confirmed` (event, consultation or membership) |
 | Consultation booked | client | `consultation_booked`, or `consultation_bank_transfer` when prepaid by transfer |
 | Consultation booked | specialist | `consultation_booked_specialist` |
 | Consultation cancelled (by client, specialist or admin) | client, and the specialist unless they cancelled it | `consultation_cancelled`, `consultation_cancelled_specialist` |
@@ -33,8 +33,8 @@ without either gets no notices.
   loads the data with the service key. Server actions call them through `notifyLater()`, which runs after the
   response (Next.js `after()`), so a slow or failed email never blocks or undoes the action.
 
-For card payments the Stripe webhook should call `notifyLater(() => notifyPaymentConfirmed(paymentId))` once it
-marks the payment `succeeded`; the same email covers both payment methods.
+Card payments call `notifyLater(() => notifyPaymentConfirmed(paymentId))` once the payment is `succeeded`
+(src/lib/stripe/checkout.ts and webhook.ts, see docs/payments.md); the same email covers both payment methods.
 
 ### Settings (Vercel → Settings → Environment Variables)
 

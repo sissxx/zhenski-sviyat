@@ -6,6 +6,7 @@ import Typography from "@mui/material/Typography";
 import { z } from "zod";
 import { BookingFacts } from "@/components/consultations/BookingFacts";
 import { BankTransferDetails } from "@/components/events/BankTransferDetails";
+import { CardPaymentButton } from "@/components/payments/CardPaymentButton";
 import { PageIntro } from "@/components/ui/PageIntro";
 import { Panel } from "@/components/ui/Panel";
 import { Section } from "@/components/ui/Section";
@@ -13,12 +14,17 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { getMyBooking } from "@/lib/consultations/queries";
 import { getBankDetails } from "@/lib/events/queries";
 import { consultationConfirmationPath, loginPath, routes } from "@/lib/routes";
+import { formatDateTime } from "@/lib/locale";
+import { syncReturnedCheckout } from "@/lib/stripe/checkout";
+import { isStripeConfigured } from "@/lib/stripe/server";
 
-type ConfirmationPageProps = { searchParams: Promise<{ zapis?: string | string[] }> };
+type ConfirmationPageProps = {
+  searchParams: Promise<{ zapis?: string | string[]; session_id?: string | string[]; plashtane?: string | string[] }>;
+};
 
 export const metadata: Metadata = { title: "Потвърждение за консултация", robots: { index: false } };
 
-type Outcome = "confirmed" | "bank" | "ended";
+type Outcome = "confirmed" | "bank" | "card" | "ended";
 
 const outcomes: Record<Outcome, { title: string; text: string }> = {
   confirmed: {
@@ -29,6 +35,10 @@ const outcomes: Record<Outcome, { title: string; text: string }> = {
     title: "Заявката чака плащане",
     text: "Часът ти е запазен временно. Потвърждаваме го, щом преводът пристигне и екипът го отбележи.",
   },
+  card: {
+    title: "Плащането не е завършено",
+    text: "Часът ти е запазен временно. Довърши плащането с карта, за да го потвърдим.",
+  },
   ended: {
     title: "Заявката не е активна",
     text: "Тази консултация е отказана или срокът за плащане е изтекъл. Можеш да запазиш нов час.",
@@ -36,19 +46,31 @@ const outcomes: Record<Outcome, { title: string; text: string }> = {
 };
 
 export default async function ConsultationConfirmationPage({ searchParams }: ConfirmationPageProps) {
-  const { zapis } = await searchParams;
+  const { zapis, session_id: sessionId, plashtane } = await searchParams;
   const bookingId = typeof zapis === "string" && z.uuid().safeParse(zapis).success ? zapis : null;
   if (!bookingId) redirect(routes.consultations);
 
   const user = await getCurrentUser();
   if (!user) redirect(loginPath(consultationConfirmationPath(bookingId)));
 
+  // Back from Stripe Checkout: ask Stripe and record the payment now instead of waiting for the webhook.
+  if (typeof sessionId === "string" && isStripeConfigured()) await syncReturnedCheckout(sessionId, user.id);
   const booking = await getMyBooking(bookingId);
   if (!booking) redirect(routes.consultations);
 
   const outcome: Outcome =
-    booking.status === "pending_payment" ? "bank" : booking.status === "confirmed" || booking.status === "completed" ? "confirmed" : "ended";
-  const { title, text } = outcomes[outcome];
+    booking.status === "pending_payment"
+      ? booking.payment?.provider === "stripe"
+        ? "card"
+        : "bank"
+      : booking.status === "confirmed" || booking.status === "completed" ? "confirmed" : "ended";
+  const { title } = outcomes[outcome];
+  const text =
+    outcome === "card" && typeof sessionId === "string"
+      ? "Плащането се обработва. Обнови страницата след малко; ако не се потвърди, опитай отново."
+      : outcome === "card" && plashtane === "prekasnato"
+        ? "Плащането беше прекъснато и нищо не е таксувано. Часът ти се пази още малко, ако искаш да опиташ отново."
+        : outcomes[outcome].text;
   const bank = outcome === "bank" ? await getBankDetails() : null;
 
   return (
@@ -75,7 +97,7 @@ export default async function ConsultationConfirmationPage({ searchParams }: Con
               fontWeight: 600,
             }}
           >
-            {outcome === "bank" ? "…" : outcome === "ended" ? "!" : "✓"}
+            {outcome === "bank" || outcome === "card" ? "…" : outcome === "ended" ? "!" : "✓"}
           </Box>
           <Typography id="outcome-title" variant="h4" component="h2" sx={{ color: "primary.main" }}>
             {title}
@@ -90,6 +112,17 @@ export default async function ConsultationConfirmationPage({ searchParams }: Con
               bank={bank}
               subject="часът"
             />
+          )}
+
+          {outcome === "card" && booking.payment && (
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+              <CardPaymentButton paymentId={booking.payment.id} />
+              {booking.hold_expires_at && (
+                <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                  Часът се пази до {formatDateTime(booking.hold_expires_at)}.
+                </Typography>
+              )}
+            </Box>
           )}
 
           <Panel tone="card" aria-label="Подробности" sx={{ width: "100%" }}>

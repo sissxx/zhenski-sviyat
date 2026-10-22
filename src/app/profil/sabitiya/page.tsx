@@ -96,13 +96,13 @@ function RegistrationCard({ registration }: { registration: MyRegistration }) {
         {registration.price_cents === 0
           ? "Безплатно"
           : `${formatPrice(registration.price_cents)} · ${registration.payment_method === "bank_transfer" ? "банков превод" : "карта"}`}
-        {pending && payment?.bank_reference && ` · основание ${payment.bank_reference}`}
+        {pending && payment?.provider === "bank_transfer" && payment.bank_reference && ` · основание ${payment.bank_reference}`}
         {pending && registration.hold_expires_at && ` · срок за плащане ${formatDateTime(registration.hold_expires_at)}`}
       </Typography>
       <Box sx={{ display: "flex", flexWrap: "wrap", alignItems: "flex-start", gap: 1.5 }}>
         {isActive(registration) && (
           <Button size="small" variant={pending ? "contained" : "outlined"} href={`${eventConfirmationPath(event.slug)}?zapisvane=${registration.id}`}>
-            {pending ? "Данни за превода" : "Подробности"}
+            {pending ? (payment?.provider === "stripe" ? "Довърши плащането" : "Данни за превода") : "Подробности"}
           </Button>
         )}
         {canCancel && <CancelRegistrationButton registrationId={registration.id} paid={registration.status === "confirmed" && registration.price_cents > 0} />}
