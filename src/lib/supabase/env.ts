@@ -15,3 +15,8 @@ export function supabaseUrl(): string {
 export function supabasePublishableKey(): string {
   return required("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY);
 }
+
+/** False until the Supabase variables are set, so pages can say so instead of crashing. */
+export function isSupabaseConfigured(): boolean {
+  return Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY);
+}
