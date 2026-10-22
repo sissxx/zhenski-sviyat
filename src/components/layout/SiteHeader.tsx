@@ -55,7 +55,7 @@ export function SiteHeader() {
          
           href={routes.home}
           underline="none"
-          aria-label="Женски свят — начало"
+          aria-label="Начало"
           sx={{ display: "flex", alignItems: "center", gap: 2.25, color: "inherit" }}
         >
           <Box

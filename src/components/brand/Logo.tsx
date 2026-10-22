@@ -1,31 +1,12 @@
+import Image from "next/image";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 
-/**
- * "Женски свят" mark. The green circle is the placeholder symbol from Figma;
- * swap it for the official SVG once NSJS supplies it.
- */
+/** Official "Сдружение Женски свят" horizontal logo (public/brand/logo-horizontal.svg, 1120×430). */
 export function WomensWorldLogo() {
   return (
-    <Box sx={{ display: "flex", alignItems: "center", gap: 1.25 }}>
-      <Box
-        aria-hidden
-        sx={{ width: 48, height: 48, borderRadius: "50%", bgcolor: "primary.main", flexShrink: 0 }}
-      />
-      <Box sx={{ color: "primary.main", lineHeight: 1 }}>
-        <Typography
-          component="span"
-          sx={{ display: "block", fontFamily: "var(--font-lora)", fontWeight: 700, fontSize: 18, lineHeight: 1.1, whiteSpace: "nowrap" }}
-        >
-          ЖЕНСКИ СВЯТ
-        </Typography>
-        <Typography
-          component="span"
-          sx={{ display: "block", fontWeight: 600, fontSize: 7, letterSpacing: "0.35em", whiteSpace: "nowrap" }}
-        >
-          ПЪТ КЪМ СЕБЕ СИ
-        </Typography>
-      </Box>
+    <Box sx={{ position: "relative", height: { xs: 48, lg: 58 }, aspectRatio: "1120 / 430", flexShrink: 0 }}>
+      <Image src="/brand/logo-horizontal.svg" alt="Сдружение Женски свят — Път към себе си" fill priority />
     </Box>
   );
 }
