@@ -8,7 +8,7 @@ import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import Typography from "@mui/material/Typography";
 
-export type Choice<T extends string> = { value: T; label: string; hint?: ReactNode };
+export type Choice<T extends string> = { value: T; label: string; hint?: ReactNode; disabled?: boolean };
 
 type ChoiceCardsProps<T extends string> = {
   legend: string;
@@ -46,6 +46,7 @@ export function ChoiceCards<T extends string>({ legend, name, choices, value, on
             <FormControlLabel
               key={choice.value}
               value={choice.value}
+              disabled={choice.disabled}
               control={<Radio size="small" />}
               label={
                 <>

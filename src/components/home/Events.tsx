@@ -2,11 +2,14 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { Section } from "@/components/ui/Section";
-import { eventHref, eventLocationLabel, events } from "@/content/events";
+import { listUpcomingEvents } from "@/lib/events/queries";
+import { eventLocationLabel } from "@/lib/events/types";
 import { formatDate, formatDayMonthBadge } from "@/lib/locale";
-import { routes } from "@/lib/routes";
+import { eventPath, routes } from "@/lib/routes";
 
-export function Events() {
+/** The next three events on the homepage. */
+export async function Events() {
+  const events = await listUpcomingEvents(3);
   return (
     <Section bg="background.paper" aria-labelledby="events-title">
       <Box sx={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 2, mb: 2.5 }}>
@@ -17,6 +20,11 @@ export function Events() {
           Виж всички събития
         </Button>
       </Box>
+      {events.length === 0 && (
+        <Typography sx={{ color: "text.secondary" }}>
+          Подготвяме следващите срещи. Скоро ще ги обявим тук.
+        </Typography>
+      )}
       <Box component="ul" sx={{ listStyle: "none", m: 0, p: 0, display: "grid", gap: 2.25, gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)", md: "repeat(3, 1fr)" } }}>
         {events.map((event) => (
           <Box
@@ -41,7 +49,7 @@ export function Events() {
                 </Box>
                 {eventLocationLabel(event)}
               </Typography>
-              <Button variant="outlined" href={eventHref(event)} aria-label={`Виж събитието: ${event.title}`}>
+              <Button variant="outlined" href={eventPath(event.slug)} aria-label={`Виж събитието: ${event.title}`}>
                 Виж събитието
               </Button>
             </Box>

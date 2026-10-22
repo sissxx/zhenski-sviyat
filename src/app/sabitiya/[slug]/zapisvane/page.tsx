@@ -1,33 +1,45 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { EventFacts } from "@/components/events/EventFacts";
 import { EventRegistrationForm } from "@/components/events/EventRegistrationForm";
+import { FormAlert } from "@/components/forms/FormAlert";
 import { AppLink } from "@/components/ui/AppLink";
 import { PageIntro } from "@/components/ui/PageIntro";
 import { Panel } from "@/components/ui/Panel";
 import { Section } from "@/components/ui/Section";
-import { events, findEvent } from "@/content/events";
-import { eventPath, routes } from "@/lib/routes";
+import { getCurrentUser } from "@/lib/auth/session";
+import { getEventBySlug, getMyActiveRegistration } from "@/lib/events/queries";
+import { availabilityLabels } from "@/lib/events/types";
+import { createClient } from "@/lib/supabase/server";
+import { eventConfirmationPath, eventPath, eventRegistrationPath, loginPath, routes } from "@/lib/routes";
 
 type RegistrationPageProps = { params: Promise<{ slug: string }> };
 
-export function generateStaticParams() {
-  return events.map((event) => ({ slug: event.slug }));
-}
-
 export async function generateMetadata({ params }: RegistrationPageProps): Promise<Metadata> {
-  const event = findEvent((await params).slug);
+  const event = await getEventBySlug((await params).slug);
   return event ? { title: `Записване: ${event.title}`, robots: { index: false } } : {};
 }
 
 export default async function EventRegistrationPage({ params }: RegistrationPageProps) {
-  const event = findEvent((await params).slug);
+  const { slug } = await params;
+  const event = await getEventBySlug(slug);
   if (!event) notFound();
   const paid = event.priceCents > 0;
-  const soldOut = event.spotsLeft === 0;
+
+  const user = await getCurrentUser();
+  const registration = user ? await getMyActiveRegistration(event.id) : null;
+  // Already signed up (or mid-payment): show that registration instead of a second form.
+  if (registration) redirect(`${eventConfirmationPath(slug)}?zapisvane=${registration.id}`);
+
+  let profile: { first_name: string | null; last_name: string | null; phone: string | null; status: string } | null = null;
+  if (user) {
+    const supabase = await createClient();
+    const { data } = await supabase.from("profiles").select("first_name, last_name, phone, status").eq("id", user.id).maybeSingle();
+    profile = data;
+  }
 
   return (
     <>
@@ -36,8 +48,8 @@ export default async function EventRegistrationPage({ params }: RegistrationPage
         title={paid ? "Записване и плащане" : "Записване"}
         lead={
           paid
-            ? "Попълни данните си, за да заявиш участие. Можеш да платиш с карта или по банков път."
-            : "Попълни данните си, за да запазиш място. Участието е безплатно."
+            ? "Заяви участие с данните от профила си и плати по банков път."
+            : "Запази място с данните от профила си. Участието е безплатно."
         }
       />
 
@@ -59,15 +71,62 @@ export default async function EventRegistrationPage({ params }: RegistrationPage
             <Typography id="form-title" variant="h5" component="h2" sx={{ color: "primary.main" }}>
               Данни за записване
             </Typography>
-            {soldOut ? (
+            {event.availability !== "open" ? (
               <>
-                <Typography>Всички места за това събитие са заети.</Typography>
+                <Typography>
+                  {event.availability === "full"
+                    ? "Всички места за това събитие са заети."
+                    : `${availabilityLabels[event.availability]}. Не можеш да се запишеш за това събитие.`}
+                </Typography>
                 <Button variant="outlined" href={routes.events}>
                   Виж другите събития
                 </Button>
               </>
+            ) : !user ? (
+              <>
+                <Typography>
+                  За да се запишеш, влез в профила си. Така ще виждаш записванията и плащанията си на едно място.
+                </Typography>
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5 }}>
+                  <Button variant="contained" href={loginPath(eventRegistrationPath(slug))}>
+                    Вход
+                  </Button>
+                  <Button variant="outlined" href={`${routes.register}?next=${encodeURIComponent(eventRegistrationPath(slug))}`}>
+                    Създай профил
+                  </Button>
+                </Box>
+              </>
+            ) : profile?.status === "suspended" ? (
+              <FormAlert severity="warning">
+                Профилът ти е временно спрян и не можеш да се записваш за събития. Свържи се с нас за повече информация.
+              </FormAlert>
+            ) : paid && !event.allowBankTransfer ? (
+              <>
+                <Typography>
+                  За това събитие се плаща с карта, а онлайн плащането ще бъде достъпно съвсем скоро. Дотогава можеш да
+                  запазиш място, като се свържеш с нас.
+                </Typography>
+                <Button variant="outlined" href={routes.contacts}>
+                  Свържи се с нас
+                </Button>
+              </>
             ) : (
-              <EventRegistrationForm slug={event.slug} paid={paid} />
+              <>
+                <Box component="dl" sx={{ m: 0, display: "grid", gridTemplateColumns: "auto 1fr", columnGap: 2, rowGap: 1, fontSize: 14 }}>
+                  <Typography component="dt" sx={{ fontSize: 14, color: "text.secondary" }}>Име</Typography>
+                  <Typography component="dd" sx={{ m: 0, fontSize: 14, fontWeight: 600 }}>
+                    {[profile?.first_name, profile?.last_name].filter(Boolean).join(" ") || "—"}
+                  </Typography>
+                  <Typography component="dt" sx={{ fontSize: 14, color: "text.secondary" }}>Имейл</Typography>
+                  <Typography component="dd" sx={{ m: 0, fontSize: 14, fontWeight: 600, overflowWrap: "anywhere" }}>{user.email}</Typography>
+                  <Typography component="dt" sx={{ fontSize: 14, color: "text.secondary" }}>Телефон</Typography>
+                  <Typography component="dd" sx={{ m: 0, fontSize: 14, fontWeight: 600 }}>{profile?.phone || "—"}</Typography>
+                </Box>
+                <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                  Данните са от профила ти. <AppLink href={routes.accountDetails}>Промени ги</AppLink>, ако нещо не е вярно.
+                </Typography>
+                <EventRegistrationForm slug={event.slug} priceCents={event.priceCents} />
+              </>
             )}
           </Panel>
         </Box>

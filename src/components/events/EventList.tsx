@@ -5,27 +5,29 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { Section } from "@/components/ui/Section";
-import { eventCategories, type EventCategory, type EventFormat } from "@/content/events";
+import type { EventFormat } from "@/lib/events/types";
 import { routes } from "@/lib/routes";
 
-type Filter = "all" | EventCategory | "online";
+type Filter = "all" | "in_person" | "online";
 
 const filters: { value: Filter; label: string }[] = [
   { value: "all", label: "Всички" },
-  ...(Object.entries(eventCategories) as [EventCategory, string][]).map(([value, label]) => ({ value, label })),
+  { value: "in_person", label: "На живо" },
   { value: "online", label: "Онлайн" },
 ];
 
 /** A card rendered on the server (so dates and prices are formatted once) plus what the filter needs. */
-export type EventListItem = { slug: string; category: EventCategory; format: EventFormat; card: ReactNode };
+export type EventListItem = { slug: string; format: EventFormat; card: ReactNode };
 
+// Hybrid events count as both.
 const matches = (item: EventListItem, filter: Filter) =>
-  filter === "all" || (filter === "online" ? item.format === "online" : item.category === filter);
+  filter === "all" || item.format === filter || item.format === "hybrid";
 
 /** Filter buttons and the event grid (Figma frame 8:664). */
 export function EventList({ items }: { items: EventListItem[] }) {
   const [filter, setFilter] = useState<Filter>("all");
   const visible = items.filter((item) => matches(item, filter));
+  if (items.length === 0) return <NoEvents />;
 
   return (
     <>
@@ -66,7 +68,7 @@ export function EventList({ items }: { items: EventListItem[] }) {
         ) : (
           <Box sx={{ textAlign: "center", py: 6, px: 2, border: "1px dashed", borderColor: "brand.cardBorder", borderRadius: "14px" }}>
             <Typography variant="h5" component="h2" sx={{ mb: 1 }}>
-              Няма предстоящи събития в тази категория
+              Няма предстоящи събития от този вид
             </Typography>
             <Typography sx={{ color: "text.secondary", mb: 2.5 }}>
               Разгледай всички събития или се абонирай за новини, за да научиш първа за новите.
@@ -83,5 +85,24 @@ export function EventList({ items }: { items: EventListItem[] }) {
         )}
       </Section>
     </>
+  );
+}
+
+/** Nothing scheduled at all. */
+function NoEvents() {
+  return (
+    <Section bg="background.paper" aria-label="Предстоящи събития">
+      <Box sx={{ textAlign: "center", py: 6, px: 2, border: "1px dashed", borderColor: "brand.cardBorder", borderRadius: "14px" }}>
+        <Typography variant="h5" component="h2" sx={{ mb: 1 }}>
+          В момента няма обявени събития
+        </Typography>
+        <Typography sx={{ color: "text.secondary", mb: 2.5 }}>
+          Подготвяме следващите срещи. Абонирай се за новини, за да научиш първа, или заяви индивидуална консултация.
+        </Typography>
+        <Button variant="outlined" href={routes.consultations}>
+          Заяви консултация
+        </Button>
+      </Box>
+    </Section>
   );
 }

@@ -21,3 +21,16 @@ insert into public.consultation_types (slug, name, description, duration_minutes
 
 insert into public.faqs (question, answer, sort_order, is_published) values
   ('Как да се регистрирам за събитие?', 'Влезте в профила си, отворете събитието и натиснете „Запиши се“.', 1, true);
+
+-- Sample events (from the Figma events screens). Dates are far ahead so they stay upcoming.
+insert into public.events (slug, title, summary, description, status, format, starts_at, ends_at, city, venue_name,
+                           price_cents, capacity, allow_bank_transfer, published_at) values
+  ('zhenska-sila-rabotilnitsa', 'Женска сила — работилница', 'Практическа среща за увереност, цели и развитие.',
+   'Практическа работилница с упражнения и разговори, които помагат да разпознаем силните си страни, да поставяме лични цели и да изграждаме увереност. Ще има време за споделяне, въпроси и нови запознанства.',
+   'published', 'in_person', '2027-05-15T15:30:00Z', '2027-05-15T18:00:00Z', 'София', null, 2000, 25, true, now()),
+  ('razgovor-za-balansa', 'Разговор за баланса', 'Разговор за работа, личен живот и граници.',
+   'Онлайн среща в малка група за това как да намираме баланс между работа, семейство и време за себе си, и как да поставяме граници, без да се чувстваме виновни.',
+   'published', 'online', '2027-05-22T15:00:00Z', '2027-05-22T16:30:00Z', null, null, 0, 40, false, now()),
+  ('pravni-vaprosi-i-otgovori', 'Правни въпроси и отговори', 'Полезни насоки и среща със специалист.',
+   'Среща с адвокат от сдружението, на която ще разгледаме често срещани казуси — трудови права, семейно право и защита от тормоз — и ще отговорим на въпросите ви.',
+   'published', 'in_person', '2027-06-05T15:00:00Z', '2027-06-05T17:00:00Z', 'София', null, 1500, 30, true, now());
