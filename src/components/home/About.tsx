@@ -4,13 +4,14 @@ import Typography from "@mui/material/Typography";
 import { Section } from "@/components/ui/Section";
 import { missionStats } from "@/content/home";
 import { routes } from "@/lib/routes";
+import { site } from "@/lib/site";
 
 export function About() {
   return (
     <Section bg="brand.sand" aria-labelledby="about-title">
       <Box sx={{ display: "grid", gap: { xs: 3, md: 5 }, gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" }, alignItems: "start" }}>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2, alignItems: "flex-start" }}>
-          <Typography variant="eyebrow">За НСЖС</Typography>
+          <Typography variant="eyebrow">За {site.orgShortName}</Typography>
           <Typography id="about-title" variant="h2">
             Общност, която подкрепя и вдъхновява жените.
           </Typography>

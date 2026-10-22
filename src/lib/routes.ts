@@ -1,3 +1,5 @@
+import { site } from "./site";
+
 /**
  * Public URLs. Slugs are Latin transliterations so links stay readable when shared.
  * Only the homepage exists so far; the rest render the 404 page until built.
@@ -27,7 +29,7 @@ export type NavItem = { label: string; href: string };
 
 export const mainNav: NavItem[] = [
   { label: "Начало", href: routes.home },
-  { label: "За НСЖС", href: routes.about },
+  { label: `За ${site.orgShortName}`, href: routes.about },
   { label: "Нашата общност", href: routes.community },
   { label: "Събития", href: routes.events },
   { label: "Въпроси", href: routes.faq },
@@ -37,7 +39,7 @@ export const mainNav: NavItem[] = [
 
 export const footerNav: { title: NavItem; links: NavItem[] }[] = [
   {
-    title: { label: "За НСЖС", href: routes.about },
+    title: { label: `За ${site.orgShortName}`, href: routes.about },
     links: [
       { label: "Обща информация", href: routes.about },
       { label: "Учредители", href: routes.founders },

@@ -1,17 +1,18 @@
 import Image from "next/image";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import { site } from "@/lib/site";
 
-/** Official "Сдружение Женски свят" horizontal logo (public/brand/logo-horizontal.svg, 1120×430). */
+/** Official horizontal logo (public/brand/logo-horizontal.svg, 1120×430). */
 export function WomensWorldLogo() {
   return (
     <Box sx={{ position: "relative", height: { xs: 48, lg: 58 }, aspectRatio: "1120 / 430", flexShrink: 0 }}>
-      <Image src="/brand/logo-horizontal.svg" alt="Сдружение Женски свят — Път към себе си" fill priority />
+      <Image src="/brand/logo-horizontal.svg" alt={`${site.logoName} — ${site.tagline}`} fill priority />
     </Box>
   );
 }
 
-/** НСЖС wordmark with the organisation's full name underneath. */
+/** Organisation short-name wordmark with the organisation's full name underneath. */
 export function NsjsWordmark({ inverse = false }: { inverse?: boolean }) {
   return (
     <Box sx={{ lineHeight: 1 }}>
@@ -26,14 +27,14 @@ export function NsjsWordmark({ inverse = false }: { inverse?: boolean }) {
           color: inverse ? "brand.paper" : "brand.dark",
         }}
       >
-        НСЖС
+        {site.orgShortName}
       </Typography>
       {!inverse && (
         <Typography
           component="span"
           sx={{ display: "block", fontWeight: 600, fontSize: 8, color: "text.secondary", whiteSpace: "nowrap", mt: 0.25 }}
         >
-          НАЦИОНАЛНА СЪЮЗНА ЖЕНСКА СОЛИДАРНОСТ
+          {site.orgFullName.toLocaleUpperCase("bg-BG")}
         </Typography>
       )}
     </Box>
