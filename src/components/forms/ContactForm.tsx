@@ -52,6 +52,7 @@ export function ContactForm({ defaultSubject = "" }: { defaultSubject?: string }
       <FormTextField
         label="Тема"
         placeholder="За какво се отнася запитването?"
+        defaultValue={defaultSubject}
         registration={register("subject")}
         error={errors.subject}
       />

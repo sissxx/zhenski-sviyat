@@ -24,8 +24,8 @@ export function Panel({ children, tone = "paper", component = "div", sx, ...rest
       component={component}
       sx={[
         {
-          ...tones[tone],
           border: "1px solid",
+          ...tones[tone],
           borderRadius: "18px",
           p: { xs: 2.5, md: 3 },
           display: "flex",
