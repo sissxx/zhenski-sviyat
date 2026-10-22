@@ -6,32 +6,61 @@ import Typography from "@mui/material/Typography";
 import { EventFacts } from "@/components/events/EventFacts";
 import { PageIntro } from "@/components/ui/PageIntro";
 import { Panel } from "@/components/ui/Panel";
-import { Placeholder } from "@/components/ui/Placeholder";
 import { Section } from "@/components/ui/Section";
-import { eventCategories, eventLocationLabel, events, findEvent } from "@/content/events";
-import { formatDate } from "@/lib/locale";
-import { eventRegistrationPath, routes } from "@/lib/routes";
+import { getEventBySlug, getMyActiveRegistration } from "@/lib/events/queries";
+import { eventLocationLabel, registrationStatusLabels, type PublicEvent } from "@/lib/events/types";
+import { formatDate, formatDateTime } from "@/lib/locale";
+import { eventConfirmationPath, eventRegistrationPath, routes } from "@/lib/routes";
 
 type EventPageProps = { params: Promise<{ slug: string }> };
 
-export function generateStaticParams() {
-  return events.map((event) => ({ slug: event.slug }));
+export async function generateMetadata({ params }: EventPageProps): Promise<Metadata> {
+  const event = await getEventBySlug((await params).slug);
+  return event ? { title: event.title, description: event.summary ?? undefined } : {};
 }
 
-export async function generateMetadata({ params }: EventPageProps): Promise<Metadata> {
-  const event = findEvent((await params).slug);
-  return event ? { title: event.title, description: event.summary } : {};
+const eyebrows: Record<PublicEvent["availability"], string> = {
+  open: "Предстоящо събитие",
+  full: "Предстоящо събитие",
+  not_open_yet: "Предстоящо събитие",
+  closed: "Предстоящо събитие",
+  past: "Отминало събитие",
+  cancelled: "Отменено събитие",
+};
+
+/** Seats line and why sign-up is unavailable, if it is. */
+function availabilityText(event: PublicEvent): { text: string; tone: "error.main" | "text.secondary" } | null {
+  switch (event.availability) {
+    case "open":
+      return event.capacity !== null && event.seatsLeft !== null
+        ? { text: `Свободни места: ${event.seatsLeft} от ${event.capacity}`, tone: "text.secondary" }
+        : null;
+    case "full":
+      return { text: "Всички места са заети.", tone: "error.main" };
+    case "not_open_yet":
+      return {
+        text: `Записването започва на ${formatDateTime(event.registrationOpensAt!)}.`,
+        tone: "text.secondary",
+      };
+    case "closed":
+      return { text: "Записването за това събитие приключи.", tone: "text.secondary" };
+    case "past":
+      return { text: "Събитието вече се проведе.", tone: "text.secondary" };
+    case "cancelled":
+      return { text: "Събитието е отменено.", tone: "error.main" };
+  }
 }
 
 export default async function EventPage({ params }: EventPageProps) {
-  const event = findEvent((await params).slug);
+  const event = await getEventBySlug((await params).slug);
   if (!event) notFound();
-  const soldOut = event.spotsLeft === 0;
+  const registration = await getMyActiveRegistration(event.id);
+  const note = availabilityText(event);
 
   return (
     <>
       <PageIntro
-        eyebrow={`Предстоящо събитие · ${eventCategories[event.category]}`}
+        eyebrow={eyebrows[event.availability]}
         title={event.title}
         lead={`${formatDate(event.startsAt)} · ${eventLocationLabel(event)}`}
       />
@@ -48,26 +77,47 @@ export default async function EventPage({ params }: EventPageProps) {
             <Typography variant="h4" component="h2" sx={{ color: "primary.main" }}>
               За събитието
             </Typography>
-            <Typography sx={{ fontSize: 15 }}>{event.description}</Typography>
-            <Placeholder>Програмата и водещите ще бъдат уточнени.</Placeholder>
+            {(event.description ?? event.summary ?? "")
+              .split(/\n{2,}/)
+              .filter(Boolean)
+              .map((paragraph, index) => (
+                <Typography key={index} sx={{ fontSize: 15, whiteSpace: "pre-line" }}>
+                  {paragraph}
+                </Typography>
+              ))}
           </Box>
 
           <Panel tone="mint" aria-labelledby="booking-title" sx={{ position: { md: "sticky" }, top: { md: 120 } }}>
             <Typography id="booking-title" variant="h5" component="h2" sx={{ color: "primary.main" }}>
-              Запази своето място
+              {registration ? "Ти си записана" : "Запази своето място"}
             </Typography>
             <EventFacts event={event} />
-            <Typography sx={{ fontSize: 13, color: soldOut ? "error.main" : "text.secondary" }}>
-              {soldOut ? "Няма свободни места." : `Свободни места: ${event.spotsLeft} от ${event.capacity}`}
-            </Typography>
-            {soldOut ? (
-              <Button variant="contained" disabled sx={{ minWidth: 220 }}>
-                Няма свободни места
-              </Button>
+            {registration ? (
+              <>
+                <Typography sx={{ fontSize: 14 }}>
+                  Статус: <strong>{registrationStatusLabels[registration.status]}</strong>
+                </Typography>
+                <Button
+                  variant="contained"
+                  href={`${eventConfirmationPath(event.slug)}?zapisvane=${registration.id}`}
+                  sx={{ minWidth: 220 }}
+                >
+                  {registration.status === "pending_payment" ? "Данни за плащане" : "Виж записването"}
+                </Button>
+              </>
             ) : (
-              <Button variant="contained" href={eventRegistrationPath(event.slug)} sx={{ minWidth: 220 }}>
-                Запиши се
-              </Button>
+              <>
+                {note && <Typography sx={{ fontSize: 13, color: note.tone }}>{note.text}</Typography>}
+                {event.availability === "open" ? (
+                  <Button variant="contained" href={eventRegistrationPath(event.slug)} sx={{ minWidth: 220 }}>
+                    Запиши се
+                  </Button>
+                ) : (
+                  <Button variant="contained" disabled sx={{ minWidth: 220 }}>
+                    {event.availability === "full" ? "Няма свободни места" : "Записването е затворено"}
+                  </Button>
+                )}
+              </>
             )}
             <Button variant="outlined" href={routes.events} sx={{ minWidth: 220 }}>
               Виж всички събития

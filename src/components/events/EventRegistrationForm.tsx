@@ -1,93 +1,54 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { Controller, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { useState, useTransition, type FormEvent } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import { ConsentCheckbox } from "@/components/forms/ConsentCheckbox";
-import { FormTextField } from "@/components/forms/FormTextField";
-import { PaymentMethodField } from "@/components/forms/PaymentMethodField";
-import { consent, email, fullName, phone } from "@/lib/validation";
-import { eventConfirmationPath } from "@/lib/routes";
+import { FormAlert } from "@/components/forms/FormAlert";
+import { PaymentMethodField, type PaymentMethod } from "@/components/forms/PaymentMethodField";
+import { registerForEvent } from "@/lib/events/actions";
+import { formatPrice } from "@/lib/locale";
 
-const schema = z.object({
-  name: fullName,
-  email,
-  phone,
-  paymentMethod: z.enum(["card", "bank"]),
-  consent,
-});
-
-type RegistrationValues = z.infer<typeof schema>;
-
-type EventRegistrationFormProps = { slug: string; paid: boolean };
+type EventRegistrationFormProps = { slug: string; priceCents: number };
 
 /**
- * Event sign-up. UI only for now: a valid submit goes straight to the
- * confirmation screen. Once Supabase and Stripe are connected, card payments
- * will go through Stripe Checkout and bank transfers will wait for an admin.
+ * Event sign-up for a signed-in user. The profile supplies name, email and phone, so the form only
+ * asks how to pay. Card payment (Stripe) comes later; until then paid events are paid by bank transfer.
  */
-export function EventRegistrationForm({ slug, paid }: EventRegistrationFormProps) {
-  const router = useRouter();
-  const {
-    register,
-    control,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<RegistrationValues>({
-    resolver: zodResolver(schema),
-    defaultValues: { name: "", email: "", phone: "", paymentMethod: "card", consent: false },
-  });
+export function EventRegistrationForm({ slug, priceCents }: EventRegistrationFormProps) {
+  const paid = priceCents > 0;
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("bank");
+  const [error, setError] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
 
-  const onSubmit = (values: RegistrationValues) => {
-    const payment = paid ? values.paymentMethod : "free";
-    router.push(`${eventConfirmationPath(slug)}?plashtane=${payment}`);
+  const submit = (event: FormEvent) => {
+    event.preventDefault();
+    setError(null);
+    startTransition(async () => {
+      // On success the action redirects to the confirmation page.
+      const result = await registerForEvent({ slug, paymentMethod: paid && paymentMethod === "bank" ? "bank" : undefined });
+      if (!result.ok) setError(result.error);
+    });
   };
 
   return (
     <Box
       component="form"
       noValidate
-      onSubmit={handleSubmit(onSubmit)}
+      onSubmit={submit}
       sx={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 2.25, width: "100%" }}
     >
-      <FormTextField label="Име и фамилия" placeholder="Въведи името си" autoComplete="name" registration={register("name")} error={errors.name} />
-      <FormTextField
-        label="Имейл"
-        type="email"
-        placeholder="name@example.com"
-        autoComplete="email"
-        registration={register("email")}
-        error={errors.email}
-      />
-      <FormTextField
-        label="Телефон"
-        type="tel"
-        placeholder="Телефон за връзка"
-        autoComplete="tel"
-        registration={register("phone")}
-        error={errors.phone}
-      />
-      {paid && (
-        <Controller
-          control={control}
-          name="paymentMethod"
-          render={({ field, fieldState }) => (
-            <PaymentMethodField value={field.value} onChange={field.onChange} error={fieldState.error?.message} />
-          )}
-        />
-      )}
-      <ConsentCheckbox registration={register("consent")} error={errors.consent} />
+      {paid && <PaymentMethodField value={paymentMethod} onChange={setPaymentMethod} cardAvailable={false} />}
+      {error && <FormAlert severity="error">{error}</FormAlert>}
       <Box sx={{ display: "flex", flexDirection: "column", gap: 1.25 }}>
-        <Button type="submit" variant="contained" disabled={isSubmitting} sx={{ minWidth: 260 }}>
-          {paid ? "Продължи към плащане" : "Запиши се"}
+        <Button type="submit" variant="contained" disabled={pending} sx={{ minWidth: 260 }}>
+          {pending ? "Изпращане…" : paid ? `Заяви участие · ${formatPrice(priceCents)}` : "Запиши се"}
         </Button>
-        <Typography variant="body2" sx={{ color: "text.secondary" }}>
-          Записването и плащанията все още не са свързани. Бутонът показва как ще изглежда потвърждението.
-        </Typography>
+        {paid && (
+          <Typography variant="body2" sx={{ color: "text.secondary" }}>
+            След заявката ще видиш данните за превода. Мястото ти се пази, докато преводът пристигне.
+          </Typography>
+        )}
       </Box>
     </Box>
   );

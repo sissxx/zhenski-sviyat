@@ -1,19 +1,31 @@
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import { eventLocationLabel, type SiteEvent } from "@/content/events";
+import { eventLocationLabel, eventPriceLabel, type EventFormat } from "@/lib/events/types";
 import { formatDate, formatTime } from "@/lib/locale";
-import { eventPriceLabel } from "./EventCard";
+
+export type EventFactsData = {
+  startsAt: string;
+  endsAt?: string | null;
+  format: EventFormat;
+  city: string | null;
+  venueName?: string | null;
+  venueAddress?: string | null;
+  priceCents: number;
+};
+
+function placeLabel(event: EventFactsData): string {
+  if (event.format === "online") return "Онлайн · линкът се вижда в профила ти след потвърждение";
+  const venue = [event.venueName, event.venueAddress].filter(Boolean).join(", ");
+  return `${eventLocationLabel(event)} · ${venue || "адресът предстои"}`;
+}
 
 /** Date, time, place and fee as a description list (booking panel and checkout summary). */
-export function EventFacts({ event }: { event: SiteEvent }) {
-  const place =
-    event.format === "online"
-      ? "Онлайн · линкът се изпраща по имейл"
-      : `${eventLocationLabel(event)} · ${event.address ?? "адресът предстои"}`;
+export function EventFacts({ event }: { event: EventFactsData }) {
+  const time = event.endsAt ? `${formatTime(event.startsAt)} – ${formatTime(event.endsAt)}` : formatTime(event.startsAt);
   const facts = [
     { term: "Дата", value: <time dateTime={event.startsAt}>{formatDate(event.startsAt)}</time> },
-    { term: "Час", value: formatTime(event.startsAt) },
-    { term: "Място", value: place },
+    { term: "Час", value: time },
+    { term: "Място", value: placeLabel(event) },
     { term: "Такса", value: eventPriceLabel(event) },
   ];
   return (
