@@ -6,7 +6,7 @@ import Typography from "@mui/material/Typography";
 import { EventFacts } from "@/components/events/EventFacts";
 import { EventRegistrationForm } from "@/components/events/EventRegistrationForm";
 import { FormAlert } from "@/components/forms/FormAlert";
-import { AppLink } from "@/components/ui/AppLink";
+import { AppLink, TextLink } from "@/components/ui/AppLink";
 import { PageIntro } from "@/components/ui/PageIntro";
 import { Panel } from "@/components/ui/Panel";
 import { Section } from "@/components/ui/Section";
@@ -125,7 +125,7 @@ export default async function EventRegistrationPage({ params }: RegistrationPage
                   <Typography component="dd" sx={{ m: 0, fontSize: 14, fontWeight: 600 }}>{profile?.phone || "—"}</Typography>
                 </Box>
                 <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                  Данните са от профила ти. <AppLink href={routes.accountDetails}>Промени ги</AppLink>, ако нещо не е вярно.
+                  Данните са от профила ти. <TextLink href={routes.accountDetails}>Промени ги</TextLink>, ако нещо не е вярно.
                 </Typography>
                 <EventRegistrationForm
                   slug={event.slug}

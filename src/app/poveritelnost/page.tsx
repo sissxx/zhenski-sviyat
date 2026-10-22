@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { LegalPlaceholder } from "@/components/legal/LegalPlaceholder";
-import { AppLink } from "@/components/ui/AppLink";
+import { TextLink } from "@/components/ui/AppLink";
 import { routes } from "@/lib/routes";
 
 export const metadata: Metadata = {
@@ -34,7 +34,7 @@ export default function PrivacyPage() {
         ))}
       </Box>
       <Typography>
-        Въпроси за личните данни можеш да ни изпратиш чрез <AppLink href={routes.contacts}>страницата за контакти</AppLink>.
+        Въпроси за личните данни можеш да ни изпратиш чрез <TextLink href={routes.contacts}>страницата за контакти</TextLink>.
       </Typography>
     </LegalPlaceholder>
   );

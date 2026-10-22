@@ -14,13 +14,23 @@ function PlusIcon() {
   );
 }
 
-/** Accordion of questions; `idPrefix` keeps ids unique when two lists share a page. */
-export function FaqList({ items, idPrefix, striped = false }: { items: FaqItem[]; idPrefix: string; striped?: boolean }) {
+type FaqListProps = {
+  items: FaqItem[];
+  /** Keeps ids unique when two lists share a page. */
+  idPrefix: string;
+  striped?: boolean;
+  /** Heading level of each question: one below the heading the list sits under. */
+  headingLevel?: "h2" | "h3";
+};
+
+/** Accordion of questions. */
+export function FaqList({ items, idPrefix, striped = false, headingLevel = "h3" }: FaqListProps) {
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 1.25 }}>
       {items.map((item, index) => (
         <Accordion
           key={item.question}
+          slotProps={{ heading: { component: headingLevel } }}
           sx={{
             ...(striped && index % 2 === 0 && { bgcolor: "brand.mint" }),
             "& .MuiAccordionSummary-expandIconWrapper.Mui-expanded": { transform: "rotate(45deg)" },
@@ -32,7 +42,8 @@ export function FaqList({ items, idPrefix, striped = false }: { items: FaqItem[]
             aria-controls={`${idPrefix}-${index}-content`}
             sx={{ minHeight: 48, "& .MuiAccordionSummary-content": { my: 1.25 } }}
           >
-            <Typography component="h3" sx={{ fontWeight: 500, fontSize: 14 }}>
+            {/* The accordion already wraps the summary in the heading element. */}
+            <Typography component="span" sx={{ fontWeight: 500, fontSize: 14 }}>
               {item.question}
             </Typography>
           </AccordionSummary>

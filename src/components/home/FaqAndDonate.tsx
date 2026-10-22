@@ -1,6 +1,6 @@
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import { AppLink } from "@/components/ui/AppLink";
+import { AppLink, TextLink } from "@/components/ui/AppLink";
 import Typography from "@mui/material/Typography";
 import { FaqList } from "@/components/faq/FaqList";
 import { faqs } from "@/content/faq";
@@ -39,12 +39,10 @@ export function FaqAndDonate() {
           <Button variant="contained" color="onDark" href={routes.support}>
             Направи дарение
           </Button>
-          <Typography sx={{ fontSize: 13, color: "brand.sage" }}>
-            <AppLink href={routes.contacts} sx={{ color: "inherit" }}>
-              Контактна форма
-            </AppLink>
-            {" · Национален телефон"}
-          </Typography>
+          {/* The national phone number isn't published yet; both live on the contacts page. */}
+          <TextLink href={routes.contacts} sx={{ fontSize: 13, color: "brand.sage" }}>
+            Контактна форма и национален телефон
+          </TextLink>
         </Box>
       </Box>
     </Box>

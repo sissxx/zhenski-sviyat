@@ -6,7 +6,7 @@ import { routes } from "@/lib/routes";
  */
 
 export const topics = [
-  { icon: "♡", title: "Психологическа подкрепа", text: "Разбиране и пространство" },
+  { icon: "♡", title: "Психоло\u00adгическа подкрепа", text: "Разбиране и пространство" }, // Soft hyphen: breaks as "Психоло-гическа" on 320px screens.
   { icon: "⚖", title: "Юридическа подкрепа", text: "Насоки и професионална помощ" },
   { icon: "✧", title: "Личностно израстване", text: "Увереност и развитие" },
   { icon: "＋", title: "Здраве и грижа", text: "Информиран избор" },

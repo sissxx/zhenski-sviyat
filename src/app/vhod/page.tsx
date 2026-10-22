@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { AuthCard } from "@/components/auth/AuthCard";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { FormAlert } from "@/components/forms/FormAlert";
-import { AppLink } from "@/components/ui/AppLink";
+import { TextLink } from "@/components/ui/AppLink";
 import { routes, safeNextPath } from "@/lib/routes";
 
 export const metadata: Metadata = {
@@ -24,14 +24,14 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
       lead="Влез с имейла и паролата, с които се регистрира."
       footer={
         <span>
-          Нямаш профил? <AppLink href={routes.register}>Регистрирай се</AppLink>
+          Нямаш профил? <TextLink href={routes.register}>Регистрирай се</TextLink>
         </span>
       }
     >
       {greshka === "link" && (
         <FormAlert severity="error">
           Линкът е невалиден или е изтекъл. Влез с паролата си или{" "}
-          <AppLink href={routes.forgotPassword}>поискай нов линк</AppLink>.
+          <TextLink href={routes.forgotPassword}>поискай нов линк</TextLink>.
         </FormAlert>
       )}
       <LoginForm next={continueTo} />

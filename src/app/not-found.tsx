@@ -1,7 +1,10 @@
+import type { Metadata } from "next";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { Section } from "@/components/ui/Section";
 import { routes } from "@/lib/routes";
+
+export const metadata: Metadata = { title: "Страницата не е намерена" };
 
 export default function NotFound() {
   return (

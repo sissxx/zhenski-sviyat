@@ -9,3 +9,8 @@ type AppLinkProps = Omit<LinkProps, "href" | "component"> & { href: string };
 export function AppLink(props: AppLinkProps) {
   return <Link component={NextLink} {...props} />;
 }
+
+/** Link inside a sentence: always underlined so it doesn't rely on colour alone (WCAG 1.4.1). */
+export function TextLink(props: AppLinkProps) {
+  return <Link component={NextLink} underline="always" {...props} />;
+}
