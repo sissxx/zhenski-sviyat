@@ -39,10 +39,12 @@ export function FaqAndDonate() {
           <Button variant="contained" color="onDark" href={routes.support}>
             Направи дарение
           </Button>
-          {/* The national phone number isn't published yet; both live on the contacts page. */}
-          <TextLink href={routes.contacts} sx={{ fontSize: 13, color: "brand.sage" }}>
-            Контактна форма и национален телефон
-          </TextLink>
+          <Typography sx={{ fontSize: 14, color: "brand.sage" }}>
+            Искаш да помогнеш по друг начин?{" "}
+            <TextLink href={routes.contacts} sx={{ color: "brand.paper" }}>
+              Пиши ни
+            </TextLink>
+          </Typography>
         </Box>
       </Box>
     </Box>

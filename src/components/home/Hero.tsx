@@ -34,7 +34,7 @@ export function Hero() {
               Предстоящи събития
             </Button>
           </Box>
-          <Typography sx={{ fontSize: 12, fontWeight: 600, color: "text.secondary", letterSpacing: "0.04em" }}>
+          <Typography sx={{ fontSize: 13, fontWeight: 600, color: "text.secondary", letterSpacing: "0.04em" }}>
             ПОДКРЕПА · ЗНАНИЕ · ВЗАИМОПОМОЩ
           </Typography>
         </Box>
@@ -44,19 +44,20 @@ export function Hero() {
           sx={{
             bgcolor: "brand.sageLight",
             border: "1px solid #C2D1B8",
-            borderRadius: "28px",
-            minHeight: { xs: 280, md: 380 },
-            p: 3.5,
+            borderRadius: { xs: "20px", md: "28px" },
+            // On phones it stays a short quote card so the topics below show up sooner.
+            minHeight: { xs: 0, md: 380 },
+            p: { xs: 2.5, md: 3.5 },
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
             gap: 2,
           }}
         >
-          <Box aria-hidden sx={{ width: 120, height: 120, borderRadius: "50%", bgcolor: "brand.sage", mx: "auto" }} />
+          <Box aria-hidden sx={{ display: { xs: "none", md: "block" }, width: 120, height: 120, borderRadius: "50%", bgcolor: "brand.sage", mx: "auto" }} />
           <Typography
             component="p"
-            sx={{ fontFamily: "var(--font-lora)", fontWeight: 500, fontSize: { xs: 26, md: 32 }, lineHeight: 1.2, color: "brand.dark" }}
+            sx={{ fontFamily: "var(--font-lora)", fontWeight: 500, fontSize: { xs: 22, md: 32 }, lineHeight: 1.2, color: "brand.dark" }}
           >
             Жените са по-силни
             <br />

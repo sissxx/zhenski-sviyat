@@ -34,7 +34,7 @@ export function About() {
           <Box component="dl" sx={{ display: "flex", flexWrap: "wrap", gap: 2.25, m: 0 }}>
             {missionStats.map((stat) => (
               <Box key={stat.label} sx={{ minWidth: 120, display: "flex", flexDirection: "column-reverse", gap: 0.5 }}>
-                <Typography component="dt" sx={{ fontSize: 12, color: "text.secondary" }}>
+                <Typography component="dt" sx={{ fontSize: 14, color: "text.secondary" }}>
                   {stat.label}
                 </Typography>
                 <Typography component="dd" sx={{ m: 0, fontFamily: "var(--font-lora)", fontWeight: 700, fontSize: 21, color: "brand.dark" }}>

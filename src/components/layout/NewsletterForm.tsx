@@ -26,7 +26,7 @@ export function NewsletterForm() {
 
   return (
     <Box component="form" noValidate onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 1.25 }}>
-      <Typography component="label" htmlFor="newsletter-email" sx={{ fontWeight: 600, fontSize: 13, color: "brand.paper" }}>
+      <Typography component="label" htmlFor="newsletter-email" sx={{ fontWeight: 600, fontSize: 14, color: "brand.paper" }}>
         Абонирай се за новини
       </Typography>
       <Box sx={{ display: "flex", gap: 1 }}>
@@ -39,13 +39,13 @@ export function NewsletterForm() {
           autoComplete="email"
           inputProps={{ "aria-describedby": "newsletter-status" }}
           onChange={() => status !== "idle" && setStatus("idle")}
-          sx={{ flex: 1, minWidth: 0, bgcolor: "brand.paper", borderRadius: "8px", px: 1.25, height: 40, fontSize: 13 }}
+          sx={{ flex: 1, minWidth: 0, bgcolor: "brand.paper", borderRadius: "8px", px: 1.25, height: 40, fontSize: 14 }}
         />
         <Button type="submit" variant="contained" color="onDark" sx={{ minWidth: 0, minHeight: 40, px: 2 }}>
           Изпрати
         </Button>
       </Box>
-      <Typography id="newsletter-status" role="status" sx={{ fontSize: 12, color: "brand.sage", minHeight: 18 }}>
+      <Typography id="newsletter-status" role="status" sx={{ fontSize: 14, color: "brand.sage", minHeight: 18 }}>
         {status === "invalid" && "Моля, въведи валиден имейл адрес."}
         {status === "pending" && "Благодарим! Бюлетинът стартира скоро."}
       </Typography>

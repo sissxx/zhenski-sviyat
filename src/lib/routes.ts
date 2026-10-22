@@ -74,11 +74,14 @@ export type NavItem = { label: string; href: string };
 /** Extra account section for people linked to a specialist profile. */
 export const specialistNavItem: NavItem = { label: "Моят график", href: routes.accountSpecialist };
 
+/** The logo links home, so the desktop menu leaves "Начало" out; only the mobile menu shows it. */
+export const homeNavItem: NavItem = { label: "Начало", href: routes.home };
+
 export const mainNav: NavItem[] = [
-  { label: "Начало", href: routes.home },
   { label: "За нас", href: routes.about },
   { label: "Нашата общност", href: routes.community },
   { label: "Събития", href: routes.events },
+  { label: "Консултации", href: routes.consultations },
   { label: "Въпроси", href: routes.faq },
   { label: "Подкрепи ни", href: routes.support },
   { label: "Контакти", href: routes.contacts },
@@ -97,8 +100,9 @@ export const footerNav: { title: NavItem; links: NavItem[] }[] = [
     title: { label: "Нашата общност", href: routes.community },
     links: [
       { label: "Събития", href: routes.events },
-      { label: "Фокус групи", href: routes.community },
       { label: "Консултации", href: routes.consultations },
+      { label: "Клуб „Красота, стил и естетика“", href: routes.beautyClub },
+      { label: "Viber общност", href: routes.viber },
     ],
   },
   {

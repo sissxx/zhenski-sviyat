@@ -28,7 +28,7 @@ export function Membership() {
             <Box sx={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 1.25 }}>
               <Typography sx={{ fontFamily: "var(--font-lora)", fontWeight: 700, fontSize: 26, color: "brand.dark" }}>
                 {formatPrice(plan.priceCents)}
-                <Typography component="span" sx={{ fontFamily: "var(--font-inter)", fontWeight: 400, fontSize: 12, color: "text.secondary", ml: 1 }}>
+                <Typography component="span" sx={{ fontFamily: "var(--font-inter)", fontWeight: 400, fontSize: 14, color: "text.secondary", ml: 1 }}>
                   / месец
                 </Typography>
               </Typography>

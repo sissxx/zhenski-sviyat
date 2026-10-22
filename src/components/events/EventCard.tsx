@@ -30,7 +30,7 @@ export function EventCard({ event }: { event: PublicEvent }) {
         <Typography component="time" dateTime={event.startsAt} title={formatDate(event.startsAt)} sx={{ fontWeight: 600, fontSize: 14, color: "primary.main" }}>
           {formatDayMonthBadge(event.startsAt)}
         </Typography>
-        <Typography sx={{ fontWeight: 600, fontSize: 13, color: status ? "text.secondary" : "brand.accent" }}>
+        <Typography sx={{ fontWeight: 600, fontSize: 14, color: status ? "text.secondary" : "brand.accent" }}>
           {status ?? eventPriceLabel(event)}
         </Typography>
       </Box>

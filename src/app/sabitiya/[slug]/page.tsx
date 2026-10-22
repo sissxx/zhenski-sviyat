@@ -107,7 +107,7 @@ export default async function EventPage({ params }: EventPageProps) {
               </>
             ) : (
               <>
-                {note && <Typography sx={{ fontSize: 13, color: note.tone }}>{note.text}</Typography>}
+                {note && <Typography sx={{ fontSize: 14, color: note.tone }}>{note.text}</Typography>}
                 {event.availability === "open" ? (
                   <Button variant="contained" href={eventRegistrationPath(event.slug)} sx={{ minWidth: 220 }}>
                     Запиши се

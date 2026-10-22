@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import { Placeholder } from "@/components/ui/Placeholder";
 import { consent, email, fullName } from "@/lib/validation";
 import { ConsentCheckbox } from "./ConsentCheckbox";
 import { FormTextField } from "./FormTextField";
@@ -68,6 +69,8 @@ export function ContactForm({ defaultSubject = "" }: { defaultSubject?: string }
       <Button type="submit" variant="contained" disabled={isSubmitting} sx={{ minWidth: 220 }}>
         Изпрати съобщение
       </Button>
+      {/* Tells people what happens after they send; the association still has to set the response time. */}
+      <Placeholder>Отговаряме на имейла, който посочиш, до [срок за отговор].</Placeholder>
       {submitted && (
         <NotConnectedNotice>
           Благодарим! Формата за контакт все още не е свързана, затова съобщението не е изпратено.
