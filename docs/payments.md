@@ -54,8 +54,11 @@ Events to send: `checkout.session.completed`, `checkout.session.async_payment_su
 `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.paid`, `invoice.payment_failed`,
 `charge.refunded`.
 
-Email hooks for the Brevo work are in `src/lib/payments/notifications.ts` (`paymentSucceeded`,
-`paymentFailed`, `subscriptionPaymentFailed`). They are called after the change is stored and do nothing yet.
+Emails (docs/emails.md): a card payment for an event or consultation, and every paid plan invoice, sends
+"payment confirmed" (`notifyPaymentConfirmed`) once it is stored. It runs after the response, and its dedupe key
+stops a second copy when both the webhook and the return page record the same payment. Sign-up by card sends
+no bank-transfer email, since those only go out for pending bank-transfer payments. There is no email yet for
+an expired checkout or a failed renewal.
 
 ## Setup (test mode)
 

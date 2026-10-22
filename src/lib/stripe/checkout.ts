@@ -2,7 +2,7 @@ import "server-only";
 import type Stripe from "stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { siteOrigin } from "@/lib/site-origin";
-import { paymentSucceeded } from "@/lib/payments/notifications";
+import { notifyLater, notifyPaymentConfirmed } from "@/lib/email/notifications";
 import { idOf, isoFromUnix, stripe } from "./server";
 
 /**
@@ -156,7 +156,8 @@ export async function applyCheckoutSession(session: Stripe.Checkout.Session): Pr
     p_stripe_checkout_session_id: session.id,
   });
   if (error) throw error;
-  await paymentSucceeded(payment.id);
+  // "Payment confirmed" email; sendEmail skips it if the webhook and the return page both get here.
+  notifyLater(() => notifyPaymentConfirmed(payment.id));
 }
 
 /**

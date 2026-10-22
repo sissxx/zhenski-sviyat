@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { getCurrentUser } from "@/lib/auth/session";
+import { notifyEventRegistration, notifyLater } from "@/lib/email/notifications";
 import { dbErrorMessage } from "@/lib/db-errors";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
@@ -54,6 +55,7 @@ export async function registerForEvent(input: z.infer<typeof registerSchema>): P
   const registration = data?.[0];
   if (!registration) return { ok: false, error: dbErrorMessage(null) };
 
+  notifyLater(() => notifyEventRegistration(registration.registration_id));
   revalidatePath(routes.accountEvents);
   // Card: on to Stripe Checkout. An unfinished bank-transfer sign-up comes back as it was and goes to
   // its confirmation page with the transfer details.

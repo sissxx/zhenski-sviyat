@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import type { Database } from "@/lib/supabase/database.types";
+import { notifyConsultationCancelled, notifyLater, notifyPaymentConfirmed } from "@/lib/email/notifications";
 import { eurosToCents, type FormValues } from "./convert";
 import { deleteEntity as deleteRow, writeEntity } from "./entities";
 import { adminErrorMessage, genericAdminError } from "./errors";
@@ -121,6 +122,7 @@ export async function cancelBooking(bookingId: string, reason: string): Promise<
       p_booking_id: bookingId,
       p_reason: reason.trim().slice(0, 500) || "Отказано от администратор",
     });
+    if (!error) notifyLater(() => notifyConsultationCancelled(bookingId));
     return error;
   });
 }
@@ -246,6 +248,7 @@ export async function confirmBankTransfer(paymentId: string, note: string): Prom
       p_payment_id: paymentId,
       ...(note.trim() ? { p_note: note.trim().slice(0, 500) } : {}),
     });
+    if (!error) notifyLater(() => notifyPaymentConfirmed(paymentId));
     return error;
   });
 }

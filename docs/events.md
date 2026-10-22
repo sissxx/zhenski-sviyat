@@ -22,5 +22,6 @@ status are always current.
   `bank_transfer_hold_days` ends); the page shows the amount, the `NSJS-…` reference, the deadline and the bank
   account from `app_settings` (a placeholder until an admin fills in the IBAN). Until the Stripe keys are set,
   card shows as "скоро", and paid events without bank transfer ask people to get in touch.
-- Confirmation emails (Brevo) aren't sent yet, so the pages don't promise one.
+- Sign-up sends a confirmation or bank transfer email, and a confirmed payment (bank transfer confirmed by an admin,
+  or card payment reported by Stripe) sends "payment confirmed" (see `docs/emails.md`).
 - No category column: the Figma category filter was replaced by a format filter.

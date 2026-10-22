@@ -1,7 +1,7 @@
 import "server-only";
 import type Stripe from "stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { paymentFailed, subscriptionPaymentFailed } from "@/lib/payments/notifications";
+import { notifyLater, notifyPaymentConfirmed } from "@/lib/email/notifications";
 import { applyCheckoutSession, syncSubscription, syncSubscriptionById } from "./checkout";
 import { idOf, stripe } from "./server";
 
@@ -68,9 +68,8 @@ async function failCheckoutPayment(session: Stripe.Checkout.Session, status: "ex
   const { data: payment } = await db.from("payments").select("stripe_checkout_session_id").eq("id", paymentId).maybeSingle();
   if (!payment || (payment.stripe_checkout_session_id && payment.stripe_checkout_session_id !== session.id)) return;
 
-  const { data, error } = await db.rpc("mark_payment_failed", { p_payment_id: paymentId, p_status: status, p_reason: reason });
+  const { error } = await db.rpc("mark_payment_failed", { p_payment_id: paymentId, p_status: status, p_reason: reason });
   if (error) throw error;
-  if (data.status === status) await paymentFailed(paymentId);
 }
 
 /** Subscriptions created on this site carry the user id; anything else in the account is ignored. */
@@ -98,7 +97,7 @@ async function recordInvoice(invoice: Stripe.Invoice, paid: boolean) {
     await syncSubscription(subscription);
   }
 
-  const { error } = await db.rpc("record_stripe_invoice", {
+  const { data: payment, error } = await db.rpc("record_stripe_invoice", {
     p_stripe_subscription_id: subscriptionId,
     p_stripe_invoice_id: invoice.id,
     p_amount_cents: amount,
@@ -106,7 +105,8 @@ async function recordInvoice(invoice: Stripe.Invoice, paid: boolean) {
     p_failure_reason: paid ? undefined : "invoice_payment_failed",
   });
   if (error) throw error;
-  if (!paid) await subscriptionPaymentFailed(subscriptionId);
+  // Each paid invoice (first month and renewals) gets the "payment confirmed" email, once per payment.
+  if (paid && payment.status === "succeeded") notifyLater(() => notifyPaymentConfirmed(payment.id));
 }
 
 /** A refund made in the Stripe dashboard is recorded on the matching one-time payment. */
