@@ -33,6 +33,7 @@ Node 22 (see `.nvmrc`).
 | `src/lib/locale.ts` | `bg-BG` / `Europe/Sofia` / EUR formatting helpers |
 | `src/lib/routes.ts` | Public URLs and navigation menus |
 | `src/theme/` | Brand tokens, fonts and the MUI theme |
+| `public/brand/` | Final logos (horizontal, full, wordmark, icon) as SVG and PNG; favicon lives in `src/app/icon.svg` |
 
 ## Conventions
 

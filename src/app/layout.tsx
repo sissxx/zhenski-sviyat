@@ -6,15 +6,16 @@ import { SiteHeader } from "@/components/layout/SiteHeader";
 import { inter, lora } from "@/theme/fonts";
 import { brand } from "@/theme/tokens";
 import { Providers } from "./providers";
+import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: {
-    default: "Женски свят — НСЖС",
-    template: "%s · Женски свят",
+    default: `${site.name} — ${site.orgShortName}`,
+    template: `%s · ${site.name}`,
   },
   description:
-    "Национална съюзна женска солидарност: общност за подкрепа, споделяне и развитие на жените в България.",
-  openGraph: { locale: "bg_BG", type: "website", siteName: "Женски свят" },
+    `${site.orgFullName}: общност за подкрепа, споделяне и развитие на жените в България.`,
+  openGraph: { locale: "bg_BG", type: "website", siteName: site.name },
 };
 
 export const viewport: Viewport = {

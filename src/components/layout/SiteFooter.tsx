@@ -4,6 +4,7 @@ import Typography from "@mui/material/Typography";
 import { NsjsWordmark } from "@/components/brand/Logo";
 import { footerNav, routes } from "@/lib/routes";
 import { NewsletterForm } from "./NewsletterForm";
+import { site } from "@/lib/site";
 
 const linkSx = { color: "brand.sage", fontSize: 13, "&:hover": { color: "brand.paper" } } as const;
 
@@ -60,7 +61,7 @@ export function SiteFooter() {
           </Box>
         </Box>
         <Typography sx={{ mt: 5, pt: 3, borderTop: "1px solid rgba(255,255,252,0.15)", fontSize: 12, color: "brand.sage" }}>
-          © {new Date().getFullYear()} Национална съюзна женска солидарност
+          © {new Date().getFullYear()} {site.orgFullName}
         </Typography>
       </Box>
     </Box>
