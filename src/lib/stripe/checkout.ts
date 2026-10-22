@@ -64,7 +64,10 @@ export async function startPaymentCheckout({ paymentId, userId, successPath, can
     .eq("id", paymentId)
     .maybeSingle();
   if (error) throw error;
-  if (!payment || payment.user_id !== userId || payment.provider !== "stripe") return { kind: "not_payable" };
+  if (!payment || payment.user_id !== userId || payment.provider !== "stripe") {
+    console.warn("startPaymentCheckout: payment not payable by card", { paymentId, found: Boolean(payment) });
+    return { kind: "not_payable" };
+  }
   if (payment.status === "succeeded") return { kind: "paid" };
   if (payment.status !== "pending" || (payment.expires_at && new Date(payment.expires_at).getTime() <= Date.now())) {
     return { kind: "not_payable" };
