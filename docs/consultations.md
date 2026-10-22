@@ -10,6 +10,7 @@ rules in `/admin/nastroyki`. Pages render per request.
 | Confirmation | `/konsultatsii/potvarzhdenie?zapis=<id>` | outcome, bank transfer details while unpaid |
 | My consultations | `/profil/konsultatsii` | upcoming and past bookings, payment status, cancel, move |
 | Move | `/profil/konsultatsii/<id>/premesti` | new time with the same specialist and service |
+| Specialist schedule | `/profil/spetsialist` | for accounts linked to a specialist: own bookings with client contacts, cancel, mark held / no-show, own weekly hours and time off |
 
 - Code: `src/lib/consultations/queries.ts` (reads, free slots, what the user may still do),
   `src/lib/consultations/actions.ts` (slots for the picker, booking, cancel and move via `book_consultation`,
@@ -31,3 +32,13 @@ rules in `/admin/nastroyki`. Pages render per request.
   `get_available_slots` still counts the current booking as taken.
 - Confirmation and reminder emails (Brevo) aren't sent yet, so the pages don't promise one.
 - Consultation types have no online/in-person field; the service's "location info" text says where it happens.
+
+## Specialists
+
+- The admin links a specialist profile to a site account in `/admin/spetsialisti/<id>` ("Профил за вход (имейл)").
+  The account must exist first. Linking sets `specialists.user_id` and adds the `specialist` role.
+- A linked account sees "Моят график" in Моят профил (`src/lib/specialist/`). It lists the specialist's bookings from
+  the last 30 days onward with the clients' names, emails and phones, and lets them cancel (no deadline for staff;
+  the reason is stored), mark past ones as held or no-show, and add or remove their own weekly hours and time off
+  (Sisi's decision, 2026-10-22). Profile, services and prices stay admin-only.
+- RLS limits all of this to the specialist's own rows; payments stay admin-only.

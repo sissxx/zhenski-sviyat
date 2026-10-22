@@ -4,11 +4,11 @@ import NextLink from "next/link";
 import { usePathname } from "next/navigation";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import { accountNav, routes } from "@/lib/routes";
+import { accountNav, routes, type NavItem } from "@/lib/routes";
 import { signOut } from "@/lib/auth/actions";
 
-/** Section links of the account area: a column on desktop, a scrollable row on phones. */
-export function AccountNav() {
+/** Section links of the account area: a column on desktop, a scrollable row on phones. `extraItems` follow the usual ones. */
+export function AccountNav({ extraItems = [] }: { extraItems?: NavItem[] }) {
   const pathname = usePathname() ?? routes.account;
   return (
     <Box component="nav" aria-label="Моят профил" sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
@@ -25,7 +25,7 @@ export function AccountNav() {
           pb: { xs: 0.5, md: 0 },
         }}
       >
-        {accountNav.map((item) => {
+        {[...accountNav, ...extraItems].map((item) => {
           const active = pathname === item.href;
           return (
             <li key={item.href}>

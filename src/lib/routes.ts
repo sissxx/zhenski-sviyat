@@ -26,6 +26,7 @@ export const routes = {
   accountEvents: "/profil/sabitiya",
   accountConsultations: "/profil/konsultatsii",
   accountSubscriptions: "/profil/abonamenti",
+  accountSpecialist: "/profil/spetsialist",
   privacy: "/poveritelnost",
   terms: "/obshti-usloviya",
   admin: "/admin",
@@ -69,6 +70,9 @@ export const accountNav: NavItem[] = [
 ];
 
 export type NavItem = { label: string; href: string };
+
+/** Extra account section for people linked to a specialist profile. */
+export const specialistNavItem: NavItem = { label: "Моят график", href: routes.accountSpecialist };
 
 export const mainNav: NavItem[] = [
   { label: "Начало", href: routes.home },
