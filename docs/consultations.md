@@ -30,7 +30,7 @@ rules in `/admin/nastroyki`. Pages render per request.
   cancelled paid booking goes to "Плащания → За преглед" for a refund decision.
 - When moving, times that overlap the current booking (other than its own start) aren't offered, because
   `get_available_slots` still counts the current booking as taken.
-- Confirmation and reminder emails (Brevo) aren't sent yet, so the pages don't promise one.
+- Booking, cancelling and moving send emails to the client and the specialist (see `docs/emails.md`). Reminders before the session aren't sent yet.
 - Consultation types have no online/in-person field; the service's "location info" text says where it happens.
 
 ## Specialists
