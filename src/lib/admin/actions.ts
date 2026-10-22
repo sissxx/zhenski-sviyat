@@ -3,10 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import type { Database } from "@/lib/supabase/database.types";
-import { eurosToCents, localDateTimeToIso, type FormValues } from "./convert";
+import { eurosToCents, type FormValues } from "./convert";
 import { deleteEntity as deleteRow, writeEntity } from "./entities";
 import { adminErrorMessage, genericAdminError } from "./errors";
 import { entityForms, type EntityKey } from "./forms";
+import { availabilityRows, availabilitySchema, timeOffRow, timeOffSchema, type AvailabilityInput, type TimeOffInput } from "./schedule";
 import { AdminAccessError, requireAdminAction } from "./session";
 
 /**
@@ -154,36 +155,10 @@ export async function saveSpecialistServices(specialistId: string, services: { t
   });
 }
 
-const timePattern = /^([01]\d|2[0-3]):[0-5]\d$/;
-const datePattern = /^(\d{4}-\d{2}-\d{2})?$/;
-const availabilitySchema = z
-  .object({
-    weekdays: z.array(z.number().int().min(1).max(7)).min(1),
-    start: z.string().regex(timePattern),
-    end: z.string().regex(timePattern),
-    validFrom: z.string().regex(datePattern),
-    validUntil: z.string().regex(datePattern),
-  })
-  .refine((v) => v.end > v.start)
-  .refine((v) => !v.validFrom || !v.validUntil || v.validUntil >= v.validFrom);
-
-export async function addAvailability(specialistId: string, input: z.infer<typeof availabilitySchema>): Promise<AdminResult> {
+export async function addAvailability(specialistId: string, input: AvailabilityInput): Promise<AdminResult> {
   const parsed = availabilitySchema.safeParse(input);
   if (!uuid.safeParse(specialistId).success || !parsed.success) return invalidInput;
-  const { weekdays, start, end, validFrom, validUntil } = parsed.data;
-  return run(async (supabase) => {
-    const { error } = await supabase.from("specialist_availability").insert(
-      weekdays.map((weekday) => ({
-        specialist_id: specialistId,
-        weekday,
-        start_time: start,
-        end_time: end,
-        valid_from: validFrom || null,
-        valid_until: validUntil || null,
-      })),
-    );
-    return error;
-  });
+  return run(async (supabase) => (await supabase.from("specialist_availability").insert(availabilityRows(specialistId, parsed.data))).error);
 }
 
 export async function deleteAvailability(id: string): Promise<AdminResult> {
@@ -191,23 +166,10 @@ export async function deleteAvailability(id: string): Promise<AdminResult> {
   return run(async (supabase) => (await supabase.from("specialist_availability").delete().eq("id", id)).error);
 }
 
-const dateTimeLocal = z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/);
-const timeOffSchema = z
-  .object({ startsAt: dateTimeLocal, endsAt: dateTimeLocal, reason: z.string().max(300) })
-  .refine((v) => v.endsAt > v.startsAt);
-
-export async function addTimeOff(specialistId: string, input: z.infer<typeof timeOffSchema>): Promise<AdminResult> {
+export async function addTimeOff(specialistId: string, input: TimeOffInput): Promise<AdminResult> {
   const parsed = timeOffSchema.safeParse(input);
   if (!uuid.safeParse(specialistId).success || !parsed.success) return invalidInput;
-  return run(async (supabase) => {
-    const { error } = await supabase.from("specialist_time_off").insert({
-      specialist_id: specialistId,
-      starts_at: localDateTimeToIso(parsed.data.startsAt),
-      ends_at: localDateTimeToIso(parsed.data.endsAt),
-      reason: parsed.data.reason.trim() || null,
-    });
-    return error;
-  });
+  return run(async (supabase) => (await supabase.from("specialist_time_off").insert(timeOffRow(specialistId, parsed.data))).error);
 }
 
 export async function deleteTimeOff(id: string): Promise<AdminResult> {

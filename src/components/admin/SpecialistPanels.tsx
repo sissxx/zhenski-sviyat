@@ -11,6 +11,7 @@ import Typography from "@mui/material/Typography";
 import { FormAlert } from "@/components/forms/FormAlert";
 import { addAvailability, addTimeOff, saveSpecialistServices, type AdminResult } from "@/lib/admin/actions";
 import { weekdayLabel } from "@/lib/admin/labels";
+import type { AvailabilityInput, TimeOffInput } from "@/lib/admin/schedule";
 
 type Feedback = { ok: boolean; message: string } | null;
 
@@ -83,8 +84,14 @@ export function SpecialistServicesForm({ specialistId, options }: { specialistId
   );
 }
 
-/** Adds weekly working hours, for one or several weekdays at once. */
-export function AddAvailabilityForm({ specialistId }: { specialistId: string }) {
+type AddAvailability = (specialistId: string, input: AvailabilityInput) => Promise<AdminResult>;
+type AddTimeOff = (specialistId: string, input: TimeOffInput) => Promise<AdminResult>;
+
+/**
+ * Adds weekly working hours, for one or several weekdays at once.
+ * `action` defaults to the admin action; the specialist's own schedule page passes its own.
+ */
+export function AddAvailabilityForm({ specialistId, action = addAvailability }: { specialistId: string; action?: AddAvailability }) {
   const [weekdays, setWeekdays] = useState<number[]>([]);
   const [start, setStart] = useState("09:00");
   const [end, setEnd] = useState("17:00");
@@ -139,7 +146,7 @@ export function AddAvailabilityForm({ specialistId }: { specialistId: string }) 
         variant="contained"
         disabled={pending || invalid}
         sx={{ alignSelf: "flex-start" }}
-        onClick={() => submit(() => addAvailability(specialistId, { weekdays, start, end, validFrom, validUntil }), () => setWeekdays([]))}
+        onClick={() => submit(() => action(specialistId, { weekdays, start, end, validFrom, validUntil }), () => setWeekdays([]))}
       >
         {pending ? "Добавяне…" : "Добави работно време"}
       </Button>
@@ -148,7 +155,7 @@ export function AddAvailabilityForm({ specialistId }: { specialistId: string }) 
 }
 
 /** Blocks a period (holiday, sick day) so no slots are offered in it. */
-export function AddTimeOffForm({ specialistId }: { specialistId: string }) {
+export function AddTimeOffForm({ specialistId, action = addTimeOff }: { specialistId: string; action?: AddTimeOff }) {
   const [startsAt, setStartsAt] = useState("");
   const [endsAt, setEndsAt] = useState("");
   const [reason, setReason] = useState("");
@@ -182,7 +189,7 @@ export function AddTimeOffForm({ specialistId }: { specialistId: string }) {
         sx={{ alignSelf: "flex-start" }}
         onClick={() =>
           submit(
-            () => addTimeOff(specialistId, { startsAt, endsAt, reason }),
+            () => action(specialistId, { startsAt, endsAt, reason }),
             () => {
               setStartsAt("");
               setEndsAt("");

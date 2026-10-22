@@ -9,7 +9,8 @@ import { Section } from "@/components/ui/Section";
 import { signOut } from "@/lib/auth/actions";
 import { isCurrentUserAdmin } from "@/lib/admin/session";
 import { requireUser } from "@/lib/auth/session";
-import { routes } from "@/lib/routes";
+import { getMySpecialist } from "@/lib/specialist/session";
+import { routes, specialistNavItem } from "@/lib/routes";
 
 export const metadata: Metadata = {
   title: { default: "Моят профил", template: "%s · Моят профил" },
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
 export default async function AccountLayout({ children }: { children: ReactNode }) {
   const { user, profile } = await requireUser();
   const name = profile?.first_name || user.email;
-  const isAdmin = await isCurrentUserAdmin();
+  const [isAdmin, specialist] = await Promise.all([isCurrentUserAdmin(), getMySpecialist()]);
 
   return (
     <>
@@ -44,7 +45,7 @@ export default async function AccountLayout({ children }: { children: ReactNode 
             alignItems: "start",
           }}
         >
-          <AccountNav />
+          <AccountNav extraItems={specialist ? [specialistNavItem] : []} />
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5, minWidth: 0 }}>
             {profile?.status === "suspended" && (
               <FormAlert severity="warning">
