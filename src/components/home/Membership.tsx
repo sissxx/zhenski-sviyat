@@ -2,7 +2,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { Section } from "@/components/ui/Section";
-import { membershipPlans } from "@/content/home";
+import { membershipPlans } from "@/content/plans";
 import { formatPrice } from "@/lib/locale";
 
 export function Membership() {
@@ -15,7 +15,7 @@ export function Membership() {
         Срещай се, учи, споделяй и получавай подкрепа в среда, създадена за жени.
       </Typography>
       <Box sx={{ display: "grid", gap: 2.25, gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" } }}>
-        {membershipPlans.map((plan) => (
+        {Object.values(membershipPlans).map((plan) => (
           <Box
             key={plan.title}
             sx={{ bgcolor: "background.paper", border: "1px solid #CBD8C2", borderRadius: "22px", p: 3, display: "flex", flexDirection: "column", gap: 1.75 }}
@@ -33,11 +33,11 @@ export function Membership() {
                 </Typography>
               </Typography>
               <Box sx={{ flexGrow: 1 }} />
-              <Button variant="contained" href={plan.cta.href}>
-                {plan.cta.label}
+              <Button variant="contained" href={plan.href}>
+                {plan.ctaLabel}
               </Button>
             </Box>
-            <Typography variant="caption">Плащането и достъпът подлежат на уточняване</Typography>
+            <Typography variant="caption">Плащане с карта или по банков път</Typography>
           </Box>
         ))}
       </Box>

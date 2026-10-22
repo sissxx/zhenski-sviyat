@@ -1,7 +1,7 @@
 import Box from "@mui/material/Box";
 import { AppLink } from "@/components/ui/AppLink";
 import Typography from "@mui/material/Typography";
-import { NsjsWordmark } from "@/components/brand/Logo";
+import { SiteWordmark } from "@/components/brand/Logo";
 import { footerNav, routes } from "@/lib/routes";
 import { NewsletterForm } from "./NewsletterForm";
 import { site } from "@/lib/site";
@@ -20,7 +20,7 @@ export function SiteFooter() {
           }}
         >
           <Box sx={{ display: "flex", flexDirection: "column", gap: 1.25 }}>
-            <NsjsWordmark inverse />
+            <SiteWordmark />
             <Typography sx={{ fontSize: 13, color: "brand.sage", maxWidth: 240 }}>
               Обединяваме и подкрепяме жените за по-добър живот.
             </Typography>
@@ -61,7 +61,7 @@ export function SiteFooter() {
           </Box>
         </Box>
         <Typography sx={{ mt: 5, pt: 3, borderTop: "1px solid rgba(255,255,252,0.15)", fontSize: 12, color: "brand.sage" }}>
-          © {new Date().getFullYear()} {site.orgFullName}
+          © {new Date().getFullYear()} {site.name}
         </Typography>
       </Box>
     </Box>

@@ -8,6 +8,7 @@ type SectionProps = {
   bg?: string;
   id?: string;
   "aria-labelledby"?: string;
+  "aria-label"?: string;
   sx?: SxProps<Theme>;
 };
 

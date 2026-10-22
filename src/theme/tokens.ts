@@ -10,9 +10,11 @@ export const brand = {
   bg: "#FBF9F0",
   paper: "#FFFFFC",
   mint: "#EDF2E5",
+  /** Pale band behind lists and forms on inner pages. */
+  mintLight: "#F2F5EC",
   sand: "#F6F1E6",
   divider: "#DBE3D4",
-  /** Eyebrow labels ("ЗА НСЖС", "МЕСЕЧНО ЧЛЕНСТВО"). */
+  /** Eyebrow labels ("ЗА СДРУЖЕНИЕТО", "МЕСЕЧНО ЧЛЕНСТВО"). */
   accent: "#335C47",
   /** Image placeholders and light text on green panels. */
   sage: "#C7D4BF",

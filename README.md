@@ -1,6 +1,6 @@
-# Женски свят — НСЖС
+# Сдружение Женски свят
 
-Public website and membership platform for the National Women's Solidarity Association (НСЖС).
+Public website and membership platform for the association Сдружение Женски свят (Women's World).
 Bulgarian UI, `bg-BG` locale, `Europe/Sofia` time zone, prices in EUR.
 
 ## Stack

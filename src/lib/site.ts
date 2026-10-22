@@ -1,13 +1,9 @@
 /**
- * Organisation and site names in one place. The final logo reads
- * "Сдружение Женски свят" while the Figma header says "НСЖС"; which name the
- * site uses is still open, so change it here rather than in components.
+ * Organisation and site names in one place. The association is
+ * "Сдружение Женски свят" (decided 2026-10-22); the logo carries the same name.
  */
 export const site = {
-  name: "Женски свят",
+  name: "Сдружение Женски свят",
+  shortName: "Женски свят",
   tagline: "Път към себе си",
-  /** Logo text, also used as its alt text. */
-  logoName: "Сдружение Женски свят",
-  orgShortName: "НСЖС",
-  orgFullName: "Национална съюзна женска солидарност",
 } as const;
