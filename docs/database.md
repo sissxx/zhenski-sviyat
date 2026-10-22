@@ -17,6 +17,7 @@ Supabase (Postgres) schema for the Women's World / NSJS platform. Everything is 
 | `…100800_rls` | Row Level Security policies and table privileges |
 | `…100900_storage` | public `media` bucket for images, admin-only uploads |
 | `…101000_foreign_key_indexes` | indexes on foreign keys flagged by the Supabase performance advisor |
+| `…120000_admin_payment_review` | `resolve_payment_review` for the admin panel (see docs/admin.md) |
 
 `supabase/seed.sql` holds development data only (the provisional €8 / €21 plans, two Viber groups).
 `supabase/checks/database_checks.sql` checks RLS isolation, double-booking protection, payments and Viber access.

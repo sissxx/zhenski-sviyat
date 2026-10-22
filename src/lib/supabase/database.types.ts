@@ -2178,6 +2178,43 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      resolve_payment_review: {
+        Args: { p_note: string; p_payment_id: string }
+        Returns: {
+          admin_note: string | null
+          amount_cents: number
+          bank_reference: string | null
+          confirmed_by: string | null
+          consultation_booking_id: string | null
+          created_at: string
+          currency: string
+          description: string | null
+          event_registration_id: string | null
+          expires_at: string | null
+          failed_at: string | null
+          failure_reason: string | null
+          id: string
+          needs_review: boolean
+          paid_at: string | null
+          provider: Database["public"]["Enums"]["payment_provider"]
+          refunded_amount_cents: number
+          refunded_at: string | null
+          review_reason: string | null
+          status: Database["public"]["Enums"]["payment_status"]
+          stripe_checkout_session_id: string | null
+          stripe_invoice_id: string | null
+          stripe_payment_intent_id: string | null
+          subscription_id: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "payments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       run_maintenance: { Args: never; Returns: Json }
       set_booking_outcome: {
         Args: {
