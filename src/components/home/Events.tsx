@@ -2,7 +2,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { Section } from "@/components/ui/Section";
-import { upcomingEvents } from "@/content/home";
+import { eventHref, eventLocationLabel, events } from "@/content/events";
 import { formatDate, formatDayMonthBadge } from "@/lib/locale";
 import { routes } from "@/lib/routes";
 
@@ -18,7 +18,7 @@ export function Events() {
         </Button>
       </Box>
       <Box component="ul" sx={{ listStyle: "none", m: 0, p: 0, display: "grid", gap: 2.25, gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)", md: "repeat(3, 1fr)" } }}>
-        {upcomingEvents.map((event) => (
+        {events.map((event) => (
           <Box
             component="li"
             key={event.slug}
@@ -39,9 +39,9 @@ export function Events() {
                 <Box component="span" aria-hidden sx={{ mr: 0.75 }}>
                   ⌖
                 </Box>
-                {event.location}
+                {eventLocationLabel(event)}
               </Typography>
-              <Button variant="outlined" href={event.href} aria-label={`Виж събитието: ${event.title}`}>
+              <Button variant="outlined" href={eventHref(event)} aria-label={`Виж събитието: ${event.title}`}>
                 Виж събитието
               </Button>
             </Box>

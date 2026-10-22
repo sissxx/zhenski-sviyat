@@ -113,6 +113,23 @@ const theme = createTheme(
           variantMapping: { eyebrow: "p" },
         },
       },
+      // Form inputs as in the Figma forms: cream fill, light border, 8px corners.
+      MuiOutlinedInput: {
+        styleOverrides: {
+          root: {
+            backgroundColor: brand.bg,
+            borderRadius: 8,
+            fontSize: "0.875rem",
+            "& .MuiOutlinedInput-notchedOutline": { borderColor: brand.divider },
+            "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: brand.accent },
+          },
+          input: { paddingBlock: 12, paddingInline: 14 },
+          multiline: { padding: 0 },
+        },
+      },
+      MuiFormHelperText: {
+        styleOverrides: { root: { marginInline: 0, fontSize: "0.8125rem" } },
+      },
       MuiAccordion: {
         defaultProps: { disableGutters: true, elevation: 0, square: false },
         styleOverrides: {

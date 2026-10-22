@@ -2,7 +2,7 @@ import Box from "@mui/material/Box";
 import { AppLink } from "@/components/ui/AppLink";
 import Typography from "@mui/material/Typography";
 import { Section } from "@/components/ui/Section";
-import { founders } from "@/content/home";
+import { founders } from "@/content/founders";
 import { routes } from "@/lib/routes";
 
 export function Founders() {
@@ -15,10 +15,9 @@ export function Founders() {
         component="ul"
         sx={{ listStyle: "none", m: 0, p: 0, display: "grid", gap: 1.75, gridTemplateColumns: { xs: "repeat(2, 1fr)", sm: "repeat(4, 1fr)", lg: "repeat(7, 1fr)" } }}
       >
-        {founders.map((name) => (
+        {founders.map(({ shortName: name }) => (
           <li key={name}>
             <AppLink
-             
               href={routes.founders}
               underline="none"
               sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 1, p: 1, borderRadius: "12px", "&:hover": { bgcolor: "brand.mint" } }}

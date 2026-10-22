@@ -10,11 +10,11 @@ import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: {
-    default: `${site.name} — ${site.orgShortName}`,
-    template: `%s · ${site.name}`,
+    default: `${site.name} — ${site.tagline}`,
+    template: `%s · ${site.shortName}`,
   },
   description:
-    `${site.orgFullName}: общност за подкрепа, споделяне и развитие на жените в България.`,
+    `${site.name}: общност за подкрепа, споделяне и развитие на жените в България.`,
   openGraph: { locale: "bg_BG", type: "website", siteName: site.name },
 };
 

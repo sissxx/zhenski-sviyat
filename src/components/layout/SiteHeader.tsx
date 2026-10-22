@@ -14,7 +14,7 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import SvgIcon from "@mui/material/SvgIcon";
 import Toolbar from "@mui/material/Toolbar";
-import { NsjsWordmark, WomensWorldLogo } from "@/components/brand/Logo";
+import { WomensWorldLogo } from "@/components/brand/Logo";
 import { mainNav, routes } from "@/lib/routes";
 
 function MenuIcon() {
@@ -52,21 +52,11 @@ export function SiteHeader() {
         sx={{ justifyContent: "space-between", gap: 2, px: { xs: 2, sm: 3, xl: 7.5 }, py: { xs: 1, lg: 3 } }}
       >
         <AppLink
-         
           href={routes.home}
           underline="none"
           aria-label="Начало"
-          sx={{ display: "flex", alignItems: "center", gap: 2.25, color: "inherit" }}
+          sx={{ display: "flex", alignItems: "center", color: "inherit" }}
         >
-          <Box
-            sx={{
-              display: { xs: "none", sm: "block" },
-              // Narrow desktops: drop the НСЖС wordmark so the full nav fits on one line.
-              "@media (min-width: 1200px) and (max-width: 1379px)": { display: "none" },
-            }}
-          >
-            <NsjsWordmark />
-          </Box>
           <WomensWorldLogo />
         </AppLink>
 

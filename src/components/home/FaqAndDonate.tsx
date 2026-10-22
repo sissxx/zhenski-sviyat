@@ -1,22 +1,12 @@
-import Accordion from "@mui/material/Accordion";
-import AccordionDetails from "@mui/material/AccordionDetails";
-import AccordionSummary from "@mui/material/AccordionSummary";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import { AppLink } from "@/components/ui/AppLink";
 import Typography from "@mui/material/Typography";
-import { faqPreview } from "@/content/home";
+import { FaqList } from "@/components/faq/FaqList";
+import { faqs } from "@/content/faq";
 import { routes } from "@/lib/routes";
 
 const panelPadding = { px: { xs: 2, sm: 3, md: 7 }, py: { xs: 5, md: 7 } };
-
-function PlusIcon() {
-  return (
-    <Box component="span" aria-hidden sx={{ fontSize: 18, lineHeight: 1, color: "brand.dark", width: 14, textAlign: "center" }}>
-      +
-    </Box>
-  );
-}
 
 export function FaqAndDonate() {
   return (
@@ -27,30 +17,7 @@ export function FaqAndDonate() {
           <Typography id="faq-title" variant="h3" component="h2">
             Често задавани въпроси
           </Typography>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 1.25 }}>
-            {faqPreview.map((item, index) => (
-              <Accordion
-                key={item.question}
-                sx={{ "& .MuiAccordionSummary-expandIconWrapper.Mui-expanded": { transform: "rotate(45deg)" } }}
-              >
-                <AccordionSummary
-                  expandIcon={<PlusIcon />}
-                  id={`faq-${index}-header`}
-                  aria-controls={`faq-${index}-content`}
-                  sx={{ minHeight: 44, "& .MuiAccordionSummary-content": { my: 1.25 } }}
-                >
-                  <Typography component="h3" sx={{ fontWeight: 500, fontSize: 14 }}>
-                    {item.question}
-                  </Typography>
-                </AccordionSummary>
-                <AccordionDetails sx={{ pt: 0 }}>
-                  <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                    {item.answer}
-                  </Typography>
-                </AccordionDetails>
-              </Accordion>
-            ))}
-          </Box>
+          <FaqList items={faqs.slice(0, 5)} idPrefix="faq" />
           <AppLink href={routes.faq} sx={{ fontWeight: 600, fontSize: 14, alignSelf: "flex-start" }}>
             Всички въпроси
           </AppLink>
