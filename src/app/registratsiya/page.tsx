@@ -18,7 +18,7 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
   const chosenPlan = Object.values(membershipPlans).find((item) => item.slug === plan);
   // After confirming the email, a new member continues to their subscriptions to activate the chosen plan.
   const continueTo = chosenPlan
-    ? routes.accountSubscriptions
+    ? `${routes.accountSubscriptions}?plan=${chosenPlan.slug}`
     : safeNextPath(typeof next === "string" ? next : null, `${routes.account}?potvarden=1`);
 
   return (

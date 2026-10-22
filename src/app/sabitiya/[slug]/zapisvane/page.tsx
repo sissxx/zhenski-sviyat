@@ -14,6 +14,7 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { getEventBySlug, getMyActiveRegistration } from "@/lib/events/queries";
 import { availabilityLabels } from "@/lib/events/types";
 import { createClient } from "@/lib/supabase/server";
+import { isStripeConfigured } from "@/lib/stripe/server";
 import { eventConfirmationPath, eventPath, eventRegistrationPath, loginPath, routes } from "@/lib/routes";
 
 type RegistrationPageProps = { params: Promise<{ slug: string }> };
@@ -28,6 +29,7 @@ export default async function EventRegistrationPage({ params }: RegistrationPage
   const event = await getEventBySlug(slug);
   if (!event) notFound();
   const paid = event.priceCents > 0;
+  const cardAvailable = isStripeConfigured();
 
   const user = await getCurrentUser();
   const registration = user ? await getMyActiveRegistration(event.id) : null;
@@ -48,7 +50,7 @@ export default async function EventRegistrationPage({ params }: RegistrationPage
         title={paid ? "Записване и плащане" : "Записване"}
         lead={
           paid
-            ? "Заяви участие с данните от профила си и плати по банков път."
+            ? "Заяви участие с данните от профила си и плати с карта или по банков път."
             : "Запази място с данните от профила си. Участието е безплатно."
         }
       />
@@ -100,7 +102,7 @@ export default async function EventRegistrationPage({ params }: RegistrationPage
               <FormAlert severity="warning">
                 Профилът ти е временно спрян и не можеш да се записваш за събития. Свържи се с нас за повече информация.
               </FormAlert>
-            ) : paid && !event.allowBankTransfer ? (
+            ) : paid && !event.allowBankTransfer && !cardAvailable ? (
               <>
                 <Typography>
                   За това събитие се плаща с карта, а онлайн плащането ще бъде достъпно съвсем скоро. Дотогава можеш да
@@ -125,7 +127,12 @@ export default async function EventRegistrationPage({ params }: RegistrationPage
                 <Typography variant="body2" sx={{ color: "text.secondary" }}>
                   Данните са от профила ти. <AppLink href={routes.accountDetails}>Промени ги</AppLink>, ако нещо не е вярно.
                 </Typography>
-                <EventRegistrationForm slug={event.slug} priceCents={event.priceCents} />
+                <EventRegistrationForm
+                  slug={event.slug}
+                  priceCents={event.priceCents}
+                  cardAvailable={cardAvailable}
+                  bankAvailable={event.allowBankTransfer}
+                />
               </>
             )}
           </Panel>

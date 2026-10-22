@@ -90,7 +90,7 @@ function BookingCard({ booking, rules }: { booking: MyBooking; rules: BookingRul
         {booking.price_cents === 0
           ? "Безплатно"
           : `${formatPrice(booking.price_cents)} · ${booking.payment_method === "bank_transfer" ? "банков превод" : booking.payment_method ? "карта" : "плащане на място"}`}
-        {pending && payment?.bank_reference && ` · основание ${payment.bank_reference}`}
+        {pending && payment?.provider === "bank_transfer" && payment.bank_reference && ` · основание ${payment.bank_reference}`}
         {pending && booking.hold_expires_at && ` · срок за плащане ${formatDateTime(booking.hold_expires_at)}`}
       </Typography>
       {pastDeadline && (
@@ -101,7 +101,7 @@ function BookingCard({ booking, rules }: { booking: MyBooking; rules: BookingRul
       <Box sx={{ display: "flex", flexWrap: "wrap", alignItems: "flex-start", gap: 1.5 }}>
         {isActive(booking) && isUpcoming(booking) && (
           <Button size="small" variant={pending ? "contained" : "outlined"} href={consultationConfirmationPath(booking.id)}>
-            {pending ? "Данни за превода" : "Подробности"}
+            {pending ? (payment?.provider === "stripe" ? "Довърши плащането" : "Данни за превода") : "Подробности"}
           </Button>
         )}
         {canReschedule && (

@@ -16,10 +16,11 @@ status are always current.
 - Database error keys map to Bulgarian in `src/lib/db-errors.ts` (shared with the admin panel).
 - Free events are confirmed at once. A user can't sign up twice: the database allows one live registration per user
   and event, and a pending one is handed back instead of a duplicate.
-- Paid events: **bank transfer only for now**. The registration holds the seat as `pending_payment` until an admin
-  confirms the transfer (or the hold of `bank_transfer_hold_days` ends). The page shows the amount, the
-  `NSJS-…` reference, the deadline and the bank account from `app_settings`; until an admin fills in the IBAN a
-  placeholder is shown. Card payment (Stripe Checkout) is shown as "скоро"; paid events without bank transfer
-  ask people to get in touch.
+- Paid events: **card** (Stripe Checkout, see docs/payments.md) or **bank transfer** when the event allows it.
+  Card holds the seat for `checkout_hold_minutes` and confirms it as soon as Stripe reports the payment. Bank
+  transfer holds the seat as `pending_payment` until an admin confirms the transfer (or the hold of
+  `bank_transfer_hold_days` ends); the page shows the amount, the `NSJS-…` reference, the deadline and the bank
+  account from `app_settings` (a placeholder until an admin fills in the IBAN). Until the Stripe keys are set,
+  card shows as "скоро", and paid events without bank transfer ask people to get in touch.
 - Confirmation emails (Brevo) aren't sent yet, so the pages don't promise one.
 - No category column: the Figma category filter was replaced by a format filter.

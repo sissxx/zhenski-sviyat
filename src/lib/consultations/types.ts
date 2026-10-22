@@ -38,7 +38,7 @@ export type BookingRules = {
 
 /**
  * How a booking at this price gets paid:
- * free, paid on site (no prepayment), bank transfer before the session, or card only (Stripe comes later).
+ * free, paid on site (no prepayment), card or bank transfer before the session, or card only.
  */
 export type PaymentMode = "free" | "on_site" | "bank" | "card_only";
 

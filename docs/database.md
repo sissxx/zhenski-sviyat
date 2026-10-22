@@ -133,9 +133,9 @@ Viber membership can't be automated reliably (spec 9).
 and marks past bookings and events completed. Holds are also cleaned up whenever someone books.
 
 **Stripe webhooks.** Store each event first:
-`insert into stripe_webhook_events (id, type, payload) values (...) on conflict (id) do nothing returning id`.
-If nothing comes back, the event was already received, so skip it. Set `processed_at` when it succeeds, or
-`attempts` / `last_error` when it fails.
+`insert into stripe_webhook_events (id, type, payload) values (...) on conflict (id) do nothing`.
+Then skip it if `processed_at` is set; otherwise process it and set `processed_at`, or `attempts` / `last_error`
+when it fails (Stripe retries, and the retry is processed again). Details in docs/payments.md.
 
 ## Row Level Security
 

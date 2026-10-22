@@ -7,6 +7,7 @@ import Typography from "@mui/material/Typography";
 import { z } from "zod";
 import { EventFacts } from "@/components/events/EventFacts";
 import { BankTransferDetails } from "@/components/events/BankTransferDetails";
+import { CardPaymentButton } from "@/components/payments/CardPaymentButton";
 import { PageIntro } from "@/components/ui/PageIntro";
 import { Panel } from "@/components/ui/Panel";
 import { Section } from "@/components/ui/Section";
@@ -19,15 +20,18 @@ import {
   getPrivateEventDetails,
 } from "@/lib/events/queries";
 import { eventConfirmationPath, eventPath, loginPath, routes } from "@/lib/routes";
+import { formatDateTime } from "@/lib/locale";
+import { syncReturnedCheckout } from "@/lib/stripe/checkout";
+import { isStripeConfigured } from "@/lib/stripe/server";
 
 type ConfirmationPageProps = {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ zapisvane?: string | string[] }>;
+  searchParams: Promise<{ zapisvane?: string | string[]; session_id?: string | string[]; plashtane?: string | string[] }>;
 };
 
 export const metadata: Metadata = { title: "Потвърждение за записване", robots: { index: false } };
 
-type Outcome = "free" | "paid" | "bank" | "ended";
+type Outcome = "free" | "paid" | "bank" | "card" | "ended";
 
 const outcomes: Record<Outcome, { title: string; text: string }> = {
   free: {
@@ -42,6 +46,10 @@ const outcomes: Record<Outcome, { title: string; text: string }> = {
     title: "Заявката чака плащане",
     text: "Мястото ти е запазено временно. Потвърждаваме го, щом преводът пристигне и екипът го отбележи.",
   },
+  card: {
+    title: "Плащането не е завършено",
+    text: "Мястото ти е запазено временно. Довърши плащането с карта, за да го потвърдим.",
+  },
   ended: {
     title: "Записването не е активно",
     text: "Това записване е отказано или срокът за плащане е изтекъл. Можеш да се запишеш отново, ако има свободни места.",
@@ -50,7 +58,7 @@ const outcomes: Record<Outcome, { title: string; text: string }> = {
 
 export default async function EventConfirmationPage({ params, searchParams }: ConfirmationPageProps) {
   const { slug } = await params;
-  const { zapisvane } = await searchParams;
+  const { zapisvane, session_id: sessionId, plashtane } = await searchParams;
   const registrationId = typeof zapisvane === "string" && z.uuid().safeParse(zapisvane).success ? zapisvane : null;
 
   const user = await getCurrentUser();
@@ -61,6 +69,8 @@ export default async function EventConfirmationPage({ params, searchParams }: Co
 
   const event = await getEventBySlug(slug);
   if (!event) notFound();
+  // Back from Stripe Checkout: ask Stripe and record the payment now instead of waiting for the webhook.
+  if (typeof sessionId === "string" && isStripeConfigured()) await syncReturnedCheckout(sessionId, user.id);
   const registration = registrationId ? await getMyRegistration(registrationId) : await getMyActiveRegistration(event.id);
   if (!registration || registration.event?.id !== event.id) redirect(eventPath(slug));
 
@@ -71,9 +81,17 @@ export default async function EventConfirmationPage({ params, searchParams }: Co
         ? "paid"
         : "free"
       : registration.status === "pending_payment"
-        ? "bank"
+        ? payment?.provider === "stripe"
+          ? "card"
+          : "bank"
         : "ended";
-  const { title, text } = outcomes[outcome];
+  const { title } = outcomes[outcome];
+  const text =
+    outcome === "card" && typeof sessionId === "string"
+      ? "Плащането се обработва. Обнови страницата след малко; ако не се потвърди, опитай отново."
+      : outcome === "card" && plashtane === "prekasnato"
+        ? "Плащането беше прекъснато и нищо не е таксувано. Мястото ти се пази още малко, ако искаш да опиташ отново."
+        : outcomes[outcome].text;
   const [bank, privateDetails] = await Promise.all([
     outcome === "bank" ? getBankDetails() : null,
     registration.status === "confirmed" ? getPrivateEventDetails(event.id) : null,
@@ -95,7 +113,7 @@ export default async function EventConfirmationPage({ params, searchParams }: Co
               width: 48,
               height: 48,
               borderRadius: "50%",
-              bgcolor: outcome === "bank" || outcome === "ended" ? "brand.accent" : "primary.main",
+              bgcolor: outcome === "bank" || outcome === "card" || outcome === "ended" ? "brand.accent" : "primary.main",
               color: "brand.paper",
               display: "grid",
               placeItems: "center",
@@ -103,7 +121,7 @@ export default async function EventConfirmationPage({ params, searchParams }: Co
               fontWeight: 600,
             }}
           >
-            {outcome === "bank" ? "…" : outcome === "ended" ? "!" : "✓"}
+            {outcome === "bank" || outcome === "card" ? "…" : outcome === "ended" ? "!" : "✓"}
           </Box>
           <Typography id="outcome-title" variant="h4" component="h2" sx={{ color: "primary.main" }}>
             {title}
@@ -117,6 +135,17 @@ export default async function EventConfirmationPage({ params, searchParams }: Co
               deadline={registration.hold_expires_at}
               bank={bank}
             />
+          )}
+
+          {outcome === "card" && payment && (
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+              <CardPaymentButton paymentId={payment.id} />
+              {registration.hold_expires_at && (
+                <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                  Мястото се пази до {formatDateTime(registration.hold_expires_at)}.
+                </Typography>
+              )}
+            </Box>
           )}
 
           {privateDetails && (privateDetails.online_url || privateDetails.attendee_instructions) && (

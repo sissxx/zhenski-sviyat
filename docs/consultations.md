@@ -22,8 +22,9 @@ rules in `/admin/nastroyki`. Pages render per request.
 - The database re-checks every booking (working hours, time off, notice, overlaps for the specialist and for the
   user). If the time was taken meanwhile, the form shows the error and reloads the free times.
 - Payment depends on the service and the specialist's price: free, paid on site (`requires_prepayment` off),
-  **bank transfer** (prepaid, `allow_bank_transfer` on), or card only, which shows "скоро" and a contact link until
-  Stripe is added. Bank transfers hold the time as `pending_payment` until an admin confirms the payment, or until the
+  prepaid by **card or bank transfer** (`allow_bank_transfer` on), or prepaid by card only. Card goes through Stripe
+  Checkout (docs/payments.md); until the Stripe keys are set it shows "скоро", and card-only services show a contact
+  link. Bank transfers hold the time as `pending_payment` until an admin confirms the payment, or until the
   hold ends (`bank_transfer_hold_days`, at the latest 2 hours before the session).
 - Users can cancel an unpaid booking any time and a confirmed one until `consultation_cancel_deadline_hours` before
   the start; they can move a confirmed one within the same deadline, up to `consultation_max_reschedules` times. A

@@ -10,10 +10,12 @@ type PaymentMethodFieldProps = {
   error?: string;
   /** False until Stripe is connected: the card option is shown as coming soon. */
   cardAvailable?: boolean;
+  /** False when only card payments are accepted. */
+  bankAvailable?: boolean;
 };
 
 /** Card (Stripe) or bank transfer. */
-export function PaymentMethodField({ cardAvailable = true, ...props }: PaymentMethodFieldProps) {
+export function PaymentMethodField({ cardAvailable = true, bankAvailable = true, ...props }: PaymentMethodFieldProps) {
   const choices: Choice<PaymentMethod>[] = [
     {
       value: "card",
@@ -25,8 +27,11 @@ export function PaymentMethodField({ cardAvailable = true, ...props }: PaymentMe
     },
     {
       value: "bank",
-      label: "Банков превод",
-      hint: "Получаваш данни за превод. Мястото се потвърждава, щом плащането пристигне.",
+      label: bankAvailable ? "Банков превод" : "Банков превод — не е възможен тук",
+      hint: bankAvailable
+        ? "Получаваш данни за превод. Потвърждаваме, щом плащането пристигне."
+        : "Тук се приема само плащане с карта.",
+      disabled: !bankAvailable,
     },
   ];
   return <ChoiceCards legend="Начин на плащане" name="paymentMethod" choices={choices} {...props} />;

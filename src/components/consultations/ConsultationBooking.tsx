@@ -38,6 +38,8 @@ export type BookingViewer =
 type ConsultationBookingProps = {
   services: BookableService[];
   viewer: BookingViewer;
+  /** False while Stripe isn't set up: card-only services can't be booked online yet. */
+  cardAvailable: boolean;
   initialServiceSlug?: string;
   initialSpecialistSlug?: string;
 };
@@ -75,7 +77,7 @@ function Facts({ rows }: { rows: [string, string][] }) {
  * Free times come from the database; the booking itself is created and re-checked on the server.
  * Visitors can browse times, and log in to book.
  */
-export function ConsultationBooking({ services, viewer, initialServiceSlug, initialSpecialistSlug }: ConsultationBookingProps) {
+export function ConsultationBooking({ services, viewer, cardAvailable, initialServiceSlug, initialSpecialistSlug }: ConsultationBookingProps) {
   const initialService = services.find((s) => s.slug === initialServiceSlug) ?? services[0];
   const [serviceId, setServiceId] = useState(initialService.id);
   const [specialistId, setSpecialistId] = useState(
@@ -83,7 +85,7 @@ export function ConsultationBooking({ services, viewer, initialServiceSlug, init
   );
   const [slot, setSlot] = useState<ConsultationSlot | null>(null);
   const [note, setNote] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("bank");
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(cardAvailable ? "card" : "bank");
   const [slotError, setSlotError] = useState<string | undefined>();
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -92,6 +94,9 @@ export function ConsultationBooking({ services, viewer, initialServiceSlug, init
   const { slots, reload } = useFreeSlots(service.id, specialistId === ANY ? null : specialistId);
   const specialist = slot ? service.specialists.find((s) => s.id === slot.specialistId) : undefined;
   const mode = specialist ? paymentModeOf(service, specialist.priceCents) : null;
+  const prepaid = mode === "bank" || mode === "card_only";
+  // Card-only services always go to Stripe; the others let the user pick.
+  const method: PaymentMethod = mode === "card_only" ? "card" : paymentMethod;
 
   const pickService = (id: string) => {
     setServiceId(id);
@@ -108,13 +113,13 @@ export function ConsultationBooking({ services, viewer, initialServiceSlug, init
       return;
     }
     startTransition(async () => {
-      // On success the action redirects to the confirmation page.
+      // On success the action redirects to Stripe Checkout or the confirmation page.
       const result = await bookConsultation({
         serviceId: service.id,
         specialistId: specialist.id,
         startsAt: slot.startsAt,
         note,
-        paymentMethod: mode === "bank" && paymentMethod === "bank" ? "bank" : undefined,
+        paymentMethod: prepaid ? method : undefined,
       });
       if (!result.ok) {
         setError(result.error);
@@ -233,7 +238,7 @@ export function ConsultationBooking({ services, viewer, initialServiceSlug, init
           <FormAlert severity="warning">
             Профилът ти е временно спрян и не можеш да запазваш консултации. Свържи се с нас за повече информация.
           </FormAlert>
-        ) : mode === "card_only" ? (
+        ) : mode === "card_only" && !cardAvailable ? (
           <>
             <Typography>
               Тази консултация се плаща с карта, а онлайн плащането ще бъде достъпно съвсем скоро. Дотогава можеш да
@@ -260,15 +265,35 @@ export function ConsultationBooking({ services, viewer, initialServiceSlug, init
               helperText={note.length > 1000 ? "Бележката е твърде дълга." : undefined}
               sx={{ width: "100%" }}
             />
-            {mode === "bank" && <PaymentMethodField value={paymentMethod} onChange={setPaymentMethod} cardAvailable={false} />}
+            {prepaid && (
+              <PaymentMethodField
+                value={method}
+                onChange={setPaymentMethod}
+                cardAvailable={cardAvailable}
+                bankAvailable={mode === "bank"}
+              />
+            )}
             {error && <FormAlert severity="error">{error}</FormAlert>}
             <Box sx={{ display: "flex", flexDirection: "column", gap: 1.25 }}>
-              <Button type="submit" variant="contained" disabled={pending || note.length > 1000} sx={{ minWidth: 220 }}>
-                {pending ? "Изпращане…" : mode === "bank" ? "Заяви час и плати с превод" : "Запази час"}
+              <Button
+                type="submit"
+                variant="contained"
+                disabled={pending || note.length > 1000 || (prepaid && method === "card" && !cardAvailable)}
+                sx={{ minWidth: 220 }}
+              >
+                {pending
+                  ? "Изпращане…"
+                  : !prepaid
+                    ? "Запази час"
+                    : method === "card"
+                      ? "Запази час и плати с карта"
+                      : "Заяви час и плати с превод"}
               </Button>
-              {mode === "bank" && (
+              {prepaid && (
                 <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                  След заявката ще видиш данните за превода. Часът ти се пази, докато преводът пристигне.
+                  {method === "card"
+                    ? "Ще те прехвърлим към защитената страница на Stripe. Часът ти се пази 30 минути, докато платиш."
+                    : "След заявката ще видиш данните за превода. Часът ти се пази, докато преводът пристигне."}
                 </Typography>
               )}
             </Box>
