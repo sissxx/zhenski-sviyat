@@ -7,7 +7,9 @@ import { FormAlert } from "@/components/forms/FormAlert";
 import { PageIntro } from "@/components/ui/PageIntro";
 import { Section } from "@/components/ui/Section";
 import { signOut } from "@/lib/auth/actions";
+import { isCurrentUserAdmin } from "@/lib/admin/session";
 import { requireUser } from "@/lib/auth/session";
+import { routes } from "@/lib/routes";
 
 export const metadata: Metadata = {
   title: { default: "Моят профил", template: "%s · Моят профил" },
@@ -17,10 +19,16 @@ export const metadata: Metadata = {
 export default async function AccountLayout({ children }: { children: ReactNode }) {
   const { user, profile } = await requireUser();
   const name = profile?.first_name || user.email;
+  const isAdmin = await isCurrentUserAdmin();
 
   return (
     <>
       <PageIntro eyebrow="Моят профил" title={`Здравей, ${name}!`}>
+        {isAdmin && (
+          <Button variant="contained" href={routes.admin} sx={{ mt: 2, mr: 1.5 }}>
+            Администрация
+          </Button>
+        )}
         <Box component="form" action={signOut} sx={{ display: { xs: "block", md: "none" }, mt: 2 }}>
           <Button type="submit" variant="outlined" size="small">
             Изход

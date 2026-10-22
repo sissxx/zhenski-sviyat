@@ -1,6 +1,6 @@
 /**
  * Public URLs. Slugs are Latin transliterations so links stay readable when shared.
- * Admin pages are not built yet and render the 404 page.
+ * Admin pages live under /admin (see adminRoutes in src/lib/admin/routes.ts).
  */
 export const routes = {
   home: "/",
@@ -28,6 +28,7 @@ export const routes = {
   accountSubscriptions: "/profil/abonamenti",
   privacy: "/poveritelnost",
   terms: "/obshti-usloviya",
+  admin: "/admin",
 } as const;
 
 export const eventPath = (slug: string) => `${routes.events}/${slug}`;
@@ -38,7 +39,7 @@ export const eventConfirmationPath = (slug: string) => `${eventPath(slug)}/potva
 export const contactPath = (subject: string) => `${routes.contacts}?tema=${encodeURIComponent(subject)}`;
 
 /** Pages that need a signed-in user. The proxy sends visitors to the login page first. */
-export const protectedPrefixes: string[] = [routes.account];
+export const protectedPrefixes: string[] = [routes.account, routes.admin];
 
 /** Login and sign-up pages, which a signed-in user skips. */
 export const guestOnlyPaths: string[] = [routes.login, routes.register];
