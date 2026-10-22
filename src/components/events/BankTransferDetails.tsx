@@ -12,10 +12,12 @@ type BankTransferDetailsProps = {
   deadline: string | null;
   /** From app_settings; until an admin fills it in, placeholders are shown. */
   bank: BankDetails;
+  /** What is released when the deadline passes: "мястото" (events) or "часът" (consultations). */
+  subject?: string;
 };
 
 /** What to put on the bank transfer: amount, reference, deadline and the association's account. */
-export function BankTransferDetails({ amountCents, reference, deadline, bank }: BankTransferDetailsProps) {
+export function BankTransferDetails({ amountCents, reference, deadline, bank, subject = "мястото" }: BankTransferDetailsProps) {
   const rows: { term: string; value: string | null; mono?: boolean }[] = [
     { term: "Сума", value: formatPrice(amountCents) },
     { term: "Основание", value: reference, mono: true },
@@ -52,7 +54,7 @@ export function BankTransferDetails({ amountCents, reference, deadline, bank }: 
       {missingAccount && <Placeholder>Получател, IBAN и BIC на сдружението.</Placeholder>}
       <Typography variant="body2" sx={{ color: "text.secondary" }}>
         Напиши основанието точно както е показано, за да свържем превода със заявката ти. Ако преводът не пристигне до
-        крайния срок, мястото се освобождава.
+        крайния срок, {subject} се освобождава.
       </Typography>
     </Panel>
   );
