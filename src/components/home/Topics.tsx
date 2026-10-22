@@ -17,7 +17,8 @@ export function Topics() {
           p: 0,
           display: "grid",
           gap: 1.75,
-          gridTemplateColumns: { xs: "repeat(2, 1fr)", sm: "repeat(3, 1fr)", lg: "repeat(6, 1fr)" },
+          // minmax(0, 1fr): a long word like "Психологическа" must not widen its column past a 320px screen.
+          gridTemplateColumns: { xs: "repeat(2, minmax(0, 1fr))", sm: "repeat(3, minmax(0, 1fr))", lg: "repeat(6, minmax(0, 1fr))" },
         }}
       >
         {topics.map((topic) => (
@@ -29,7 +30,7 @@ export function Topics() {
               border: "1px solid",
               borderColor: "divider",
               borderRadius: "18px",
-              p: 2,
+              p: { xs: 1.5, sm: 2 },
               minHeight: 136,
               display: "flex",
               flexDirection: "column",
@@ -39,7 +40,7 @@ export function Topics() {
             <Box aria-hidden sx={{ fontSize: 23, lineHeight: 1.2, color: "brand.accent" }}>
               {topic.icon}
             </Box>
-            <Typography variant="h6" component="h3" sx={{ fontSize: 15 }}>
+            <Typography variant="h6" component="h3" sx={{ fontSize: { xs: 14, sm: 15 }, overflowWrap: "anywhere" }}>
               {topic.title}
             </Typography>
             <Typography sx={{ fontSize: 12, color: "text.secondary" }}>{topic.text}</Typography>
