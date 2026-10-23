@@ -12,11 +12,9 @@ import { formatPrice } from "@/lib/locale";
 import { joinPlanPath, routes } from "@/lib/routes";
 import { perInterval, type PublicPlan } from "@/lib/subscriptions/plans";
 import { listPublicPlans } from "@/lib/subscriptions/queries";
+import { pageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
-  title: "Членство",
-  description: "Месечните членства в Сдружение Женски свят: какво включват, колко струват и как се плащат.",
-};
+export const metadata: Metadata = pageMetadata("membership");
 
 /** Plans that also have their own page with more about them. */
 const planPages = new Map<string, string>(Object.values(membershipPlans).map((plan) => [plan.slug, plan.href]));

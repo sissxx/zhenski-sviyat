@@ -8,11 +8,9 @@ import { Panel } from "@/components/ui/Panel";
 import { Section } from "@/components/ui/Section";
 import { supportAreas } from "@/content/about";
 import { routes } from "@/lib/routes";
+import { pageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
-  title: "За нас",
-  description: "Подкрепа, развитие и взаимопомощ: направленията, в които Сдружение Женски свят подкрепя жените.",
-};
+export const metadata: Metadata = pageMetadata("about");
 
 export default function AboutPage() {
   return (

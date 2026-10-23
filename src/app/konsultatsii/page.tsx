@@ -12,11 +12,9 @@ import { getBookingRules, listConsultationServices } from "@/lib/consultations/q
 import { bookingPriceLabel, paymentModeOf, servicePriceLabel } from "@/lib/consultations/types";
 import { createClient } from "@/lib/supabase/server";
 import { routes } from "@/lib/routes";
+import { pageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
-  title: "Индивидуални консултации",
-  description: "Запиши час за лична или онлайн консултация със специалист: психолог, адвокат, здравна грижа и развитие.",
-};
+export const metadata: Metadata = pageMetadata("consultations");
 
 type ConsultationsPageProps = { searchParams: Promise<{ usluga?: string | string[]; spetsialist?: string | string[] }> };
 

@@ -6,11 +6,9 @@ import { PageIntro } from "@/components/ui/PageIntro";
 import { Panel } from "@/components/ui/Panel";
 import { Placeholder } from "@/components/ui/Placeholder";
 import { Section } from "@/components/ui/Section";
+import { pageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
-  title: "Контакти",
-  description: "Свържи се със Сдружение Женски свят чрез контактната форма или националния телефон за връзка.",
-};
+export const metadata: Metadata = pageMetadata("contacts");
 
 type ContactPageProps = { searchParams: Promise<{ tema?: string | string[] }> };
 

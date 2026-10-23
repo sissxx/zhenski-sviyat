@@ -6,11 +6,9 @@ import { PageIntro } from "@/components/ui/PageIntro";
 import { Section } from "@/components/ui/Section";
 import { goals } from "@/content/about";
 import { routes } from "@/lib/routes";
+import { pageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
-  title: "Нашите цели",
-  description: "Целите на Сдружение Женски свят: сътрудничество, подкрепа и по-силна роля на жените в обществото.",
-};
+export const metadata: Metadata = pageMetadata("goals");
 
 export default function GoalsPage() {
   return (

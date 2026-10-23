@@ -8,11 +8,9 @@ import { Placeholder } from "@/components/ui/Placeholder";
 import { Section } from "@/components/ui/Section";
 import { partnerSlots, supportOptions } from "@/content/support";
 import { contactPath } from "@/lib/routes";
+import { pageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
-  title: "Партньори и подкрепи ни",
-  description: "Партньорите на Сдружение Женски свят и начините да подкрепиш дейността ни с дарение или партньорство.",
-};
+export const metadata: Metadata = pageMetadata("support");
 
 export default function SupportPage() {
   return (

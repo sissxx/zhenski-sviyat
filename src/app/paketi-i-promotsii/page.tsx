@@ -8,11 +8,9 @@ import { Placeholder } from "@/components/ui/Placeholder";
 import { Section } from "@/components/ui/Section";
 import { servicePackages } from "@/content/packages";
 import { contactPath } from "@/lib/routes";
+import { pageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
-  title: "Пакети и промоции",
-  description: "Комбинирани предложения за услуги и членство в Сдружение Женски свят.",
-};
+export const metadata: Metadata = pageMetadata("packages");
 
 export default function PackagesPage() {
   return (

@@ -7,15 +7,26 @@ import { inter, lora } from "@/theme/fonts";
 import { brand } from "@/theme/tokens";
 import { Providers } from "./providers";
 import { site } from "@/lib/site";
+import { isIndexable, siteUrl } from "@/lib/seo/config";
+import { pageMetadata } from "@/lib/seo/metadata";
 
+const home = pageMetadata("home");
+
+/**
+ * Defaults for every page. Public pages set their own title, description, canonical URL and share
+ * image (src/lib/seo); the rest fall back to the homepage preview.
+ */
 export const metadata: Metadata = {
-  title: {
-    default: `${site.name} — ${site.tagline}`,
-    template: `%s · ${site.shortName}`,
-  },
-  description:
-    `${site.name}: общност за подкрепа, споделяне и развитие на жените в България.`,
-  openGraph: { locale: "bg_BG", type: "website", siteName: site.name },
+  ...home,
+  metadataBase: new URL(siteUrl()),
+  title: { default: `${site.name} — ${site.tagline}`, template: `%s · ${site.shortName}` },
+  // Each page names its own canonical URL; inheriting the homepage's would point them all home.
+  alternates: undefined,
+  openGraph: { ...home.openGraph, url: undefined },
+  applicationName: site.name,
+  robots: isIndexable()
+    ? { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large" } }
+    : { index: false, follow: false },
 };
 
 export const viewport: Viewport = {

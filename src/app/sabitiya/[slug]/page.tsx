@@ -9,14 +9,17 @@ import { Panel } from "@/components/ui/Panel";
 import { Section } from "@/components/ui/Section";
 import { getEventBySlug, getMyActiveRegistration } from "@/lib/events/queries";
 import { eventLocationLabel, registrationStatusLabels, type PublicEvent } from "@/lib/events/types";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { formatDate, formatDateTime } from "@/lib/locale";
 import { eventConfirmationPath, eventRegistrationPath, routes } from "@/lib/routes";
+import { eventMetadata } from "@/lib/seo/metadata";
+import { eventJsonLd } from "@/lib/seo/structured-data";
 
 type EventPageProps = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: EventPageProps): Promise<Metadata> {
   const event = await getEventBySlug((await params).slug);
-  return event ? { title: event.title, description: event.summary ?? undefined } : {};
+  return event ? eventMetadata(event) : {};
 }
 
 const eyebrows: Record<PublicEvent["availability"], string> = {
@@ -59,6 +62,7 @@ export default async function EventPage({ params }: EventPageProps) {
 
   return (
     <>
+      <JsonLd data={eventJsonLd(event)} />
       <PageIntro
         eyebrow={eyebrows[event.availability]}
         title={event.title}
