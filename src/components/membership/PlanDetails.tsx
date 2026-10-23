@@ -75,7 +75,7 @@ function PaymentOption({ term, text }: { term: string; text: string }) {
       <Typography component="dt" sx={{ fontWeight: 600, fontSize: 14 }}>
         {term}
       </Typography>
-      <Typography component="dd" sx={{ m: 0, fontSize: 13, color: "text.secondary" }}>
+      <Typography component="dd" sx={{ m: 0, fontSize: 14, color: "text.secondary" }}>
         {text}
       </Typography>
     </Box>

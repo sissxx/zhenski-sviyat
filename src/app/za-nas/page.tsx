@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
+import { AppLink } from "@/components/ui/AppLink";
 import { PageIntro } from "@/components/ui/PageIntro";
 import { Panel } from "@/components/ui/Panel";
 import { Section } from "@/components/ui/Section";
@@ -35,14 +36,30 @@ export default function AboutPage() {
               <Typography variant="h6" component="h3" sx={{ color: "primary.main" }}>
                 {area.title}
               </Typography>
-              <Typography sx={{ fontSize: 14 }}>{area.text}</Typography>
+              <Typography sx={{ fontSize: 14, flexGrow: 1 }}>{area.text}</Typography>
+              <AppLink
+                href={routes.consultations}
+                aria-label={`Запиши консултация: ${area.title}`}
+                sx={{ fontSize: 14, fontWeight: 600 }}
+              >
+                Запиши консултация <span aria-hidden>→</span>
+              </AppLink>
             </Panel>
           ))}
         </Box>
       </Section>
 
-      <Section bg="brand.sand">
+      <Section bg="brand.sand" aria-labelledby="about-next-title">
+        <Typography id="about-next-title" variant="h3" component="h2" sx={{ mb: 1.5 }}>
+          Какво следва?
+        </Typography>
+        <Typography sx={{ mb: 2.5, maxWidth: 720 }}>
+          Запиши час при специалист или научи повече за хората и целите зад сдружението.
+        </Typography>
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5 }}>
+          <Button variant="contained" href={routes.consultations}>
+            Запиши консултация
+          </Button>
           <Button variant="outlined" href={routes.founders}>
             Запознай се с учредителите
           </Button>

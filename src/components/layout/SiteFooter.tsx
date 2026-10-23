@@ -6,7 +6,7 @@ import { footerNav, routes } from "@/lib/routes";
 import { NewsletterForm } from "./NewsletterForm";
 import { site } from "@/lib/site";
 
-const linkSx = { color: "brand.sage", fontSize: 13, "&:hover": { color: "brand.paper" } } as const;
+const linkSx = { color: "brand.sage", fontSize: 14, "&:hover": { color: "brand.paper" } } as const;
 
 export function SiteFooter() {
   return (
@@ -21,7 +21,7 @@ export function SiteFooter() {
         >
           <Box sx={{ display: "flex", flexDirection: "column", gap: 1.25 }}>
             <SiteWordmark />
-            <Typography sx={{ fontSize: 13, color: "brand.sage", maxWidth: 240 }}>
+            <Typography sx={{ fontSize: 14, color: "brand.sage", maxWidth: 240 }}>
               Обединяваме и подкрепяме жените за по-добър живот.
             </Typography>
           </Box>
@@ -49,7 +49,7 @@ export function SiteFooter() {
 
           <Box>
             <NewsletterForm />
-            <Typography sx={{ fontSize: 12, color: "brand.sage" }}>
+            <Typography sx={{ fontSize: 14, color: "brand.sage" }}>
               <AppLink href={routes.privacy} sx={linkSx}>
                 Поверителност
               </AppLink>
@@ -60,7 +60,7 @@ export function SiteFooter() {
             </Typography>
           </Box>
         </Box>
-        <Typography sx={{ mt: 5, pt: 3, borderTop: "1px solid rgba(255,255,252,0.15)", fontSize: 12, color: "brand.sage" }}>
+        <Typography sx={{ mt: 5, pt: 3, borderTop: "1px solid rgba(255,255,252,0.15)", fontSize: 14, color: "brand.sage" }}>
           © {new Date().getFullYear()} {site.name}
         </Typography>
       </Box>

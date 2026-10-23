@@ -39,6 +39,17 @@ test("says when no events are announced yet", async ({ page }) => {
   await expect(page.getByText("Подготвяме следващите срещи. Скоро ще ги обявим тук.")).toBeVisible();
 });
 
+test("topic cards lead to booking a consultation", async ({ page }) => {
+  const topics = page.getByRole("region", { name: "Подкрепа за всяка част от твоя път" });
+  await topics.getByRole("link", { name: /Юридическа подкрепа/ }).click();
+  await expect(page).toHaveURL("/konsultatsii");
+});
+
+test("without events the section still offers a next step", async ({ page }) => {
+  const events = page.getByRole("region", { name: "Събития, които ни събират" });
+  await expect(events.getByRole("link", { name: "Заяви консултация" })).toHaveAttribute("href", "/konsultatsii");
+});
+
 test("FAQ answers open and close", async ({ page }) => {
   const question = page.getByRole("button", { name: "Как мога да стана член?" });
   await expect(question).toHaveAttribute("aria-expanded", "false");
@@ -66,7 +77,7 @@ test.describe("desktop navigation", () => {
     await nav.getByRole("link", { name: "Събития" }).click();
     await expect(page).toHaveURL("/sabitiya");
     await expect(nav.getByRole("link", { name: "Събития" })).toHaveAttribute("aria-current", "page");
-    await expect(nav.getByRole("link", { name: "Начало", exact: true })).not.toHaveAttribute("aria-current");
+    await expect(nav.getByRole("link", { name: "За нас", exact: true })).not.toHaveAttribute("aria-current");
   });
 
   test("header buttons lead to login and sign-up", async ({ page }) => {

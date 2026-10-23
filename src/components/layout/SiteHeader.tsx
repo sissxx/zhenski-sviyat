@@ -16,7 +16,7 @@ import SvgIcon from "@mui/material/SvgIcon";
 import Toolbar from "@mui/material/Toolbar";
 import { WomensWorldLogo } from "@/components/brand/Logo";
 import { useSignedIn } from "@/components/auth/useSignedIn";
-import { mainNav, routes } from "@/lib/routes";
+import { homeNavItem, mainNav, routes } from "@/lib/routes";
 import { site } from "@/lib/site";
 
 function MenuIcon() {
@@ -63,7 +63,7 @@ export function SiteHeader() {
           <WomensWorldLogo />
         </AppLink>
 
-        <Box component="ul" sx={{ display: { xs: "none", lg: "flex" }, gap: 2.25, listStyle: "none", m: 0, p: 0 }}>
+        <Box component="ul" sx={{ display: { xs: "none", lg: "flex" }, gap: { lg: 1.5, xl: 2.25 }, listStyle: "none", m: 0, p: 0 }}>
           {mainNav.map((item) => {
             const active = isActive(pathname, item.href);
             return (
@@ -134,7 +134,7 @@ export function SiteHeader() {
           </IconButton>
         </Box>
         <List component="nav" aria-label="Мобилна навигация" sx={{ px: 1 }}>
-          {mainNav.map((item) => {
+          {[homeNavItem, ...mainNav].map((item) => {
             const active = isActive(pathname, item.href);
             return (
               <ListItemButton

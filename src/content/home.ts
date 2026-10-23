@@ -1,3 +1,5 @@
+import { supportAreas } from "@/content/about";
+import { founders } from "@/content/founders";
 import { routes } from "@/lib/routes";
 
 /**
@@ -35,8 +37,9 @@ export const services = [
   },
 ];
 
+/** Facts counted from the site's own content, so they stay true when that content changes. */
 export const missionStats = [
-  { value: "8+", label: "направления" },
-  { value: "100%", label: "подкрепа" },
-  { value: "Заедно", label: "по-силни" },
+  { value: String(supportAreas.length), label: "направления на подкрепа" },
+  { value: String(founders.length), label: "учредители специалисти" },
+  { value: "Онлайн", label: "и на живо" },
 ];

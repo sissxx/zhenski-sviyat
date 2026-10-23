@@ -61,9 +61,9 @@ const theme = createTheme(
       h5: { fontFamily: headingFont, fontWeight: 700, color: brand.dark, lineHeight: 1.3, fontSize: "1.25rem" },
       h6: { fontFamily: headingFont, fontWeight: 700, color: brand.dark, lineHeight: 1.3, fontSize: "1.125rem" },
       subtitle1: { fontSize: "1.125rem", lineHeight: 1.5 },
-      body1: { fontSize: "0.9375rem", lineHeight: 1.5 },
-      body2: { fontSize: "0.8125rem", lineHeight: 1.5 },
-      caption: { fontSize: "0.75rem", lineHeight: 1.45, color: brand.muted },
+      body1: { fontSize: "1rem", lineHeight: 1.6 },
+      body2: { fontSize: "0.875rem", lineHeight: 1.55 },
+      caption: { fontSize: "0.8125rem", lineHeight: 1.45, color: brand.muted },
       button: { fontWeight: 600, fontSize: "0.875rem", textTransform: "none", letterSpacing: 0 },
       eyebrow: {
         fontFamily: bodyFont,

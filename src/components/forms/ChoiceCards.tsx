@@ -54,7 +54,7 @@ export function ChoiceCards<T extends string>({ legend, name, choices, value, on
                     {choice.label}
                   </Typography>
                   {choice.hint && (
-                    <Typography component="span" sx={{ display: "block", fontSize: 13, color: "text.secondary" }}>
+                    <Typography component="span" sx={{ display: "block", fontSize: 14, color: "text.secondary" }}>
                       {choice.hint}
                     </Typography>
                   )}
