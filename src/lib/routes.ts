@@ -30,6 +30,7 @@ export const routes = {
   accountSpecialist: "/profil/spetsialist",
   privacy: "/poveritelnost",
   terms: "/obshti-usloviya",
+  cookies: "/biskvitki",
   admin: "/admin",
 } as const;
 

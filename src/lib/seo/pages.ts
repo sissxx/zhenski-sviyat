@@ -118,6 +118,12 @@ export const sharePages = {
     description: "Условия за ползване на сайта, профилите, записванията, консултациите и членствата.",
     eyebrow: "Документи",
   },
+  cookies: {
+    path: routes.cookies,
+    title: "Политика за бисквитките",
+    description: "Кои бисквитки използва сайтът на Сдружение Женски свят и защо.",
+    eyebrow: "Документи",
+  },
 } satisfies Record<string, SharePage>;
 
 export type SharePageKey = keyof typeof sharePages;

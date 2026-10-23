@@ -57,6 +57,10 @@ export function SiteFooter() {
               <AppLink href={routes.terms} sx={linkSx}>
                 Общи условия
               </AppLink>
+              {" · "}
+              <AppLink href={routes.cookies} sx={linkSx}>
+                Бисквитки
+              </AppLink>
             </Typography>
           </Box>
         </Box>

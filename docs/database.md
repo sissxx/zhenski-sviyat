@@ -132,6 +132,11 @@ Viber membership can't be automated reliably (spec 9).
 `20261023100000_maintenance_cron.sql`). It expires unpaid holds and payments, ends lapsed bank-transfer periods and unconfirmed sign-ups,
 and marks past bookings and events completed. Holds are also cleaned up whenever someone books.
 
+**Data retention.** The daily pg_cron job `purge-personal-data` (03:30 UTC, migration `20261023180000_data_retention.sql`)
+runs `purge_expired_personal_data()`: contact messages and the email log after 2 years, consultation notes 1 year after
+the session (also scrubbed from the audit log), audit log rows after 3 years. Payments are kept (accounting law, 10 years).
+These periods are the ones in the privacy policy (`src/content/legal/privacy.ts`); change both together.
+
 **Reminders.** `due_reminders()` lists the reminder emails due now, and the hourly pg_cron job `send-reminders` asks the
 site to send them (`request_reminder_run()`, pg_net + Supabase Vault). Timing lives in `app_settings`
 (`consultation_reminder_hours`, `event_reminder_hours`, `subscription_reminder_days`). See docs/emails.md.

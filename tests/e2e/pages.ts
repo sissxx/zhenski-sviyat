@@ -21,4 +21,5 @@ export const publicPages = [
   routes.forgotPassword,
   routes.privacy,
   routes.terms,
+  routes.cookies,
 ];

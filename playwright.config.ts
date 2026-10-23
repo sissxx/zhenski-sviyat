@@ -1,4 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
+import { cookieNoticeClosed } from "./tests/cookie-notice";
 
 /**
  * Smoke tests against a production build (`npm run build` first). They run without Supabase, Stripe or Brevo
@@ -17,6 +18,8 @@ export default defineConfig({
   reporter: process.env.CI ? [["github"], ["html", { open: "never" }]] : "list",
   use: {
     baseURL: `http://localhost:${port}`,
+    // The cookie notice is fixed at the bottom and would cover buttons; tests/e2e/cookie-notice.spec.ts checks it.
+    storageState: cookieNoticeClosed(`http://localhost:${port}`),
     locale: "bg-BG",
     timezoneId: "Europe/Sofia",
     trace: "retain-on-failure",

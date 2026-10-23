@@ -1,4 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
+import { cookieNoticeClosed } from "./tests/cookie-notice";
 import { fakeBrevoPort, fakeBrevoUrl, testEnv } from "./tests/db/env";
 
 /**
@@ -27,6 +28,8 @@ export default defineConfig({
     ...devices["Desktop Chrome"],
     viewport: { width: 1440, height: 900 },
     baseURL: `http://localhost:${port}`,
+    // The cookie notice is fixed at the bottom and would cover buttons; tests/e2e/cookie-notice.spec.ts checks it.
+    storageState: cookieNoticeClosed(`http://localhost:${port}`),
     locale: "bg-BG",
     timezoneId: "Europe/Sofia",
     trace: "retain-on-failure",
