@@ -31,6 +31,14 @@ export function formatWhen(startsAt: string, endsAt?: string | null): string {
   return formatDateTime(startsAt);
 }
 
+/** "днес", "утре" or "на 15 май 2027 г.", by the Sofia calendar day. */
+export function dayPhrase(startsAt: string, now: Date = new Date()): string {
+  const day = sofiaDateKey(startsAt);
+  if (day === sofiaDateKey(now)) return "днес";
+  if (day === sofiaDateKey(new Date(now.getTime() + 86_400_000))) return "утре";
+  return `на ${formatDate(startsAt)}`;
+}
+
 /** `lapse` says what happens when the deadline passes, e.g. "мястото се освобождава". */
 function bankBlocks(bank: BankInstructions, lapse: string): EmailBlock[] {
   return [
@@ -127,6 +135,26 @@ export function eventRegistrationPendingPayment(data: EventRegistrationData & { 
   };
 }
 
+export function eventReminder(data: EventRegistrationData): EmailContent {
+  const when = `${dayPhrase(data.startsAt)} от ${formatTime(data.startsAt)}`;
+  return {
+    subject: `Напомняне: „${data.eventTitle}“ е ${when}`,
+    preheader: `Очакваме те ${when}. ${data.place ?? ""}`.trim(),
+    heading: "Очакваме те скоро",
+    greeting: greeting(data.firstName),
+    blocks: [
+      { kind: "text", text: `Напомняме ти за „${data.eventTitle}“, ${when}. Мястото ти е запазено.` },
+      eventDetails(data),
+      ...attendeeBlocks(data),
+      { kind: "button", label: "Виж събитието", url: data.eventUrl },
+      {
+        kind: "note",
+        text: `Ако няма да можеш да дойдеш, откажи записването си от профила, за да освободиш мястото: ${data.accountUrl}`,
+      },
+    ],
+  };
+}
+
 // --- Payments ---------------------------------------------------------------------------------------------
 
 export type PaymentConfirmedData = {
@@ -209,6 +237,64 @@ export function subscriptionPendingPayment(data: SubscriptionBankTransferData): 
       },
       ...bankBlocks(data.bank, data.renewal ? "членството остава до края на вече платения период" : "заявката отпада"),
       { kind: "button", label: "Моите абонаменти", url: data.accountUrl },
+    ],
+  };
+}
+
+export type SubscriptionReminderData = {
+  firstName: string | null;
+  planName: string;
+  priceCents: number;
+  /** End of the month already paid. */
+  paidUntil: string;
+  accountUrl: string;
+  /** Set when the member already started the renewal and the transfer hasn't been confirmed yet. */
+  bank: BankInstructions | null;
+};
+
+export function subscriptionRenewalReminder(data: SubscriptionReminderData): EmailContent {
+  const until = formatDate(data.paidUntil);
+  if (data.bank) {
+    return {
+      subject: `Напомняне: членството „${data.planName}“ изтича на ${until}`,
+      preheader: `Все още не сме получили превода за подновяване. Членството е платено до ${until}.`,
+      heading: "Очакваме превода ти",
+      greeting: greeting(data.firstName),
+      blocks: [
+        {
+          kind: "text",
+          text: `Членството ти „${data.planName}“ е платено до ${until}. Започна подновяване по банков път, но все още не сме получили превода.`,
+        },
+        ...bankBlocks(data.bank, "членството остава до края на вече платения период"),
+        { kind: "note", text: "Ако преводът вече е направен, няма нужда да правиш нищо: понякога пристига за 1–2 работни дни." },
+        { kind: "button", label: "Моите абонаменти", url: data.accountUrl },
+      ],
+    };
+  }
+  return {
+    subject: `Напомняне: членството „${data.planName}“ изтича на ${until}`,
+    preheader: `Поднови го по банков път, за да не прекъсва достъпът ти.`,
+    heading: "Време е за подновяване",
+    greeting: greeting(data.firstName),
+    blocks: [
+      {
+        kind: "text",
+        text: `Членството ти „${data.planName}“ е платено до ${until}. За да продължи и следващия месец, поднови го по банков път от профила си.`,
+      },
+      {
+        kind: "details",
+        rows: [
+          { label: "Членство", value: data.planName },
+          { label: "Платено до", value: until },
+          { label: "Такса за месец", value: formatPrice(data.priceCents) },
+        ],
+      },
+      {
+        kind: "callout",
+        text: "В „Моите абонаменти“ натисни „Поднови с превод“ и ще видиш данните за превода с основанието за плащане.",
+      },
+      { kind: "button", label: "Поднови членството", url: data.accountUrl },
+      { kind: "note", text: `Ако не подновиш, достъпът ти остава до ${until} и след това спира.` },
     ],
   };
 }
@@ -309,6 +395,27 @@ export function consultationRescheduled(data: ConsultationData & { previousStart
     blocks: [
       { kind: "text", text: "Преместихме консултацията ти. Ето новия час." },
       consultationDetails(data, [{ label: "Предишен час", value: formatDateTime(data.previousStartsAt) }]),
+      { kind: "button", label: "Моите консултации", url: data.accountUrl },
+    ],
+  };
+}
+
+export function consultationReminder(data: ConsultationData & { cancelDeadlineHours: number | null }): EmailContent {
+  const when = `${dayPhrase(data.startsAt)} в ${formatTime(data.startsAt)}`;
+  return {
+    subject: `Напомняне: консултацията ти е ${when}`,
+    preheader: `${data.serviceName} ${withName(data.specialistName)}, ${when}.`,
+    heading: "Напомняне за консултация",
+    greeting: greeting(data.firstName),
+    blocks: [
+      { kind: "text", text: `Напомняме ти, че имаш консултация ${when}.` },
+      consultationDetails(data),
+      {
+        kind: "note",
+        text: data.cancelDeadlineHours
+          ? `Ако няма да можеш да дойдеш, откажи или премести часа от профила си (до ${data.cancelDeadlineHours} ч. преди началото), или ни пиши, като отговориш на този имейл.`
+          : "Ако няма да можеш да дойдеш, моля, кажи ни, като отговориш на този имейл.",
+      },
       { kind: "button", label: "Моите консултации", url: data.accountUrl },
     ],
   };

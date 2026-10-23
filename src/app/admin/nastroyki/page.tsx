@@ -17,6 +17,9 @@ const numberFields = [
   "bank_transfer_hold_days",
   "subscription_renewal_window_days",
   "subscription_past_due_grace_days",
+  "consultation_reminder_hours",
+  "event_reminder_hours",
+  "subscription_reminder_days",
 ] as const;
 
 const textFields = ["bank_transfer_beneficiary", "bank_transfer_iban", "bank_transfer_bic", "bank_transfer_bank_name"] as const;

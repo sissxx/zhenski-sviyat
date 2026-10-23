@@ -77,9 +77,12 @@ test.describe("admin panel", () => {
     expect(body).toContain('"Потвърдено"');
   });
 
-  test("an admin changes the bank details shown to payers", async ({ page }) => {
+  test("an admin changes the bank details shown to payers and sees the reminder timing", async ({ page }) => {
     const admin = await createUser({ admin: true });
     await login(page, admin, "/admin/nastroyki");
+    await expect(page.getByLabel("Преди консултация (часа)")).toHaveValue("24");
+    await expect(page.getByLabel("Преди събитие (часа)")).toHaveValue("24");
+    await expect(page.getByLabel("Преди края на платен месец по банков път (дни)")).toHaveValue("5");
     const field = page.getByLabel("Банка", { exact: true });
     const original = await field.inputValue();
     await field.fill("Банка за теста");

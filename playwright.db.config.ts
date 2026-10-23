@@ -1,5 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
-import { testEnv } from "./tests/db/env";
+import { fakeBrevoPort, fakeBrevoUrl, testEnv } from "./tests/db/env";
 
 /**
  * Database tests: the real pages against a local Supabase started with `npx supabase start`, which applies
@@ -8,6 +8,7 @@ import { testEnv } from "./tests/db/env";
  *
  * tests/db/env.ts refuses any Supabase that isn't on this machine, so the live project is never touched.
  * Stripe runs with a placeholder test key: the tests sign webhook events themselves and never call Stripe.
+ * Emails go to a local stand-in for Brevo (tests/db/fake-brevo.ts), so the tests can read what was sent.
  */
 const port = Number(process.env.E2E_DB_PORT ?? 3200);
 const executablePath = process.env.PLAYWRIGHT_CHROMIUM_PATH || undefined;
@@ -31,11 +32,18 @@ export default defineConfig({
     trace: "retain-on-failure",
     launchOptions: { executablePath },
   },
-  webServer: {
-    command: `npm run start -- -p ${port}`,
-    url: `http://localhost:${port}`,
-    reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
-    env: testEnv,
-  },
+  webServer: [
+    {
+      command: `node --experimental-strip-types --no-warnings tests/db/fake-brevo.ts ${fakeBrevoPort}`,
+      url: fakeBrevoUrl,
+      reuseExistingServer: !process.env.CI,
+    },
+    {
+      command: `npm run start -- -p ${port}`,
+      url: `http://localhost:${port}`,
+      reuseExistingServer: !process.env.CI,
+      timeout: 120_000,
+      env: testEnv,
+    },
+  ],
 });

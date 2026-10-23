@@ -327,6 +327,37 @@ select checks.ok((select count(*) = 1 from public.viber_access_actions where act
   'admin to-do list asks to remove alice');
 
 -- ---------------------------------------------------------------------------
+-- Reminder emails
+-- ---------------------------------------------------------------------------
+insert into public.events (id, slug, title, status, starts_at, price_cents, capacity) values
+  ('10000000-0000-0000-0000-0000000000e1', 'napomnyane', 'Скоро', 'published', now() + interval '10 hours', 0, 10);
+insert into public.event_registrations (event_id, user_id, status, price_cents, confirmed_at, created_at) values
+  ('10000000-0000-0000-0000-0000000000e1', '00000000-0000-0000-0000-00000000000b', 'confirmed', 0, now() - interval '2 days', now() - interval '2 days'),
+  ('10000000-0000-0000-0000-0000000000e1', '00000000-0000-0000-0000-00000000000c', 'confirmed', 0, now() - interval '1 hour', now() - interval '1 hour');
+
+select checks.expect_error($$set local role authenticated; select public.due_reminders()$$, 'permission denied');
+reset role;
+select checks.ok((select count(*) = 1 from public.due_reminders() d
+                   join public.event_registrations r on r.id = d.target_id
+                  where d.kind = 'event' and r.user_id = '00000000-0000-0000-0000-00000000000b'),
+  'event reminder due for the early sign-up');
+select checks.ok((select count(*) = 0 from public.due_reminders() d
+                   join public.event_registrations r on r.id = d.target_id
+                  where r.user_id = '00000000-0000-0000-0000-00000000000c'),
+  'no reminder for a sign-up inside the window');
+
+update public.app_settings set event_reminder_hours = 0 where id;
+select checks.ok((select count(*) = 0 from public.due_reminders() where kind = 'event'), 'event reminders can be switched off');
+update public.app_settings set event_reminder_hours = 24 where id;
+
+insert into public.email_log (to_email, template_key, dedupe_key, status)
+select 'alice@example.org', 'event_reminder', dedupe_key, 'sent' from public.due_reminders() where kind = 'event';
+select checks.ok((select count(*) = 0 from public.due_reminders() where kind = 'event'), 'a sent reminder is not due again');
+
+select checks.ok((select public.request_reminder_run() is null), 'reminder run does nothing without the Vault secrets');
+select checks.ok(exists (select 1 from cron.job where jobname = 'send-reminders' and schedule = '5 * * * *'), 'hourly reminder job scheduled');
+
+-- ---------------------------------------------------------------------------
 -- Admin safety and audit trail
 -- ---------------------------------------------------------------------------
 select checks.expect_error($$delete from public.user_roles where role = 'admin'$$, 'last_admin');
