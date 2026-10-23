@@ -6,6 +6,6 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Skip static files, images and the Stripe webhook (no user session there).
-  matcher: ["/((?!_next/static|_next/image|api/stripe/|brand/|icon.svg|apple-icon.png|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)"],
+  // Skip static files, images, the Stripe webhook and the cron endpoints (no user session there).
+  matcher: ["/((?!_next/static|_next/image|api/stripe/|api/cron/|brand/|icon.svg|apple-icon.png|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)"],
 };

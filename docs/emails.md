@@ -4,7 +4,7 @@ All emails are Bulgarian, one column, readable on phones. Two kinds:
 
 1. **Account emails** (confirm sign-up, reset password, change email) are sent by **Supabase Auth**. They go
    through Brevo once Supabase's SMTP settings point at Brevo, and use the templates in `supabase/templates/`.
-2. **Site emails** (events, payments, consultations) are sent by the app through the **Brevo API**.
+2. **Site emails** (events, payments, consultations, reminders) are sent by the app through the **Brevo API**.
 
 ## Site emails
 
@@ -18,6 +18,9 @@ All emails are Bulgarian, one column, readable on phones. Two kinds:
 | Consultation booked | specialist | `consultation_booked_specialist` |
 | Consultation cancelled (by client, specialist or admin) | client, and the specialist unless they cancelled it | `consultation_cancelled`, `consultation_cancelled_specialist` |
 | Consultation moved by the client | client and specialist | `consultation_rescheduled`, `consultation_rescheduled_specialist` |
+| **Reminder**, 24 h before a confirmed consultation | client | `consultation_reminder` |
+| **Reminder**, 24 h before an event | everyone with a confirmed place | `event_reminder` (includes the online link / attendee notes) |
+| **Reminder**, 5 days before a bank-transfer membership month ends | member | `subscription_renewal_reminder` ("renew" link, or the transfer details again if the renewal was started but not paid) |
 
 Specialists get mail at `specialist_private.notification_email`, or their login email when that is empty. A specialist
 without either gets no notices.
@@ -37,6 +40,48 @@ without either gets no notices.
 Card payments call `notifyLater(() => notifyPaymentConfirmed(paymentId))` once the payment is `succeeded`
 (src/lib/stripe/checkout.ts and webhook.ts, see docs/payments.md); the same email covers both payment methods.
 
+## Reminders
+
+Migration `20261023120000_reminders.sql`. How it works:
+
+1. `due_reminders()` (database) lists the reminders due now: confirmed consultations and event places starting
+   within the reminder window, and active bank-transfer memberships whose paid month ends within the window. Anything
+   already in `email_log` under the same `dedupe_key` is left out, so each reminder goes **once**. The key includes the
+   start time (or period end), so a moved consultation or event, or the next month, gets its own reminder.
+2. A pg_cron job `send-reminders` runs `request_reminder_run()` at minute 5 of **every hour**. It makes an HTTP POST
+   (pg_net) to the site's `/api/cron/reminders` with `Authorization: Bearer <CRON_SECRET>`. Vercel Hobby crons run only
+   once a day, so the database is the clock here, as for `run_maintenance()`.
+3. The route (`src/app/api/cron/reminders/route.ts` → `src/lib/email/reminders.ts`) sends each due reminder through
+   `sendEmail()`, at most 100 per run (Brevo's free plan allows 300 a day).
+
+Rules:
+
+- **Timing is set in Admin → Настройки → "Напомняния по имейл"**: hours before a consultation (default 24), hours
+  before an event (24), days before a bank-transfer month ends (5). `0` switches a reminder off. The membership
+  reminder never goes earlier than renewal opens (`subscription_renewal_window_days`, default 14).
+- Something booked or confirmed **inside** the window gets no reminder (its confirmation email is recent).
+- No reminders for pending (unpaid) bookings, cancelled places, suspended accounts, card memberships (Stripe renews
+  them) or memberships set to end at the period end.
+- Without Brevo settings the run does nothing (rather than logging a `skipped` row every hour).
+
+### Switching reminders on (once, after the migration is applied)
+
+1. Make a long random secret, e.g. `openssl rand -hex 32`.
+2. Vercel → Settings → Environment Variables: add `CRON_SECRET` = that secret (Production, sensitive), then redeploy.
+3. Supabase → SQL Editor (or Project Settings → Vault), store the same secret and the endpoint address:
+
+   ```sql
+   select vault.create_secret('<the secret>', 'cron_secret');
+   select vault.create_secret('https://zhenski-sviyat.vercel.app/api/cron/reminders', 'reminders_url');
+   ```
+
+   When the domain changes, update `reminders_url` (`vault.update_secret`). Until both secrets exist the hourly job
+   does nothing.
+
+Check it: `select * from cron.job_run_details where jobid = (select jobid from cron.job where jobname = 'send-reminders')
+order by start_time desc limit 5;` (the job), `select * from net._http_response order by created desc limit 5;` (the
+site's answer, e.g. `{"status":"done","due":2,...}`) and `email_log` rows with template keys ending in `_reminder`.
+
 ### Settings (Vercel → Settings → Environment Variables)
 
 | Name | Value | Notes |
@@ -47,6 +92,7 @@ Card payments call `notifyLater(() => notifyPaymentConfirmed(paymentId))` once t
 | `EMAIL_REPLY_TO` | where replies should go | optional |
 | `SUPABASE_SECRET_KEY` | already set for Production | needed to read the data and write `email_log`; add it to Preview too to send from previews |
 | `NEXT_PUBLIC_SITE_URL` | `https://<domain>` once there is one | links in emails; without it Vercel's production URL is used |
+| `CRON_SECRET` | a long random string | **Sensitive.** Protects `/api/cron/reminders`; the same value goes in Supabase Vault as `cron_secret` (see Reminders) |
 
 Without `BREVO_API_KEY` or `EMAIL_FROM_ADDRESS` nothing is sent; each email is logged as `skipped`.
 Check what was sent in Supabase: `select * from email_log order by created_at desc;`.

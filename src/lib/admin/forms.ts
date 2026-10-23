@@ -505,6 +505,9 @@ export const settingsForm: EntityForm = {
     subscriptions_allow_bank_transfer: bool,
     subscription_renewal_window_days: intIn(1, 60),
     subscription_past_due_grace_days: intIn(0, 60),
+    consultation_reminder_hours: intIn(0, 168),
+    event_reminder_hours: intIn(0, 168),
+    subscription_reminder_days: intIn(0, 30),
     bank_transfer_beneficiary: optText(200),
     bank_transfer_iban: z
       .string()
@@ -549,6 +552,22 @@ export const settingsForm: EntityForm = {
         { name: "subscription_renewal_window_days", label: "Подновяване по банков път — от колко дни преди края", type: "number", span: 3 },
         { name: "subscription_past_due_grace_days", label: "Гратисен период при неуспешно плащане с карта (дни)", type: "number", span: 3 },
         { name: "subscriptions_allow_bank_transfer", label: "Абонаменти по банков път", type: "checkbox" },
+      ],
+    },
+    {
+      title: "Напомняния по имейл",
+      description:
+        "Изпращат се автоматично веднъж на всеки час. 0 изключва напомнянето. Записвания, направени по-малко от това време преди началото, не получават напомняне.",
+      fields: [
+        { name: "consultation_reminder_hours", label: "Преди консултация (часа)", type: "number", span: 3 },
+        { name: "event_reminder_hours", label: "Преди събитие (часа)", type: "number", span: 3 },
+        {
+          name: "subscription_reminder_days",
+          label: "Преди края на платен месец по банков път (дни)",
+          type: "number",
+          span: 3,
+          helperText: "Не по-рано от началото на подновяването.",
+        },
       ],
     },
     {

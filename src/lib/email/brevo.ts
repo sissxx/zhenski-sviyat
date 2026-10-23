@@ -7,7 +7,8 @@ import type { RenderedEmail } from "./layout";
  * The key lives only in BREVO_API_KEY on the server; the sender address must be a verified Brevo sender.
  */
 
-const endpoint = "https://api.brevo.com/v3/smtp/email";
+// BREVO_API_URL only exists for the database tests, which point it at a local stand-in (tests/db/fake-brevo.ts).
+const endpoint = () => process.env.BREVO_API_URL || "https://api.brevo.com/v3/smtp/email";
 
 export type Recipient = { email: string; name?: string | null };
 
@@ -21,7 +22,7 @@ export async function sendViaBrevo(to: Recipient, email: RenderedEmail, tag: str
   if (!apiKey || !fromAddress) throw new Error("BREVO_API_KEY or EMAIL_FROM_ADDRESS is not set");
 
   const replyTo = process.env.EMAIL_REPLY_TO;
-  const response = await fetch(endpoint, {
+  const response = await fetch(endpoint(), {
     method: "POST",
     headers: { "api-key": apiKey, "content-type": "application/json", accept: "application/json" },
     body: JSON.stringify({

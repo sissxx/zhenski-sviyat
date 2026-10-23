@@ -40,6 +40,13 @@ export const secretKey = process.env.TEST_SUPABASE_SECRET_KEY!;
 /** Placeholder Stripe test settings: card options show, and the tests sign webhook events with this secret. */
 export const stripeWebhookSecret = "whsec_local_database_tests";
 
+/** Port and address of the stand-in for Brevo started by playwright.db.config.ts. */
+export const fakeBrevoPort = Number(process.env.FAKE_BREVO_PORT ?? 3299);
+export const fakeBrevoUrl = `http://127.0.0.1:${fakeBrevoPort}`;
+
+/** The reminder endpoint's secret; the database's hourly job sends the real one from Supabase Vault. */
+export const cronSecret = "cron_local_database_tests";
+
 /** Environment for `next build` and `next start` in the database tests. */
 export const testEnv: Record<string, string> = {
   NEXT_PUBLIC_SUPABASE_URL: supabaseTestUrl,
@@ -48,8 +55,10 @@ export const testEnv: Record<string, string> = {
   STRIPE_SECRET_KEY: "sk_test_local_database_tests",
   STRIPE_WEBHOOK_SECRET: stripeWebhookSecret,
   STRIPE_ALLOW_LIVE: "",
-  // No Brevo: emails are logged as skipped in email_log instead of being sent.
-  BREVO_API_KEY: "",
-  EMAIL_FROM_ADDRESS: "",
+  // Emails go to the local stand-in for Brevo (tests/db/fake-brevo.ts), never to Brevo itself.
+  BREVO_API_KEY: "local-database-tests",
+  BREVO_API_URL: `${fakeBrevoUrl}/v3/smtp/email`,
+  EMAIL_FROM_ADDRESS: "test@example.org",
+  CRON_SECRET: cronSecret,
   NEXT_PUBLIC_SITE_URL: "",
 };

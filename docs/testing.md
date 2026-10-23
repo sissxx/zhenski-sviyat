@@ -60,4 +60,6 @@ subscriptions (both need Stripe's API; check them by hand in test mode, see docs
 
 ### Emails
 
-Brevo is off in the tests, so emails are recorded as skipped in `email_log` and nothing is sent.
+Emails go to a local stand-in for Brevo (`tests/db/fake-brevo.ts`, port 3299, started by `playwright.db.config.ts`
+through `BREVO_API_URL`), so nothing is sent and the tests can read the subject and text of what would have gone out
+(`GET http://127.0.0.1:3299/emails?to=<address>`). `tests/db/reminders.spec.ts` uses it to check the reminder emails.

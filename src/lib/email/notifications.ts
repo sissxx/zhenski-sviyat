@@ -470,3 +470,82 @@ export async function notifyConsultationRescheduled(bookingId: string, previousS
   await Promise.all(sends);
 }
 
+
+// --- Reminders --------------------------------------------------------------------------------------------
+// Sent by the hourly reminder run (src/lib/email/reminders.ts). The dedupe key comes from due_reminders() in the
+// database, so each reminder goes out once.
+
+export async function sendConsultationReminder(bookingId: string, dedupeKey: string) {
+  const db = adminClient();
+  if (!db) return "skipped" as const;
+  const b = await loadBooking(db, bookingId);
+  if (!b || b.status !== "confirmed") return "skipped" as const;
+  const { data: settings } = await db.from("app_settings").select("consultation_cancel_deadline_hours").maybeSingle();
+  return sendEmail({
+    ...toClient(b),
+    template: "consultation_reminder",
+    dedupeKey,
+    content: t.consultationReminder({ ...clientData(b), cancelDeadlineHours: settings?.consultation_cancel_deadline_hours ?? null }),
+  });
+}
+
+export async function sendEventReminder(registrationId: string, dedupeKey: string) {
+  const db = adminClient();
+  if (!db) return "skipped" as const;
+  const { data: reg } = await db.from("event_registrations").select("id, status, user_id, event_id").eq("id", registrationId).maybeSingle();
+  if (!reg || reg.status !== "confirmed") return "skipped" as const;
+  const [loaded, person] = await Promise.all([loadEvent(db, reg.event_id), profileOf(db, reg.user_id)]);
+  if (!loaded || !person) return "skipped" as const;
+  return sendEmail({
+    template: "event_reminder",
+    to: { email: person.email, name: `${person.first_name} ${person.last_name}`.trim() },
+    userId: person.id,
+    dedupeKey,
+    related: { table: "event_registrations", id: reg.id },
+    content: t.eventReminder({
+      ...eventData(loaded.event, person.first_name),
+      onlineUrl: loaded.secret?.online_url,
+      attendeeInstructions: loaded.secret?.attendee_instructions,
+    }),
+  });
+}
+
+export async function sendSubscriptionRenewalReminder(subscriptionId: string, dedupeKey: string) {
+  const db = adminClient();
+  if (!db) return "skipped" as const;
+  const { data: sub } = await db
+    .from("subscriptions")
+    .select("id, user_id, plan_id, status, provider, current_period_end")
+    .eq("id", subscriptionId)
+    .maybeSingle();
+  if (!sub || sub.status !== "active" || sub.provider !== "bank_transfer" || !sub.current_period_end) return "skipped" as const;
+  const [{ data: plan }, person, { data: payment }] = await Promise.all([
+    db.from("membership_plans").select("name, price_cents").eq("id", sub.plan_id).maybeSingle(),
+    profileOf(db, sub.user_id),
+    db
+      .from("payments")
+      .select("amount_cents, bank_reference, expires_at")
+      .eq("subscription_id", sub.id)
+      .eq("provider", "bank_transfer")
+      .eq("status", "pending")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+  ]);
+  if (!plan || !person) return "skipped" as const;
+  return sendEmail({
+    template: "subscription_renewal_reminder",
+    to: { email: person.email, name: `${person.first_name} ${person.last_name}`.trim() },
+    userId: person.id,
+    dedupeKey,
+    related: { table: "subscriptions", id: sub.id },
+    content: t.subscriptionRenewalReminder({
+      firstName: person.first_name,
+      planName: plan.name,
+      priceCents: plan.price_cents,
+      paidUntil: sub.current_period_end,
+      accountUrl: absoluteUrl(routes.accountSubscriptions),
+      bank: payment ? await bankInstructions(db, payment) : null,
+    }),
+  });
+}

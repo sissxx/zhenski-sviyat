@@ -65,11 +65,14 @@ export type Database = {
           consultation_max_advance_days: number
           consultation_max_reschedules: number
           consultation_min_notice_hours: number
+          consultation_reminder_hours: number
           consultation_slot_step_minutes: number
           currency: string
           event_cancel_deadline_hours: number
+          event_reminder_hours: number
           id: boolean
           subscription_past_due_grace_days: number
+          subscription_reminder_days: number
           subscription_renewal_window_days: number
           subscriptions_allow_bank_transfer: boolean
           timezone: string
@@ -86,11 +89,14 @@ export type Database = {
           consultation_max_advance_days?: number
           consultation_max_reschedules?: number
           consultation_min_notice_hours?: number
+          consultation_reminder_hours?: number
           consultation_slot_step_minutes?: number
           currency?: string
           event_cancel_deadline_hours?: number
+          event_reminder_hours?: number
           id?: boolean
           subscription_past_due_grace_days?: number
+          subscription_reminder_days?: number
           subscription_renewal_window_days?: number
           subscriptions_allow_bank_transfer?: boolean
           timezone?: string
@@ -107,11 +113,14 @@ export type Database = {
           consultation_max_advance_days?: number
           consultation_max_reschedules?: number
           consultation_min_notice_hours?: number
+          consultation_reminder_hours?: number
           consultation_slot_step_minutes?: number
           currency?: string
           event_cancel_deadline_hours?: number
+          event_reminder_hours?: number
           id?: boolean
           subscription_past_due_grace_days?: number
+          subscription_reminder_days?: number
           subscription_renewal_window_days?: number
           subscriptions_allow_bank_transfer?: boolean
           timezone?: string
@@ -1693,11 +1702,14 @@ export type Database = {
           consultation_max_advance_days: number
           consultation_max_reschedules: number
           consultation_min_notice_hours: number
+          consultation_reminder_hours: number
           consultation_slot_step_minutes: number
           currency: string
           event_cancel_deadline_hours: number
+          event_reminder_hours: number
           id: boolean
           subscription_past_due_grace_days: number
+          subscription_reminder_days: number
           subscription_renewal_window_days: number
           subscriptions_allow_bank_transfer: boolean
           timezone: string
@@ -1883,6 +1895,14 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      due_reminders: {
+        Args: never
+        Returns: {
+          dedupe_key: string
+          kind: string
+          target_id: string
+        }[]
       }
       eligible_viber_group_ids: {
         Args: { p_user_id: string }
@@ -2117,6 +2137,7 @@ export type Database = {
         Args: { p_payment_id: string }
         Returns: undefined
       }
+      request_reminder_run: { Args: never; Returns: number }
       request_viber_access: {
         Args: {
           p_viber_display_name?: string
