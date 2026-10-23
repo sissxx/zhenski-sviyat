@@ -225,6 +225,9 @@ export async function notifyPaymentConfirmed(paymentId: string) {
         rows: [{ label: "Активно до", value: sub?.current_period_end ? formatDate(sub.current_period_end) : null }],
         url: absoluteUrl(routes.accountSubscriptions),
         urlLabel: "Моите абонаменти",
+        attendeeInstructions: (sub && (await planOpensViber(db, sub.plan_id)))
+          ? "Линковете към Viber групите на членството ти са в профила ти, в „Моите абонаменти“."
+          : null,
       };
     }
   }
@@ -242,6 +245,54 @@ export async function notifyPaymentConfirmed(paymentId: string) {
       paidAt: payment.paid_at,
       method: payment.provider,
       ...details,
+    }),
+  });
+}
+
+// --- Memberships ------------------------------------------------------------------------------------------
+
+async function planOpensViber(db: Admin, planId: string) {
+  const { count } = await db.from("plan_viber_groups").select("viber_group_id", { count: "exact", head: true }).eq("plan_id", planId);
+  return (count ?? 0) > 0;
+}
+
+/** After a member starts or renews a plan by bank transfer: the transfer details. */
+export async function notifySubscriptionBankTransfer(paymentId: string) {
+  const db = adminClient();
+  if (!db) return;
+  const { data: payment } = await db
+    .from("payments")
+    .select("id, user_id, status, provider, amount_cents, bank_reference, expires_at, subscription_id")
+    .eq("id", paymentId)
+    .maybeSingle();
+  if (!payment || payment.status !== "pending" || payment.provider !== "bank_transfer" || !payment.subscription_id || !payment.user_id) {
+    return;
+  }
+  const { data: sub } = await db
+    .from("subscriptions")
+    .select("id, status, current_period_end, plan_id")
+    .eq("id", payment.subscription_id)
+    .maybeSingle();
+  if (!sub) return;
+  const [{ data: plan }, person] = await Promise.all([
+    db.from("membership_plans").select("name").eq("id", sub.plan_id).maybeSingle(),
+    profileOf(db, payment.user_id),
+  ]);
+  if (!plan || !person) return;
+
+  await sendEmail({
+    template: "subscription_bank_transfer",
+    to: { email: person.email, name: `${person.first_name} ${person.last_name}`.trim() },
+    userId: person.id,
+    dedupeKey: `subscription_bank_transfer:${payment.id}`,
+    related: { table: "payments", id: payment.id },
+    content: t.subscriptionPendingPayment({
+      firstName: person.first_name,
+      planName: plan.name,
+      renewal: sub.status === "active",
+      paidUntil: sub.current_period_end,
+      accountUrl: absoluteUrl(routes.accountSubscriptions),
+      bank: await bankInstructions(db, payment),
     }),
   });
 }

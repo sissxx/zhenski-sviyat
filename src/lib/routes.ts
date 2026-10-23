@@ -12,6 +12,7 @@ export const routes = {
   consultations: "/konsultatsii",
   beautyClub: "/klub-krasota-stil-estetika",
   viber: "/viber-obshtnost",
+  membership: "/chlenstvo",
   packages: "/paketi-i-promotsii",
   faq: "/chesto-zadavani-vaprosi",
   support: "/podkrepi-ni",
@@ -38,6 +39,13 @@ export const eventConfirmationPath = (slug: string) => `${eventPath(slug)}/potva
 
 export const consultationConfirmationPath = (bookingId: string) => `${routes.consultations}/potvarzhdenie?zapis=${bookingId}`;
 export const consultationReschedulePath = (bookingId: string) => `${routes.accountConsultations}/${bookingId}/premesti`;
+
+/**
+ * "Стани член" for one plan: a visitor signs up and then lands on their subscriptions with the plan picked;
+ * a signed-in member skips sign-up (the proxy follows `next`) and goes straight there.
+ */
+export const joinPlanPath = (planSlug: string) =>
+  `${routes.register}?plan=${encodeURIComponent(planSlug)}&next=${encodeURIComponent(`${routes.accountSubscriptions}?plan=${planSlug}`)}`;
 
 /** Contact page with the subject field filled in, e.g. from a package's "Запитване" button. */
 export const contactPath = (subject: string) => `${routes.contacts}?tema=${encodeURIComponent(subject)}`;
@@ -82,6 +90,7 @@ export const mainNav: NavItem[] = [
   { label: "Нашата общност", href: routes.community },
   { label: "Събития", href: routes.events },
   { label: "Консултации", href: routes.consultations },
+  { label: "Членство", href: routes.membership },
   { label: "Въпроси", href: routes.faq },
   { label: "Подкрепи ни", href: routes.support },
   { label: "Контакти", href: routes.contacts },
@@ -101,6 +110,7 @@ export const footerNav: { title: NavItem; links: NavItem[] }[] = [
     links: [
       { label: "Събития", href: routes.events },
       { label: "Консултации", href: routes.consultations },
+      { label: "Членство", href: routes.membership },
       { label: "Клуб „Красота, стил и естетика“", href: routes.beautyClub },
       { label: "Viber общност", href: routes.viber },
     ],

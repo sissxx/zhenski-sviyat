@@ -15,10 +15,12 @@ type RegisterPageProps = { searchParams: Promise<{ plan?: string | string[]; nex
 
 export default async function RegisterPage({ searchParams }: RegisterPageProps) {
   const { plan, next } = await searchParams;
-  const chosenPlan = Object.values(membershipPlans).find((item) => item.slug === plan);
+  // Plans live in the database, so any slug-shaped value is accepted; the known ones also get their name.
+  const planSlug = typeof plan === "string" && /^[a-z0-9]+(-[a-z0-9]+)*$/.test(plan) ? plan : null;
+  const chosenPlan = Object.values(membershipPlans).find((item) => item.slug === planSlug);
   // After confirming the email, a new member continues to their subscriptions to activate the chosen plan.
-  const continueTo = chosenPlan
-    ? `${routes.accountSubscriptions}?plan=${chosenPlan.slug}`
+  const continueTo = planSlug
+    ? `${routes.accountSubscriptions}?plan=${planSlug}`
     : safeNextPath(typeof next === "string" ? next : null, `${routes.account}?potvarden=1`);
 
   return (
@@ -28,11 +30,13 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
       lead={
         chosenPlan
           ? `След като потвърдиш имейла си, ще можеш да активираш членството „${chosenPlan.title.replace(/[„“]/g, "")}“ от профила си.`
-          : "С профил се записваш за събития и консултации, следиш плащанията си и управляваш членството си."
+          : planSlug
+            ? "След като потвърдиш имейла си, ще можеш да активираш избраното членство от профила си."
+            : "С профил се записваш за събития и консултации, следиш плащанията си и управляваш членството си."
       }
       footer={
         <span>
-          Вече имаш профил? <TextLink href={loginPath(typeof next === "string" ? next : undefined)}>Влез</TextLink>
+          Вече имаш профил? <TextLink href={loginPath(planSlug ? continueTo : typeof next === "string" ? next : undefined)}>Влез</TextLink>
         </span>
       }
     >

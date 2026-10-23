@@ -3,12 +3,14 @@ import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
 import Typography from "@mui/material/Typography";
 import { CardSubscriptionToggle, SubscribeButtons } from "@/components/account/SubscriptionButtons";
+import { ViberGroupCard } from "@/components/account/ViberGroups";
 import { BankTransferDetails } from "@/components/events/BankTransferDetails";
 import { FormAlert } from "@/components/forms/FormAlert";
 import { Panel } from "@/components/ui/Panel";
 import { requireUser } from "@/lib/auth/session";
 import { getBankDetails } from "@/lib/events/queries";
 import { formatDate, formatPrice } from "@/lib/locale";
+import { routes } from "@/lib/routes";
 import { syncReturnedCheckout } from "@/lib/stripe/checkout";
 import { isStripeConfigured } from "@/lib/stripe/server";
 import {
@@ -16,11 +18,14 @@ import {
   getSubscriptionSettings,
   listActivePlans,
   listMySubscriptions,
+  listMyViberGroups,
   liveStatuses,
   type ActivePlan,
   type MySubscription,
   type SubscriptionStatus,
 } from "@/lib/subscriptions/queries";
+import { perInterval, planFeatures } from "@/lib/subscriptions/plans";
+import { TextLink } from "@/components/ui/AppLink";
 
 export const metadata: Metadata = { title: "Моите абонаменти" };
 
@@ -39,17 +44,21 @@ const statusLabels: Record<SubscriptionStatus, { label: string; color: "success"
   expired: { label: "Изтекъл", color: "default" },
 };
 
-const perInterval = (interval: string) => (interval === "year" ? "година" : "месец");
 const isLive = (s: MySubscription) => liveStatuses.includes(s.status);
 
 export default async function AccountSubscriptionsPage({ searchParams }: Props) {
-  const { user } = await requireUser();
+  const { user, profile } = await requireUser();
   const { session_id: sessionId, plashtane, plan: chosenSlug } = await searchParams;
   const cardAvailable = isStripeConfigured();
   // Back from Stripe Checkout: record the new subscription now instead of waiting for the webhook.
   if (typeof sessionId === "string" && cardAvailable) await syncReturnedCheckout(sessionId, user.id);
 
-  const [plans, subscriptions, settings] = await Promise.all([listActivePlans(), listMySubscriptions(), getSubscriptionSettings()]);
+  const [plans, subscriptions, settings, viberGroups] = await Promise.all([
+    listActivePlans(),
+    listMySubscriptions(),
+    getSubscriptionSettings(),
+    listMyViberGroups(),
+  ]);
   const live = subscriptions.filter(isLive);
   const past = subscriptions.filter((s) => !isLive(s)).slice(0, 10);
   const needsBank = live.some((s) => s.pendingPayment?.provider === "bank_transfer");
@@ -87,12 +96,38 @@ export default async function AccountSubscriptionsPage({ searchParams }: Props) 
         )}
       </Box>
 
+      <Box component="section" aria-labelledby="viber-title" sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+        <Typography id="viber-title" variant="h5" component="h2" sx={{ color: "primary.main" }}>
+          Моите Viber групи
+        </Typography>
+        {viberGroups.length === 0 ? (
+          <Typography sx={{ color: "text.secondary" }}>
+            {live.length > 0
+              ? "Членството ти още не дава достъп до Viber група. Ще се появи тук, щом е активно."
+              : "Линковете към Viber групите се появяват тук, когато имаш активно членство."}
+          </Typography>
+        ) : (
+          <>
+            {viberGroups.map((group) => (
+              <ViberGroupCard key={group.viber_group_id} group={group} defaultPhone={profile?.phone ?? ""} />
+            ))}
+            <Typography variant="body2" sx={{ color: "text.secondary" }}>
+              Линковете са само за теб, не ги споделяй. Когато членството изтече, достъпът до групите спира и екипът те
+              премахва от тях.
+            </Typography>
+          </>
+        )}
+      </Box>
+
       <Box component="section" sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
         <Typography variant="h5" component="h2" sx={{ color: "primary.main" }}>
           Членства
         </Typography>
         {plans.length === 0 ? (
-          <Typography sx={{ color: "text.secondary" }}>Членствата скоро ще могат да се активират онлайн.</Typography>
+          <Typography sx={{ color: "text.secondary" }}>
+            Членствата скоро ще могат да се активират онлайн. Какво включват виж на страница{" "}
+            <TextLink href={routes.membership}>Членство</TextLink>.
+          </Typography>
         ) : (
           <Box sx={{ display: "grid", gap: 1.5, gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" } }}>
             {plans.map((plan) => (
@@ -200,7 +235,7 @@ function PlanCard({
   card: boolean;
   bank: boolean;
 }) {
-  const features = Array.isArray(plan.features) ? plan.features.filter((f): f is string => typeof f === "string") : [];
+  const features = planFeatures(plan.features);
   return (
     <Panel tone={highlighted ? "mint" : "card"} sx={{ gap: 1.25 }}>
       <Typography variant="h6" component="h3" sx={{ color: "primary.main" }}>

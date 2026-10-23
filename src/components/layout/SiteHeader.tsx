@@ -96,7 +96,7 @@ export function SiteHeader() {
               <Button
                 variant="text"
                 href={routes.login}
-                sx={{ display: { xs: "none", md: "inline-flex" }, whiteSpace: "nowrap" }}
+                sx={{ display: { xs: "none", md: "inline-flex" }, whiteSpace: "nowrap", minWidth: 0 }}
               >
                 Вход
               </Button>
