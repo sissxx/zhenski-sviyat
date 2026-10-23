@@ -190,10 +190,10 @@ These rules aren't final yet. Admins can change them in the admin panel without 
 ## Running locally
 
 ```bash
-supabase init            # once, if supabase/config.toml does not exist yet
-supabase start
-supabase db reset        # applies migrations + seed.sql
-psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -v ON_ERROR_STOP=1 \
-  -f supabase/checks/database_checks.sql   # prints ALL DATABASE CHECKS PASSED
-supabase gen types typescript --local > src/lib/supabase/database.types.ts
+npm run db:start         # local Supabase from supabase/config.toml: applies migrations + seed.sql
+npm run db:reset         # start again from a clean database
+npm run db:checks        # prints ALL DATABASE CHECKS PASSED
+npx supabase gen types typescript --local > src/lib/supabase/database.types.ts
 ```
+
+The browser tests that use this database are described in [testing.md](testing.md).

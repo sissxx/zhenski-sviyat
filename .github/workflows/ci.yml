@@ -45,3 +45,30 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 7
+
+  database:
+    name: Database tests (local Supabase)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      # A throwaway Supabase on the runner, built from supabase/migrations and supabase/seed.sql.
+      # It is never linked to the live project, and tests/db/env.ts refuses anything that isn't local.
+      # The tests read its keys with `supabase status` (tests/db/env.ts).
+      - run: npm run db:start
+      # RLS, booking conflicts, payments and Viber access, straight in SQL, on the fresh database.
+      - run: npm run db:checks
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:db:build
+      - run: npm run test:db
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report-db
+          path: playwright-report-db/
+          retention-days: 7

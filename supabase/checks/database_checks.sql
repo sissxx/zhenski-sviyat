@@ -1,6 +1,6 @@
 -- Database behaviour checks: RLS isolation, booking conflicts, payments and Viber access (spec 15.2, 17.3).
 --
--- Run against a local Supabase database after `supabase db reset`:
+-- Run against a local Supabase database after `supabase db reset` (the seed data may be there; CI runs it):
 --   psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -v ON_ERROR_STOP=1 -f supabase/checks/database_checks.sql
 -- Everything runs in one transaction that is rolled back, so the database is left unchanged.
 -- Each failed check raises an exception; the script prints "ALL DATABASE CHECKS PASSED" at the end.
@@ -50,7 +50,7 @@ insert into auth.users (id, email, raw_user_meta_data) values
   ('00000000-0000-0000-0000-00000000000c', 'bob@example.org',   '{"first_name":"Боряна","last_name":"Иванова"}'),
   ('00000000-0000-0000-0000-00000000000d', 'spec@example.org',  '{"first_name":"Сия","last_name":"Специалист"}');
 
-select checks.ok((select count(*) = 4 from public.profiles), 'profiles created by auth trigger');
+select checks.ok((select count(*) = 4 from public.profiles where email like '%@example.org'), 'profiles created by auth trigger');
 select checks.ok((select terms_accepted_at is not null from public.profiles
                    where id = '00000000-0000-0000-0000-00000000000a'), 'consent captured from sign-up metadata');
 
@@ -97,8 +97,11 @@ grant select on checks.slot to anon, authenticated, service_role;
 set local role anon;
 set local request.jwt.claims = '{"role":"anon"}';
 
-select checks.ok((select count(*) = 2 from public.events), 'anon sees published events only');
-select checks.ok((select count(*) = 2 from public.event_listing), 'anon event listing hides drafts');
+select checks.ok(not exists (select 1 from public.events where status <> 'published'), 'anon sees published events only');
+select checks.ok((select count(*) = 2 from public.events where slug in ('free-talk', 'paid-workshop', 'secret-draft')),
+                 'anon sees the published fixtures');
+select checks.ok((select count(*) = 2 from public.event_listing where slug in ('free-talk', 'paid-workshop', 'secret-draft')),
+                 'anon event listing hides drafts');
 select checks.ok((select seats_left = 1 from public.event_listing where slug = 'paid-workshop'), 'listing shows seats left');
 select checks.expect_error('select * from public.profiles', 'permission denied');
 select checks.ok((select count(*) = 0 from public.event_private_details), 'anon cannot read private event details');
@@ -192,7 +195,7 @@ select public.confirm_bank_transfer((select payment_id from bob_reg), 'Полу�
 select checks.ok((select status = 'confirmed' from public.event_registrations
                    where id = (select registration_id from bob_reg)), 'admin confirmation confirms registration');
 select checks.ok((select count(*) >= 3 from public.event_registrations), 'admin sees all registrations');
-select checks.ok((select count(*) = 4 from public.profiles), 'admin sees all profiles');
+select checks.ok((select count(*) = 4 from public.profiles where email like '%@example.org'), 'admin sees all profiles');
 reset role;
 
 -- ---------------------------------------------------------------------------

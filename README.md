@@ -19,12 +19,14 @@ npm run lint
 npm run typecheck
 npm test           # unit tests (Vitest, tests/unit)
 npm run test:e2e   # smoke tests in a browser (Playwright, tests/e2e); run `npm run build` first
+npm run test:db    # database tests against a local Supabase (tests/db); see docs/testing.md
 ```
 
 The end-to-end tests start `npm run start` on port 3100 with the Supabase, Stripe and Brevo variables blanked,
 so they check what visitors see without those services. Install the browser once with
 `npx playwright install chromium`, or point `PLAYWRIGHT_CHROMIUM_PATH` at an existing Chromium.
-GitHub Actions (`.github/workflows/ci.yml`) runs lint, types, unit and e2e tests on every pull request.
+The database tests run the real pages against a throwaway local Supabase (Docker), never the live project.
+GitHub Actions (`.github/workflows/ci.yml`) runs lint, types, unit, e2e and database tests on every pull request.
 
 Node 22 (see `.nvmrc`).
 
