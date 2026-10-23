@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-import { isAuthorizedCron } from "@/lib/cron";
 import { renderEmail } from "@/lib/email/layout";
 import { subscriptionPendingPayment } from "@/lib/email/templates";
 import { joinPlanPath, mainNav, routes, safeNextPath } from "@/lib/routes";
@@ -113,15 +112,5 @@ describe("membership bank transfer email", () => {
     expect(email.subject).toBe("Подновяване на „Клуб“: данни за плащане");
     expect(plain(email.text)).toContain("20 ноември 2026 г.");
     expect(email.text).toContain("членството остава до края на вече платения период");
-  });
-});
-
-describe("cron authorization", () => {
-  it("accepts only the exact bearer secret", () => {
-    expect(isAuthorizedCron("Bearer s3cret", "s3cret")).toBe(true);
-    expect(isAuthorizedCron("Bearer wrong!", "s3cret")).toBe(false);
-    expect(isAuthorizedCron(null, "s3cret")).toBe(false);
-    expect(isAuthorizedCron("Bearer ", "")).toBe(false);
-    expect(isAuthorizedCron("Bearer x", undefined)).toBe(false);
   });
 });

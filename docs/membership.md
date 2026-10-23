@@ -30,14 +30,16 @@ Viber has no API to add or remove people from groups, so the site keeps the to-d
 2. **Admin → Viber достъп** shows "Покани" for every member with access who isn't marked as in the group yet, and
    "Премахни" for everyone marked as invited or in the group whose membership has lapsed. Mark each one after doing it.
 
-## Daily job
+## Maintenance job
 
-`vercel.json` runs `GET /api/cron/maintenance` daily at 02:30 UTC. It calls `run_maintenance()`: bank-transfer
-memberships whose month ended become `expired`, unpaid sign-ups are dropped, past events and consultations are closed.
-Access itself already stops at the end of the paid period; the job keeps statuses tidy.
+Migration `20261023100000_maintenance_cron.sql` schedules `run_maintenance()` every 10 minutes with Supabase
+`pg_cron` (Vercel Hobby crons run only once a day, too rare for expiring unpaid holds). Among other things it marks
+bank-transfer memberships whose month ended as `expired` and drops unpaid sign-ups. Access itself already stops at
+the end of the paid period; the job keeps statuses and the admin's Viber to-do list tidy. Until the migration is
+applied, admins can run it by hand ("Обнови сега" on the admin home), and booking or signing up also clears
+expired holds.
 
-It needs **`CRON_SECRET`** in Vercel (Production, Sensitive, any long random string); Vercel sends it with each run.
-Without it the route answers 401 and nothing runs. Admins can also run it by hand ("Обнови сега" on the admin home).
+Check it in Supabase: `select * from cron.job_run_details order by start_time desc limit 5;`.
 
 ## Emails
 
