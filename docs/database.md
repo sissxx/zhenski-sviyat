@@ -128,8 +128,8 @@ The `viber_access_actions` view is the admin's to-do list: `invite` for eligible
 `remove` for members whose access ended. Admins update `viber_memberships` after acting in Viber, since
 Viber membership can't be automated reliably (spec 9).
 
-**Maintenance.** Call `run_maintenance()` every 5–15 minutes (Vercel cron route with the service key, or
-`pg_cron`). It expires unpaid holds and payments, ends lapsed bank-transfer periods and unconfirmed sign-ups,
+**Maintenance.** `run_maintenance()` runs every 10 minutes through `pg_cron` (migration
+`20261023100000_maintenance_cron.sql`). It expires unpaid holds and payments, ends lapsed bank-transfer periods and unconfirmed sign-ups,
 and marks past bookings and events completed. Holds are also cleaned up whenever someone books.
 
 **Stripe webhooks.** Store each event first:

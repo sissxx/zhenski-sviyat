@@ -7,7 +7,7 @@ import { Placeholder } from "@/components/ui/Placeholder";
 import { Section } from "@/components/ui/Section";
 import type { MembershipPlan } from "@/content/plans";
 import { formatPrice } from "@/lib/locale";
-import { routes } from "@/lib/routes";
+import { joinPlanPath } from "@/lib/routes";
 
 type PlanDetailsProps = {
   plan: MembershipPlan;
@@ -56,7 +56,7 @@ export function PlanDetails({ plan, heading, intro, bg }: PlanDetailsProps) {
             />
           </Box>
 
-          <Button variant="contained" href={`${routes.register}?plan=${plan.slug}`} sx={{ minWidth: 220 }}>
+          <Button variant="contained" href={joinPlanPath(plan.slug)} sx={{ minWidth: 220 }}>
             Стани член
           </Button>
           <Typography variant="body2" sx={{ color: "text.secondary" }}>

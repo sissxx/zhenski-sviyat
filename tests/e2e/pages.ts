@@ -11,6 +11,7 @@ export const publicPages = [
   routes.consultations,
   routes.beautyClub,
   routes.viber,
+  routes.membership,
   routes.packages,
   routes.faq,
   routes.support,

@@ -31,7 +31,8 @@ export function formatWhen(startsAt: string, endsAt?: string | null): string {
   return formatDateTime(startsAt);
 }
 
-function bankBlocks(bank: BankInstructions, subject: "мястото" | "часът"): EmailBlock[] {
+/** `lapse` says what happens when the deadline passes, e.g. "мястото се освобождава". */
+function bankBlocks(bank: BankInstructions, lapse: string): EmailBlock[] {
   return [
     {
       kind: "details",
@@ -49,7 +50,7 @@ function bankBlocks(bank: BankInstructions, subject: "мястото" | "час�
     bank.iban
       ? {
           kind: "callout",
-          text: `Напиши основанието точно както е показано, за да свържем превода със заявката ти. Ако преводът не пристигне до крайния срок, ${subject} се освобождава.`,
+          text: `Напиши основанието точно както е показано, за да свържем превода със заявката ти. Ако преводът не пристигне до крайния срок, ${lapse}.`,
         }
       : {
           kind: "callout",
@@ -120,7 +121,7 @@ export function eventRegistrationPendingPayment(data: EventRegistrationData & { 
         text: "Благодарим ти за заявката! Мястото ти е запазено временно. Ще го потвърдим, щом получим банковия превод.",
       },
       eventDetails(data),
-      ...bankBlocks(data.bank, "мястото"),
+      ...bankBlocks(data.bank, "мястото се освобождава"),
       { kind: "button", label: "Моите събития", url: data.accountUrl },
     ],
   };
@@ -169,6 +170,45 @@ export function paymentConfirmed(data: PaymentConfirmedData): EmailContent {
       },
       ...attendeeBlocks(data),
       { kind: "button", label: data.urlLabel, url: data.url },
+    ],
+  };
+}
+
+// --- Memberships ------------------------------------------------------------------------------------------
+
+export type SubscriptionBankTransferData = {
+  firstName: string | null;
+  planName: string;
+  /** True when the member is paying the next month of an active membership. */
+  renewal: boolean;
+  /** End of the month already paid, for renewals. */
+  paidUntil: string | null;
+  accountUrl: string;
+  bank: BankInstructions;
+};
+
+export function subscriptionPendingPayment(data: SubscriptionBankTransferData): EmailContent {
+  return {
+    subject: data.renewal ? `Подновяване на „${data.planName}“: данни за плащане` : `Членство „${data.planName}“: данни за плащане`,
+    preheader: `Преведи ${formatPrice(data.bank.amountCents)} с основание ${data.bank.reference ?? ""}, за да ${data.renewal ? "продължим" : "активираме"} членството ти.`,
+    heading: data.renewal ? "Подновяване на членството" : "Почти готово",
+    greeting: greeting(data.firstName),
+    blocks: [
+      {
+        kind: "text",
+        text: data.renewal
+          ? "Благодарим ти, че оставаш с нас! Щом получим превода, ще удължим членството ти с още един период."
+          : "Благодарим ти за заявката! Ще активираме членството ти, щом получим банковия превод. Тогава в профила ти ще се появят и линковете към Viber групите.",
+      },
+      {
+        kind: "details",
+        rows: [
+          { label: "Членство", value: data.planName },
+          ...(data.renewal ? [{ label: "Платено до", value: data.paidUntil ? formatDate(data.paidUntil) : null }] : []),
+        ],
+      },
+      ...bankBlocks(data.bank, data.renewal ? "членството остава до края на вече платения период" : "заявката отпада"),
+      { kind: "button", label: "Моите абонаменти", url: data.accountUrl },
     ],
   };
 }
@@ -234,7 +274,7 @@ export function consultationPendingPayment(data: ConsultationData & { bank: Bank
         text: "Благодарим ти за заявката! Часът е запазен временно. Ще го потвърдим, щом получим банковия превод.",
       },
       consultationDetails(data),
-      ...bankBlocks(data.bank, "часът"),
+      ...bankBlocks(data.bank, "часът се освобождава"),
       { kind: "button", label: "Моите консултации", url: data.accountUrl },
     ],
   };

@@ -12,6 +12,7 @@ All emails are Bulgarian, one column, readable on phones. Two kinds:
 | --- | --- | --- |
 | Free event sign-up | participant | `event_registration_confirmed` (includes the online link / attendee notes) |
 | Paid event sign-up (bank transfer) | participant | `event_registration_bank_transfer` (amount, `NSJS-…` reference, IBAN, deadline) |
+| Membership started or renewed by bank transfer | member | `subscription_bank_transfer` (amount, reference, IBAN, deadline) |
 | Admin confirms a bank transfer, or Stripe reports a card payment or paid plan invoice | payer | `payment_confirmed` (event, consultation or membership) |
 | Consultation booked | client | `consultation_booked`, or `consultation_bank_transfer` when prepaid by transfer |
 | Consultation booked | specialist | `consultation_booked_specialist` |

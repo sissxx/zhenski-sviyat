@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { getCurrentUser } from "@/lib/auth/session";
 import type { Database } from "@/lib/supabase/database.types";
+import { fallbackPlans, toPublicPlans, type PublicPlan } from "./plans";
 
 /**
  * Plans and the signed-in user's subscriptions for the account area. The user's own Supabase client,
@@ -33,6 +34,42 @@ export async function listActivePlans() {
 }
 
 export type ActivePlan = Awaited<ReturnType<typeof listActivePlans>>[number];
+
+/**
+ * Plans for the public "Членство" page, with the Viber groups each one opens. Until an admin creates plans
+ * (or when the database can't be reached) the two plans from src/content/plans.ts are shown instead, marked
+ * `fromContent` so the page can say online sign-up isn't open yet.
+ */
+export async function listPublicPlans(): Promise<{ plans: PublicPlan[]; fromContent: boolean }> {
+  await connection();
+  if (!isSupabaseConfigured()) return { plans: fallbackPlans(), fromContent: true };
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("membership_plans")
+    .select(
+      "id, slug, name, description, features, price_cents, billing_interval, allow_bank_transfer, plan_viber_groups (viber_groups (name, is_active))",
+    )
+    .eq("is_active", true)
+    .order("sort_order")
+    .order("name");
+  if (error) console.error("listPublicPlans", error);
+  if (error || data.length === 0) return { plans: fallbackPlans(), fromContent: true };
+  return { plans: toPublicPlans(data), fromContent: false };
+}
+
+export type MyViberGroup = Database["public"]["Functions"]["my_viber_groups"]["Returns"][number];
+
+/** Viber groups the signed-in user's active memberships open, with invite links (empty after a lapse). */
+export async function listMyViberGroups(): Promise<MyViberGroup[]> {
+  if (!isSupabaseConfigured()) return [];
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("my_viber_groups");
+  if (error) {
+    console.error("listMyViberGroups", error);
+    return [];
+  }
+  return data ?? [];
+}
 
 export async function listMySubscriptions() {
   const user = await getCurrentUser();

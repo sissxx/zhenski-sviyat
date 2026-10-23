@@ -5,6 +5,7 @@ import { redirect, unstable_rethrow } from "next/navigation";
 import { z } from "zod";
 import { getCurrentUser } from "@/lib/auth/session";
 import { dbErrorMessage } from "@/lib/db-errors";
+import { notifyLater, notifySubscriptionBankTransfer } from "@/lib/email/notifications";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
@@ -13,6 +14,7 @@ import { cardUnavailable } from "@/lib/payments/paths";
 import { startSubscriptionCheckout, syncSubscriptionById } from "@/lib/stripe/checkout";
 import { isStripeConfigured, stripe } from "@/lib/stripe/server";
 import { liveStatuses } from "./queries";
+import { viberRequestSchema, type ViberRequestValues } from "./schemas";
 
 /**
  * Starting and stopping memberships. By card: Stripe Checkout in subscription mode, renewed by Stripe
@@ -99,6 +101,7 @@ export async function subscribeByBankTransfer(planId: string): Promise<Subscript
   const started = data?.[0];
   if (!started) return { ok: false, error: dbErrorMessage(null) };
 
+  notifyLater(() => notifySubscriptionBankTransfer(started.payment_id));
   revalidatePath(routes.accountSubscriptions);
   redirect(`${routes.accountSubscriptions}?prevod=${started.subscription_id}`);
 }
@@ -130,6 +133,25 @@ export async function setCardSubscriptionCancelled(subscriptionId: string, cance
     console.error("setCardSubscriptionCancelled", error);
     return { ok: false, error: "Промяната не беше записана. Опитай отново след малко." };
   }
+  revalidatePath(routes.accountSubscriptions);
+  return { ok: true };
+}
+
+/** The member tells the team which Viber number to add to a group their membership opens. */
+export async function requestViberAccess(groupId: string, values: ViberRequestValues): Promise<SubscriptionActionResult> {
+  if (!z.uuid().safeParse(groupId).success) return { ok: false, error: dbErrorMessage({ code: "P0001", message: "not_eligible" }) };
+  const parsed = viberRequestSchema.safeParse(values);
+  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? dbErrorMessage(null) };
+  if (!isSupabaseConfigured()) return notConnected;
+  await signedIn();
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("request_viber_access", {
+    p_viber_group_id: groupId,
+    p_viber_phone: parsed.data.phone,
+    p_viber_display_name: parsed.data.displayName || undefined,
+  });
+  if (error) return { ok: false, error: dbErrorMessage(error) };
   revalidatePath(routes.accountSubscriptions);
   return { ok: true };
 }
