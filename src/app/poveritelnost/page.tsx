@@ -4,11 +4,9 @@ import Typography from "@mui/material/Typography";
 import { LegalPlaceholder } from "@/components/legal/LegalPlaceholder";
 import { TextLink } from "@/components/ui/AppLink";
 import { routes } from "@/lib/routes";
+import { pageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
-  title: "Политика за поверителност",
-  description: "Как Сдружение Женски свят събира, използва и пази личните данни.",
-};
+export const metadata: Metadata = pageMetadata("privacy");
 
 // Draft summary written for the placeholder; the association's final policy replaces it.
 const points = [

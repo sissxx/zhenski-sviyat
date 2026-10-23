@@ -6,11 +6,9 @@ import { EventList } from "@/components/events/EventList";
 import { PageIntro } from "@/components/ui/PageIntro";
 import { Section } from "@/components/ui/Section";
 import { listPastEvents, listUpcomingEvents } from "@/lib/events/queries";
+import { pageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
-  title: "Събития",
-  description: "Работилници, разговори и срещи с експерти — на живо и онлайн. Запиши се за предстоящите събития.",
-};
+export const metadata: Metadata = pageMetadata("events");
 
 export default async function EventsPage() {
   const [upcoming, past] = await Promise.all([listUpcomingEvents(), listPastEvents()]);

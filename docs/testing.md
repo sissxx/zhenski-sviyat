@@ -47,6 +47,8 @@ can be repeated without a reset.
 - **Membership** (`membership.spec.ts`): plans from the database on Членство, a bank-transfer membership that the
   admin confirms, the Viber invite link appearing only then, the member's Viber number reaching the admin Viber
   page, no second membership for the same plan.
+- **Search and share previews** (`seo.spec.ts`): event titles, share tags and Event JSON-LD, the tags in `<head>`
+  for Facebook and Viber, the event share image, published events in the sitemap.
 - **Admin panel** (`admin.spec.ts`): hidden from members and visitors (pages and the CSV export), every admin
   page opens, creating an event that then shows on the site (Sofia time, euro amounts), participants and CSV
   export, bank details in Настройки.

@@ -8,11 +8,9 @@ import { Section } from "@/components/ui/Section";
 import { communityAreas } from "@/content/community";
 import { membershipPlans } from "@/content/plans";
 import { formatPrice } from "@/lib/locale";
+import { pageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
-  title: "Нашата общност",
-  description: "Събития, фокус групи, индивидуални консултации и членства в общността на Сдружение Женски свят.",
-};
+export const metadata: Metadata = pageMetadata("community");
 
 const plans = [
   { plan: membershipPlans.beautyClub, text: "Затворена Viber група с месечен абонамент." },

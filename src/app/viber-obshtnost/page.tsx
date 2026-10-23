@@ -2,11 +2,9 @@ import type { Metadata } from "next";
 import { PlanDetails } from "@/components/membership/PlanDetails";
 import { PageIntro } from "@/components/ui/PageIntro";
 import { membershipPlans } from "@/content/plans";
+import { pageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
-  title: "Затворена Viber общност",
-  description: "Месечно членство в затворената Viber общност на Сдружение Женски свят.",
-};
+export const metadata: Metadata = pageMetadata("viber");
 
 export default function ViberCommunityPage() {
   return (

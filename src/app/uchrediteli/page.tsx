@@ -6,11 +6,9 @@ import { PageIntro } from "@/components/ui/PageIntro";
 import { Panel } from "@/components/ui/Panel";
 import { Section } from "@/components/ui/Section";
 import { founders } from "@/content/founders";
+import { pageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
-  title: "Учредители",
-  description: "Учредителите на Сдружение Женски свят: юристи, психолози и специалисти в здравните грижи и естетиката.",
-};
+export const metadata: Metadata = pageMetadata("founders");
 
 export default function FoundersPage() {
   return (

@@ -54,6 +54,7 @@ After a schema change, regenerate the types with `npm run db:types` (needs `npx 
 | `src/lib/auth/` | Account forms' schemas, server actions, Bulgarian auth errors, `requireUser` (see `docs/auth.md`) |
 | `src/lib/events/`, `src/lib/consultations/` | Event sign-up and consultation booking: reads, server actions, page models (see `docs/events.md`, `docs/consultations.md`) |
 | `src/lib/stripe/`, `src/lib/payments/`, `src/lib/subscriptions/` | Stripe Checkout, the webhook handlers, plan subscriptions and payment email hooks (see `docs/payments.md`) |
+| `src/lib/seo/` | Site address, page titles/descriptions, share images (`/og/...`), JSON-LD; robots and sitemap in `src/app` (see `docs/seo.md`) |
 | `src/components/auth/`, `src/components/account/` | Login, sign-up and password forms; account area navigation and forms |
 | `src/proxy.ts` | Refreshes the Supabase session cookie on each request and guards `/profil` |
 | `src/theme/` | Brand tokens, fonts and the MUI theme |

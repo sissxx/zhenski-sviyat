@@ -4,11 +4,9 @@ import Typography from "@mui/material/Typography";
 import { LegalPlaceholder } from "@/components/legal/LegalPlaceholder";
 import { TextLink } from "@/components/ui/AppLink";
 import { routes } from "@/lib/routes";
+import { pageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
-  title: "Общи условия",
-  description: "Условия за ползване на сайта, профилите, записванията, консултациите и членствата.",
-};
+export const metadata: Metadata = pageMetadata("terms");
 
 // Draft summary written for the placeholder; the association's final terms replace it.
 const points = [

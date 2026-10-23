@@ -2,11 +2,9 @@ import type { Metadata } from "next";
 import { PlanDetails } from "@/components/membership/PlanDetails";
 import { PageIntro } from "@/components/ui/PageIntro";
 import { membershipPlans } from "@/content/plans";
+import { pageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
-  title: "Клуб „Красота, стил и естетика“",
-  description: "Клуб с месечен абонамент: професионални насоки за лична грижа и достъп до затворена Viber група.",
-};
+export const metadata: Metadata = pageMetadata("beautyClub");
 
 export default function BeautyClubPage() {
   return (

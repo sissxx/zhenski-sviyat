@@ -8,11 +8,9 @@ import { Placeholder } from "@/components/ui/Placeholder";
 import { Section } from "@/components/ui/Section";
 import { faqs } from "@/content/faq";
 import { routes } from "@/lib/routes";
+import { pageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
-  title: "Често задавани въпроси",
-  description: "Отговори на въпроси за членството, събитията, консултациите и плащанията в Сдружение Женски свят.",
-};
+export const metadata: Metadata = pageMetadata("faq");
 
 export default function FaqPage() {
   return (
