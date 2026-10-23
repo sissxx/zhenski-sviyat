@@ -12,7 +12,13 @@
     "email:auth-templates": "node --experimental-strip-types --no-warnings scripts/build-auth-email-templates.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "db:start": "npx --yes supabase@2.121.0 start -x imgproxy,mailpit,postgres-meta,supavisor",
+    "db:stop": "npx --yes supabase@2.121.0 stop",
+    "db:reset": "npx --yes supabase@2.121.0 db reset",
+    "db:checks": "psql \"postgresql://postgres:postgres@127.0.0.1:54322/postgres\" -v ON_ERROR_STOP=1 -q -f supabase/checks/database_checks.sql",
+    "test:db:build": "node --experimental-strip-types --no-warnings scripts/with-db-test-env.mjs npx next build",
+    "test:db": "playwright test -c playwright.db.config.ts"
   },
   "dependencies": {
     "@emotion/cache": "^11.14.0",
