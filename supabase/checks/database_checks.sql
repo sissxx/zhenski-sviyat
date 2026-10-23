@@ -358,6 +358,43 @@ select checks.ok((select public.request_reminder_run() is null), 'reminder run d
 select checks.ok(exists (select 1 from cron.job where jobname = 'send-reminders' and schedule = '5 * * * *'), 'hourly reminder job scheduled');
 
 -- ---------------------------------------------------------------------------
+-- Data retention (privacy policy periods)
+-- ---------------------------------------------------------------------------
+reset role;
+set local request.jwt.claims = '{"role":"service_role"}';
+insert into public.consultation_bookings
+  (id, user_id, specialist_id, consultation_type_id, starts_at, ends_at, blocked_until, status, price_cents, user_note) values
+  ('60000000-0000-0000-0000-0000000000d1', '00000000-0000-0000-0000-00000000000b', '20000000-0000-0000-0000-000000000001',
+   '30000000-0000-0000-0000-000000000001', now() - interval '400 days', now() - interval '400 days' + interval '1 hour',
+   now() - interval '400 days' + interval '1 hour', 'completed', 0, 'стара бележка'),
+  ('60000000-0000-0000-0000-0000000000d2', '00000000-0000-0000-0000-00000000000b', '20000000-0000-0000-0000-000000000001',
+   '30000000-0000-0000-0000-000000000001', now() - interval '30 days', now() - interval '30 days' + interval '1 hour',
+   now() - interval '30 days' + interval '1 hour', 'completed', 0, 'нова бележка');
+insert into public.contact_messages (name, email, message, created_at) values
+  ('Стара', 'old@example.org', 'старо запитване', now() - interval '3 years'),
+  ('Нова', 'new@example.org', 'ново запитване', now() - interval '1 day');
+insert into public.email_log (to_email, template_key, status, created_at) values
+  ('old@example.org', 'retention_check', 'sent', now() - interval '3 years');
+
+select checks.expect_error($$set local role authenticated; set local request.jwt.claims = '{"role":"authenticated"}'; select public.purge_expired_personal_data()$$, 'permission denied');
+reset role;
+set local request.jwt.claims = '{"role":"service_role"}';
+select public.purge_expired_personal_data();
+select checks.ok((select user_note is null from public.consultation_bookings where id = '60000000-0000-0000-0000-0000000000d1'),
+  'note cleared a year after the session');
+select checks.ok((select user_note = 'нова бележка' from public.consultation_bookings where id = '60000000-0000-0000-0000-0000000000d2'),
+  'recent note kept');
+select checks.ok(not exists (select 1 from public.audit_log
+                              where record_id = '60000000-0000-0000-0000-0000000000d1'
+                                and (old_data ? 'user_note' or new_data ? 'user_note')),
+  'cleared note not left in the audit log');
+select checks.ok((select count(*) = 1 from public.contact_messages where email in ('old@example.org', 'new@example.org')),
+  'old contact messages deleted, recent kept');
+select checks.ok(not exists (select 1 from public.email_log where template_key = 'retention_check'), 'old email log deleted');
+select checks.ok(exists (select 1 from cron.job where jobname = 'purge-personal-data' and schedule = '30 3 * * *'),
+  'daily retention job scheduled');
+
+-- ---------------------------------------------------------------------------
 -- Admin safety and audit trail
 -- ---------------------------------------------------------------------------
 select checks.expect_error($$delete from public.user_roles where role = 'admin'$$, 'last_admin');

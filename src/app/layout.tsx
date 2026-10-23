@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import Box from "@mui/material/Box";
+import { CookieNotice } from "@/components/layout/CookieNotice";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { inter, lora } from "@/theme/fonts";
@@ -54,6 +55,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             {children}
           </Box>
           <SiteFooter />
+          <CookieNotice />
         </Providers>
       </body>
     </html>
