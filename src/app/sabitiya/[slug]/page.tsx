@@ -72,12 +72,21 @@ export default async function EventPage({ params }: EventPageProps) {
       <Section bg="brand.mintLight" aria-label="Подробности за събитието">
         <Box sx={{ display: "grid", gap: 3.5, gridTemplateColumns: { xs: "1fr", md: "8fr 5fr" }, alignItems: "start" }}>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 1.75, minWidth: 0 }}>
-            {/* Cover image placeholder from Figma; event photos come later. */}
-            <Box sx={{ bgcolor: "brand.sageLight", borderRadius: "14px", px: 2, py: { xs: 4, md: 6 } }}>
-              <Typography sx={{ fontFamily: "var(--font-lora)", fontWeight: 700, fontSize: 22, color: "primary.main" }}>
-                Срещаме се, за да растем заедно
-              </Typography>
-            </Box>
+            {event.coverImageUrl ? (
+              <Box
+                component="img"
+                src={event.coverImageUrl}
+                alt={event.title}
+                sx={{ width: "100%", aspectRatio: "16 / 9", objectFit: "cover", borderRadius: "14px", display: "block" }}
+              />
+            ) : (
+              // Placeholder from Figma for events without a photo.
+              <Box sx={{ bgcolor: "brand.sageLight", borderRadius: "14px", px: 2, py: { xs: 4, md: 6 } }}>
+                <Typography sx={{ fontFamily: "var(--font-lora)", fontWeight: 700, fontSize: 22, color: "primary.main" }}>
+                  Срещаме се, за да растем заедно
+                </Typography>
+              </Box>
+            )}
             <Typography variant="h4" component="h2" sx={{ color: "primary.main" }}>
               За събитието
             </Typography>

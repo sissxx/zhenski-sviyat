@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   bookingPriceLabel,
   paymentModeOf,
@@ -54,6 +54,15 @@ describe("event availability", () => {
       "not_open_yet",
     );
     expect(toPublicEvent(row({ registration_open: false }), now).availability).toBe("closed");
+  });
+
+  it("turns the stored cover image path into a public media URL", () => {
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://example.supabase.co");
+    expect(toPublicEvent(row(), now).coverImageUrl).toBeNull();
+    expect(toPublicEvent(row({ cover_image_path: "events/abc.avif" }), now).coverImageUrl).toBe(
+      "https://example.supabase.co/storage/v1/object/public/media/events/abc.avif",
+    );
+    vi.unstubAllEnvs();
   });
 
   it("fills defaults for nullable view columns", () => {

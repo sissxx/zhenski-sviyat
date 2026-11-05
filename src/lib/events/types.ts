@@ -1,5 +1,6 @@
 import type { Database } from "@/lib/supabase/database.types";
 import { formatPrice } from "@/lib/locale";
+import { mediaUrl } from "@/lib/supabase/media";
 
 type ListingRow = Database["public"]["Views"]["event_listing"]["Row"];
 export type EventFormat = Database["public"]["Enums"]["event_format"];
@@ -31,6 +32,8 @@ export type PublicEvent = {
   seatsLeft: number | null;
   allowBankTransfer: boolean;
   registrationOpensAt: string | null;
+  /** Public URL of the cover photo uploaded in the admin panel, or null when there is none. */
+  coverImageUrl: string | null;
   availability: EventAvailability;
 };
 
@@ -61,6 +64,7 @@ export function toPublicEvent(row: ListingRow, now: number = Date.now()): Public
     seatsLeft: row.seats_left,
     allowBankTransfer: row.allow_bank_transfer ?? false,
     registrationOpensAt: row.registration_opens_at,
+    coverImageUrl: mediaUrl(row.cover_image_path),
     availability: availabilityOf(row, now),
   };
 }
