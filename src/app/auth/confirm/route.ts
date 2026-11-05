@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
   const tokenHash = params.get("token_hash");
   const type = params.get("type") as EmailOtpType | null;
   const code = params.get("code");
-  const fallback = type === "recovery" ? routes.newPassword : `${routes.account}?potvarden=1`;
+  const fallback = type === "recovery" ? routes.newPassword : `${routes.accountDetails}?potvarden=1`;
   const next = safeNextPath(sameSitePath(params.get("next"), request.nextUrl.origin), fallback);
 
   const failed = () => NextResponse.redirect(new URL(`${routes.login}?greshka=link`, request.url));

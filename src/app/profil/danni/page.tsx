@@ -3,6 +3,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { ProfileForm } from "@/components/account/ProfileForm";
+import { FormAlert } from "@/components/forms/FormAlert";
 import { Panel } from "@/components/ui/Panel";
 import { requireUser } from "@/lib/auth/session";
 import { formatDate } from "@/lib/locale";
@@ -10,11 +11,16 @@ import { routes } from "@/lib/routes";
 
 export const metadata: Metadata = { title: "Моите данни" };
 
-export default async function AccountDetailsPage() {
-  const { user, profile } = await requireUser();
+type AccountDetailsProps = { searchParams: Promise<{ potvarden?: string; parola?: string }> };
+
+/** The first page of the profile: after login, sign-up and email confirmation the member lands here. */
+export default async function AccountDetailsPage({ searchParams }: AccountDetailsProps) {
+  const [{ user, profile }, { potvarden, parola }] = await Promise.all([requireUser(), searchParams]);
 
   return (
     <>
+      {potvarden && <FormAlert severity="success">Имейлът ти е потвърден. Добре дошла в общността!</FormAlert>}
+      {parola === "promenena" && <FormAlert severity="success">Паролата ти е сменена.</FormAlert>}
       <Panel aria-labelledby="details-title" sx={{ p: { xs: 2.5, md: 3.5 }, gap: 2.25, alignItems: "stretch" }}>
         <Typography id="details-title" variant="h4" component="h2" sx={{ color: "primary.main" }}>
           Лични данни

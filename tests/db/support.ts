@@ -46,7 +46,7 @@ export async function login(page: Page, user: TestUser, next?: string) {
   await page.getByRole("textbox", { name: "Имейл" }).fill(user.email);
   await page.getByLabel("Парола", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Вход", exact: true }).click();
-  await expect(page).toHaveURL((url) => url.pathname === (next ? new URL(next, url).pathname : "/profil"));
+  await expect(page).toHaveURL((url) => url.pathname === (next ? new URL(next, url).pathname : "/profil/danni"));
 }
 
 /** A signed-in Supabase client for one user, to call the database functions as that user (RLS applies). */

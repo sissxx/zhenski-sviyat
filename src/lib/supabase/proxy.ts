@@ -44,7 +44,7 @@ export async function updateSession(request: NextRequest) {
   } else if (signedIn && guestOnlyPaths.includes(pathname)) {
     // "Стани член" on a plan page links to sign-up with ?plan=; a member already has an account.
     const plan = request.nextUrl.searchParams.get("plan");
-    const fallback = plan ? `${routes.accountSubscriptions}?plan=${encodeURIComponent(plan)}` : routes.account;
+    const fallback = plan ? `${routes.accountSubscriptions}?plan=${encodeURIComponent(plan)}` : routes.accountDetails;
     redirectTo = safeNextPath(request.nextUrl.searchParams.get("next"), fallback);
   }
   if (!redirectTo) return response;

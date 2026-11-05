@@ -65,13 +65,12 @@ export const loginPath = (next?: string) =>
  * A same-site path to continue to after login or an email link, or the fallback.
  * Rejects absolute and protocol-relative URLs so the parameter can't send users to another site.
  */
-export function safeNextPath(next: string | null | undefined, fallback: string = routes.account): string {
+export function safeNextPath(next: string | null | undefined, fallback: string = routes.accountDetails): string {
   if (!next || !next.startsWith("/") || next.startsWith("//") || next.startsWith("/\\")) return fallback;
   return next;
 }
 
 export const accountNav: NavItem[] = [
-  { label: "Начало", href: routes.account },
   { label: "Моите данни", href: routes.accountDetails },
   { label: "Моите събития", href: routes.accountEvents },
   { label: "Моите консултации", href: routes.accountConsultations },

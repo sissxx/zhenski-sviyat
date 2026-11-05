@@ -15,7 +15,7 @@ test.describe("accounts", () => {
     await page.getByRole("button", { name: "Създай профил" }).click();
 
     // Email confirmation is off in the local Supabase, so sign-up goes straight to the account.
-    await expect(page).toHaveURL((url) => url.pathname === "/profil");
+    await expect(page).toHaveURL((url) => url.pathname === "/profil/danni");
     const { data: profile } = await db.from("profiles").select("first_name, last_name, phone, terms_accepted_at").eq("email", email).single();
     expect(profile).toMatchObject({ first_name: "Елена", last_name: "Тестова", phone: "+359 888 123 456" });
     expect(profile?.terms_accepted_at).not.toBeNull();

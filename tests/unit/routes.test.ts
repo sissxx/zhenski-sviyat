@@ -20,7 +20,7 @@ describe("safeNextPath", () => {
 
   it("rejects anything that could leave the site", () => {
     for (const next of ["https://evil.example", "//evil.example", "/\\evil.example", "evil", "", null, undefined]) {
-      expect(safeNextPath(next)).toBe(routes.account);
+      expect(safeNextPath(next)).toBe(routes.accountDetails);
     }
   });
 
