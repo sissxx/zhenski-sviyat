@@ -16,12 +16,12 @@ export function isEmailConfigured(): boolean {
   return Boolean(process.env.BREVO_API_KEY && process.env.EMAIL_FROM_ADDRESS);
 }
 
-export async function sendViaBrevo(to: Recipient, email: RenderedEmail, tag: string): Promise<{ messageId: string | null }> {
+export async function sendViaBrevo(to: Recipient, email: RenderedEmail, tag: string, replyToOverride?: string): Promise<{ messageId: string | null }> {
   const apiKey = process.env.BREVO_API_KEY;
   const fromAddress = process.env.EMAIL_FROM_ADDRESS;
   if (!apiKey || !fromAddress) throw new Error("BREVO_API_KEY or EMAIL_FROM_ADDRESS is not set");
 
-  const replyTo = process.env.EMAIL_REPLY_TO;
+  const replyTo = replyToOverride || process.env.EMAIL_REPLY_TO;
   const response = await fetch(endpoint(), {
     method: "POST",
     headers: { "api-key": apiKey, "content-type": "application/json", accept: "application/json" },

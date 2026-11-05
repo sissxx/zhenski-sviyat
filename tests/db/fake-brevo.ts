@@ -8,7 +8,7 @@ import { createServer } from "node:http";
  * Started by playwright.db.config.ts.
  */
 
-type Sent = { to: string; subject: string; text: string; html: string; tags: string[] };
+type Sent = { to: string; subject: string; text: string; html: string; tags: string[]; replyTo: string | null };
 
 const port = Number(process.argv[2] ?? 3299);
 const sent: Sent[] = [];
@@ -26,6 +26,7 @@ createServer((request, response) => {
         text: email.textContent ?? "",
         html: email.htmlContent ?? "",
         tags: email.tags ?? [],
+        replyTo: email.replyTo?.email ?? null,
       });
       response.writeHead(201, { "content-type": "application/json" });
       response.end(JSON.stringify({ messageId: `<fake-${sent.length}@brevo.test>` }));

@@ -24,6 +24,8 @@ export type SendEmailInput = {
   userId?: string | null;
   dedupeKey?: string;
   related?: { table: string; id: string };
+  /** Where replies go instead of EMAIL_REPLY_TO, e.g. the sender of a contact-form message. */
+  replyTo?: string;
 };
 
 export type SendEmailResult = "sent" | "skipped" | "duplicate" | "failed";
@@ -81,7 +83,7 @@ export async function sendEmail(input: SendEmailInput): Promise<SendEmailResult>
   }
 
   try {
-    const { messageId } = await sendViaBrevo(input.to, rendered, input.template);
+    const { messageId } = await sendViaBrevo(input.to, rendered, input.template, input.replyTo);
     if (supabase && logId) {
       await supabase
         .from("email_log")

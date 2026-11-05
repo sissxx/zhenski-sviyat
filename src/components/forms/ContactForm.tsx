@@ -3,42 +3,47 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import { Placeholder } from "@/components/ui/Placeholder";
-import { consent, email, fullName } from "@/lib/validation";
+import { sendContactMessage } from "@/lib/contact/actions";
+import { contactSchema, type ContactValues } from "@/lib/contact/schema";
 import { ConsentCheckbox } from "./ConsentCheckbox";
+import { FormAlert } from "./FormAlert";
 import { FormTextField } from "./FormTextField";
-import { NotConnectedNotice } from "./NotConnectedNotice";
 
-const schema = z.object({
-  name: fullName,
-  email,
-  subject: z.string().trim().min(2, "Моля, въведи тема.").max(150, "Темата е твърде дълга."),
-  message: z.string().trim().min(10, "Съобщението трябва да е поне 10 знака.").max(3000, "Съобщението е твърде дълго."),
-  consent,
-});
-
-type ContactValues = z.infer<typeof schema>;
-
-/** Contact form. UI only for now: it validates, then says it is not connected yet. */
+/** Contact form. The message is saved for the admins (Админ → Съобщения) and emailed to them. */
 export function ContactForm({ defaultSubject = "" }: { defaultSubject?: string }) {
-  const [submitted, setSubmitted] = useState(false);
+  const [result, setResult] = useState<{ ok: boolean; text: string } | null>(null);
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm<ContactValues>({
-    resolver: zodResolver(schema),
-    defaultValues: { name: "", email: "", subject: defaultSubject, message: "", consent: false },
+    resolver: zodResolver(contactSchema),
+    defaultValues: { name: "", email: "", subject: defaultSubject, message: "", consent: false, website: "" },
   });
+
+  const onSubmit = async (values: ContactValues) => {
+    setResult(null);
+    try {
+      const response = await sendContactMessage(values);
+      if (response.ok) {
+        reset({ name: "", email: "", subject: "", message: "", consent: false, website: "" });
+        setResult({ ok: true, text: "Благодарим! Съобщението е изпратено. Ще ти отговорим на посочения имейл." });
+      } else {
+        setResult({ ok: false, text: response.error });
+      }
+    } catch {
+      setResult({ ok: false, text: "Съобщението не беше изпратено. Моля, провери връзката си и опитай отново." });
+    }
+  };
 
   return (
     <Box
       component="form"
       noValidate
-      onSubmit={handleSubmit(() => setSubmitted(true))}
+      onSubmit={handleSubmit(onSubmit)}
       sx={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 2.25, width: "100%" }}
     >
       <FormTextField label="Име" placeholder="Твоето име" autoComplete="name" registration={register("name")} error={errors.name} />
@@ -53,7 +58,6 @@ export function ContactForm({ defaultSubject = "" }: { defaultSubject?: string }
       <FormTextField
         label="Тема"
         placeholder="За какво се отнася запитването?"
-        defaultValue={defaultSubject}
         registration={register("subject")}
         error={errors.subject}
       />
@@ -65,17 +69,18 @@ export function ContactForm({ defaultSubject = "" }: { defaultSubject?: string }
         registration={register("message")}
         error={errors.message}
       />
+      {/* Trap for bots: hidden from people and screen readers, so only a bot fills it in. */}
+      <Box aria-hidden sx={{ position: "absolute", left: "-10000px", width: 1, height: 1, overflow: "hidden" }}>
+        <label>
+          Уебсайт
+          <input type="text" tabIndex={-1} autoComplete="off" {...register("website")} />
+        </label>
+      </Box>
       <ConsentCheckbox registration={register("consent")} error={errors.consent} />
       <Button type="submit" variant="contained" disabled={isSubmitting} sx={{ minWidth: 220 }}>
-        Изпрати съобщение
+        {isSubmitting ? "Изпращане…" : "Изпрати съобщение"}
       </Button>
-      {/* Tells people what happens after they send; the association still has to set the response time. */}
-      <Placeholder>Отговаряме на имейла, който посочиш, до [срок за отговор].</Placeholder>
-      {submitted && (
-        <NotConnectedNotice>
-          Благодарим! Формата за контакт все още не е свързана, затова съобщението не е изпратено.
-        </NotConnectedNotice>
-      )}
+      {result && <FormAlert severity={result.ok ? "success" : "error"}>{result.text}</FormAlert>}
     </Box>
   );
 }

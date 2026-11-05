@@ -18,6 +18,7 @@ export const adminRoutes = {
   partners: `${base}/partnyori`,
   promotions: `${base}/promotsii`,
   team: `${base}/ekip`,
+  messages: `${base}/saobshteniya`,
   settings: `${base}/nastroyki`,
 } as const;
 
@@ -38,6 +39,7 @@ export const adminNav: AdminNavGroup[] = [
       { label: "Абонаменти", href: adminRoutes.subscriptions },
       { label: "Viber достъп", href: adminRoutes.viber },
       { label: "Потребители", href: adminRoutes.users },
+      { label: "Съобщения", href: adminRoutes.messages },
     ],
   },
   {

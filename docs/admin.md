@@ -15,6 +15,7 @@ The service key is not used.
 | Абонаменти | `/admin/abonamenti` | Subscriptions by status; end a bank-transfer subscription |
 | Viber достъп | `/admin/viber` | Who to invite or remove (`viber_access_actions`), groups with invite links |
 | Потребители | `/admin/potrebiteli` | Search accounts; per user: their records, suspend / activate, admin role |
+| Съобщения | `/admin/saobshteniya` | Contact-form messages (also emailed to every admin, reply goes to the sender); mark as answered |
 | Видове консултации, Специалисти | `/admin/vidove-konsultatsii`, `/admin/spetsialisti` | Services; specialist profiles, which services they offer (own price), weekly hours, time off, login account |
 | Членство и планове | `/admin/chlenstvo` | Plans, prices, which Viber groups each plan opens. Stripe product and price ids fill in by themselves on the first card subscription (docs/payments.md) |
 | Съдържание | `/admin/vaprosi`, `partnyori`, `promotsii`, `ekip` | FAQs, partners, promotions, founders/team |

@@ -8,22 +8,28 @@ import { Section } from "@/components/ui/Section";
 import { communityAreas } from "@/content/community";
 import { membershipPlans } from "@/content/plans";
 import { formatPrice } from "@/lib/locale";
+import { routes } from "@/lib/routes";
 import { pageMetadata } from "@/lib/seo/metadata";
+import { perInterval } from "@/lib/subscriptions/plans";
+import { listPublicPlans } from "@/lib/subscriptions/queries";
 
 export const metadata: Metadata = pageMetadata("community");
 
-const plans = [
-  { plan: membershipPlans.beautyClub, text: "Затворена Viber група с месечен абонамент." },
-  { plan: membershipPlans.viber, text: "Месечен абонамент за участие в общността." },
-];
+/** Plans that have their own page; the others link to the membership page. */
+const planPages = new Map<string, string>(Object.values(membershipPlans).map((plan) => [plan.slug, plan.href]));
 
-export default function CommunityPage() {
+export default async function CommunityPage() {
+  // The plans from the admin panel (or the built-in ones until there are any), as on the membership page.
+  const { plans } = await listPublicPlans();
   const cards = [
     ...communityAreas,
-    ...plans.map(({ plan, text }, index) => ({
-      title: plan.title,
-      text,
-      cta: { label: `Членство · ${formatPrice(plan.priceCents)}`, href: plan.href },
+    ...plans.map((plan, index) => ({
+      title: plan.name,
+      text: plan.description ?? "",
+      cta: {
+        label: `Членство · ${formatPrice(plan.priceCents)} / ${perInterval(plan.billingInterval)}`,
+        href: planPages.get(plan.slug) ?? routes.membership,
+      },
       primary: index === 0,
     })),
   ];
