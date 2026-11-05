@@ -4,8 +4,10 @@ import Typography from "@mui/material/Typography";
 import { Section } from "@/components/ui/Section";
 import { missionStats } from "@/content/home";
 import { routes } from "@/lib/routes";
+import { listTeamMembers } from "@/lib/team/queries";
 
-export function About() {
+export async function About() {
+  const founderCount = (await listTeamMembers()).filter((m) => m.group === "founder").length;
   return (
     <Section bg="brand.sand" aria-labelledby="about-title">
       <Box sx={{ display: "grid", gap: { xs: 3, md: 5 }, gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" }, alignItems: "start" }}>
@@ -32,7 +34,7 @@ export function About() {
             участие на жените.
           </Typography>
           <Box component="dl" sx={{ display: "flex", flexWrap: "wrap", gap: 2.25, m: 0 }}>
-            {missionStats.map((stat) => (
+            {missionStats(founderCount).map((stat) => (
               <Box key={stat.label} sx={{ minWidth: 120, display: "flex", flexDirection: "column-reverse", gap: 0.5 }}>
                 <Typography component="dt" sx={{ fontSize: 14, color: "text.secondary" }}>
                   {stat.label}
