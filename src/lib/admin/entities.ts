@@ -382,29 +382,6 @@ export const entities: Record<Exclude<EntityKey, "settings">, EntityConfig> = {
     }),
   },
 
-  announcement: {
-    table: "announcements",
-    listPath: adminRoutes.announcements,
-    defaults: { title: "", body: "", link_url: "", image_path: "", starts_at: "", ends_at: "", is_published: false },
-    toRow: (v) => ({
-      title: text(v, "title"),
-      body: opt(v, "body"),
-      link_url: opt(v, "link_url"),
-      image_path: opt(v, "image_path"),
-      starts_at: optionalLocalDateTimeToIso(str(v, "starts_at")),
-      ends_at: optionalLocalDateTimeToIso(str(v, "ends_at")),
-      is_published: flag(v, "is_published"),
-    }),
-    toForm: (row) => ({
-      title: s(row, "title"),
-      body: s(row, "body"),
-      link_url: s(row, "link_url"),
-      image_path: s(row, "image_path"),
-      starts_at: isoToLocalDateTime(row.starts_at as string | null),
-      ends_at: isoToLocalDateTime(row.ends_at as string | null),
-      is_published: b(row, "is_published"),
-    }),
-  },
 };
 
 /**
