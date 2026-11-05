@@ -1,5 +1,4 @@
 import { supportAreas } from "@/content/about";
-import { founders } from "@/content/founders";
 import { routes } from "@/lib/routes";
 
 /**
@@ -38,8 +37,10 @@ export const services = [
 ];
 
 /** Facts counted from the site's own content, so they stay true when that content changes. */
-export const missionStats = [
-  { value: String(supportAreas.length), label: "направления на подкрепа" },
-  { value: String(founders.length), label: "учредители специалисти" },
-  { value: "Онлайн", label: "и на живо" },
-];
+export function missionStats(founderCount: number) {
+  return [
+    { value: String(supportAreas.length), label: "направления на подкрепа" },
+    { value: String(founderCount), label: "учредители специалисти" },
+    { value: "Онлайн", label: "и на живо" },
+  ];
+}
