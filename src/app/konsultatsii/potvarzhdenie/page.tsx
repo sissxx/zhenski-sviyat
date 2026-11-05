@@ -89,7 +89,7 @@ export default async function ConsultationConfirmationPage({ searchParams }: Con
               width: 48,
               height: 48,
               borderRadius: "50%",
-              bgcolor: outcome === "confirmed" ? "primary.main" : "brand.accent",
+              bgcolor: outcome === "confirmed" ? "primary.main" : "brand.terracotta",
               color: "brand.paper",
               display: "grid",
               placeItems: "center",

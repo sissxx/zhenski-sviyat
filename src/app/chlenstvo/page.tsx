@@ -118,7 +118,7 @@ function PlanCard({ plan }: { plan: PublicPlan }) {
           {plan.description}
         </Typography>
       )}
-      <Typography sx={{ fontFamily: "var(--font-lora)", fontWeight: 700, fontSize: 32, lineHeight: 1.2, color: "brand.dark" }}>
+      <Typography sx={{ fontFamily: "var(--font-lora)", fontWeight: 700, fontSize: 32, lineHeight: 1.2, color: "brand.terracotta" }}>
         {formatPrice(plan.priceCents)}
         <Typography component="span" sx={{ fontFamily: "var(--font-inter)", fontWeight: 400, fontSize: 14, color: "text.secondary", ml: 1 }}>
           / {perInterval(plan.billingInterval)}
@@ -152,7 +152,7 @@ function PlanCard({ plan }: { plan: PublicPlan }) {
         {plan.allowBankTransfer ? "Плащане с карта или по банков път" : "Плащане с карта"}
       </Typography>
       <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.25, mt: "auto" }}>
-        <Button variant="contained" href={joinPlanPath(plan.slug)}>
+        <Button variant="contained" color="secondary" href={joinPlanPath(plan.slug)}>
           Стани член
         </Button>
         {morePage && (

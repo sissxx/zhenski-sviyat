@@ -33,13 +33,20 @@ export function AccountNav({ extraItems = [] }: { extraItems?: NavItem[] }) {
                 component={NextLink}
                 href={item.href}
                 aria-current={active ? "page" : undefined}
-                variant={active ? "contained" : "text"}
+                variant="text"
+                color={active ? "secondary" : "primary"}
                 sx={{
                   justifyContent: "flex-start",
                   whiteSpace: "nowrap",
                   width: { md: "100%" },
                   // Terracotta edge on the current page.
                   boxShadow: active ? "inset 3px 0 0 var(--mui-palette-secondary-main)" : undefined,
+                  // The current page sits on a pale terracotta tint with darker terracotta text (6.3:1).
+                  ...(active && {
+                    bgcolor: "brand.terracottaLight",
+                    color: "secondary.dark",
+                    "&:hover": { bgcolor: "brand.terracottaLight" },
+                  }),
                 }}
               >
                 {item.label}

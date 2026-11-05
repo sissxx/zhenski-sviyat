@@ -101,10 +101,20 @@ const theme = createTheme(
           },
           outlined: {
             backgroundColor: brand.paper,
-            borderColor: brand.primary,
+            borderColor: "currentColor",
             "&:hover": { backgroundColor: brand.mint },
           },
         },
+        variants: [
+          {
+            props: { variant: "outlined", color: "secondary" },
+            style: { "&:hover": { backgroundColor: brand.terracottaLight } },
+          },
+          {
+            props: { variant: "text", color: "secondary" },
+            style: { "&:hover": { backgroundColor: brand.terracottaLight } },
+          },
+        ],
       },
       MuiLink: {
         defaultProps: { underline: "hover" },
