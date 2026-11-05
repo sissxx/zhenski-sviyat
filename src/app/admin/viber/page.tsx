@@ -5,6 +5,7 @@ import Typography from "@mui/material/Typography";
 import { ActionButton } from "@/components/admin/ActionButton";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { DataTable } from "@/components/admin/DataTable";
+import { orderColumn } from "@/components/admin/orderColumn";
 import { StatusChip } from "@/components/admin/StatusChip";
 import { setViberStatus } from "@/lib/admin/actions";
 import { personName, viberStatus } from "@/lib/admin/labels";
@@ -131,6 +132,7 @@ export default async function AdminViberPage() {
             render: (g) => (g.viber_group_invites?.invite_link ? "Има" : <StatusChip label="Няма" tone="warning" />),
           },
           { label: "В групата", render: (g) => g.viber_memberships.filter((m) => m.status === "joined").length, align: "right" },
+          orderColumn("viberGroup", groups ?? [], (g) => g.name),
           { label: "Статус", render: (g) => <StatusChip {...(g.is_active ? { label: "Активна", tone: "success" } : { label: "Неактивна" })} /> },
         ]}
       />

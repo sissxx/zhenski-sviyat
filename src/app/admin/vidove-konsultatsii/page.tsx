@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "@mui/material/Link";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { DataTable } from "@/components/admin/DataTable";
+import { orderColumn } from "@/components/admin/orderColumn";
 import { StatusChip } from "@/components/admin/StatusChip";
 import { adminRoutes, itemPath, newPath } from "@/lib/admin/routes";
 import { requireAdminPage } from "@/lib/admin/session";
@@ -36,6 +37,7 @@ export default async function AdminConsultationTypesPage() {
             render: (r) => (r.price_cents ? `${formatPrice(r.price_cents)}${r.requires_prepayment ? "" : " на място"}` : "Безплатна"),
           },
           { label: "Специалисти", render: (r) => r.specialist_consultation_types.length, align: "right" },
+          orderColumn("consultationType", data ?? [], (r) => r.name),
           { label: "Статус", render: (r) => <StatusChip {...(r.is_active ? { label: "Активна", tone: "success" } : { label: "Скрита" })} /> },
         ]}
       />

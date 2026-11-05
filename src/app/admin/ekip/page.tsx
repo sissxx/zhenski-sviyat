@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import Link from "@mui/material/Link";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { DataTable } from "@/components/admin/DataTable";
-import { MoveButtons } from "@/components/admin/MoveButtons";
+import { orderColumn } from "@/components/admin/orderColumn";
 import { StatusChip } from "@/components/admin/StatusChip";
-import { moveTeamMember } from "@/lib/admin/actions";
 import { teamGroupLabels } from "@/lib/admin/forms";
 import { adminRoutes, itemPath, newPath } from "@/lib/admin/routes";
 import { requireAdminPage } from "@/lib/admin/session";
@@ -20,8 +19,6 @@ export default async function AdminTeamPage() {
     .order("sort_order")
     .order("full_name");
   const rows = data ?? [];
-  // Arrows move people within their group, in the same order as on the public page.
-  const groupOf = (i: number) => rows[i]?.member_group;
   return (
     <>
       <AdminPageHeader
@@ -30,18 +27,14 @@ export default async function AdminTeamPage() {
         action={{ label: "Нов човек", href: newPath(adminRoutes.team) }}
       />
       <DataTable
-        rows={rows.map((r, i) => ({ ...r, isFirst: groupOf(i - 1) !== r.member_group, isLast: groupOf(i + 1) !== r.member_group }))}
+        rows={rows}
         rowKey={(r) => r.id}
         empty="Още няма добавени хора."
         columns={[
           { label: "Име", render: (r) => <Link href={itemPath(adminRoutes.team, r.id)}>{r.full_name}</Link> },
           { label: "Роля", render: (r) => r.role_title ?? "—" },
           { label: "Група", render: (r) => teamGroupLabels[r.member_group as keyof typeof teamGroupLabels] ?? r.member_group },
-          {
-            label: "Подредба",
-            nowrap: true,
-            render: (r) => <MoveButtons name={r.full_name} move={moveTeamMember.bind(null, r.id)} isFirst={r.isFirst} isLast={r.isLast} />,
-          },
+          orderColumn("teamMember", rows, (r) => r.full_name, (r) => r.member_group),
           { label: "Статус", render: (r) => <StatusChip {...(r.is_published ? { label: "Публикуван", tone: "success" } : { label: "Скрит" })} /> },
         ]}
       />

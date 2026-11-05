@@ -78,7 +78,6 @@ const optEmail = z
   .trim()
   .refine((v) => v === "" || z.email().safeParse(v).success, "Невалиден имейл адрес.");
 const bool = z.boolean();
-const sortOrder = optIntIn(0, 9999);
 
 const later = (a: string, b: string) => a === "" || b === "" || b > a;
 
@@ -86,13 +85,6 @@ const later = (a: string, b: string) => a === "" || b === "" || b > a;
 
 const publishedField = (label = "Публикувано на сайта"): FieldConfig => ({ name: "is_published", label, type: "checkbox" });
 const activeField = (label: string): FieldConfig => ({ name: "is_active", label, type: "checkbox" });
-const sortField: FieldConfig = {
-  name: "sort_order",
-  label: "Подредба",
-  type: "number",
-  span: 2,
-  helperText: "По-малкото число е по-напред.",
-};
 const slugField = (from: string, helperText = "Част от адреса на страницата. Не го сменяй след публикуване."): FieldConfig => ({
   name: "slug",
   label: "Адрес (slug)",
@@ -208,14 +200,12 @@ export const consultationTypeForm: EntityForm = {
     allow_bank_transfer: bool,
     location_info: optText(1000),
     is_active: bool,
-    sort_order: sortOrder,
   }) as unknown as EntityForm["schema"],
   sections: [
     {
       fields: [
         { name: "name", label: "Име", type: "text" },
         slugField("name"),
-        sortField,
         { name: "description", label: "Описание", type: "textarea" },
         { name: "duration_minutes", label: "Продължителност (мин.)", type: "number", span: 2 },
         { name: "buffer_minutes", label: "Почивка след нея (мин.)", type: "number", span: 2 },
@@ -237,7 +227,6 @@ export const specialistForm: EntityForm = {
     bio: optText(),
     photo_path: optText(500),
     is_active: bool,
-    sort_order: sortOrder,
     login_email: optEmail,
     notification_email: optEmail,
     phone: optText(40),
@@ -248,7 +237,6 @@ export const specialistForm: EntityForm = {
       fields: [
         { name: "full_name", label: "Име и фамилия", type: "text" },
         slugField("full_name"),
-        sortField,
         { name: "title", label: "Професия / специалност", type: "text" },
         { name: "bio", label: "Представяне", type: "textarea" },
         { name: "photo_path", label: "Снимка", type: "image", folder: "specialists" },
@@ -289,14 +277,12 @@ export const planForm: EntityForm = {
       .refine((v) => v === "" || /^price_\w+$/.test(v), "Започва с price_."),
     allow_bank_transfer: bool,
     is_active: bool,
-    sort_order: sortOrder,
   }) as unknown as EntityForm["schema"],
   sections: [
     {
       fields: [
         { name: "name", label: "Име", type: "text" },
         slugField("name"),
-        sortField,
         { name: "description", label: "Описание", type: "textarea" },
         { name: "features", label: "Какво включва", type: "lines", helperText: "По едно на ред." },
         { name: "price", label: "Цена (€)", type: "money", span: 2 },
@@ -323,14 +309,12 @@ export const viberGroupForm: EntityForm = {
     invite_link: optUrl,
     join_instructions: optText(2000),
     is_active: bool,
-    sort_order: sortOrder,
   }) as unknown as EntityForm["schema"],
   sections: [
     {
       fields: [
         { name: "name", label: "Име", type: "text" },
         slugField("name", "Вътрешен ключ на групата."),
-        sortField,
         { name: "description", label: "Описание", type: "textarea" },
         activeField("Активна"),
       ],
@@ -351,7 +335,6 @@ export const faqForm: EntityForm = {
     question: reqText(500),
     answer: reqText(5000),
     category: optText(100),
-    sort_order: sortOrder,
     is_published: bool,
   }) as unknown as EntityForm["schema"],
   sections: [
@@ -360,7 +343,6 @@ export const faqForm: EntityForm = {
         { name: "question", label: "Въпрос", type: "text" },
         { name: "answer", label: "Отговор", type: "textarea" },
         { name: "category", label: "Категория (по избор)", type: "text", span: 3 },
-        sortField,
         publishedField(),
       ],
     },
@@ -376,7 +358,6 @@ export const partnerForm: EntityForm = {
     description: optText(2000),
     logo_path: optText(500),
     website_url: optUrl,
-    sort_order: sortOrder,
     is_published: bool,
   }) as unknown as EntityForm["schema"],
   sections: [
@@ -384,7 +365,6 @@ export const partnerForm: EntityForm = {
       fields: [
         { name: "name", label: "Име", type: "text" },
         { name: "kind", label: "Вид", type: "select", options: toOptions(partnerKindLabels), span: 3 },
-        sortField,
         { name: "description", label: "Описание", type: "textarea" },
         { name: "website_url", label: "Уебсайт", type: "url" },
         { name: "logo_path", label: "Лого", type: "image", folder: "partners" },
@@ -407,7 +387,6 @@ export const promotionForm: EntityForm = {
       cta_label: optText(60),
       cta_url: z.string().trim().max(500),
       image_path: optText(500),
-      sort_order: sortOrder,
       is_published: bool,
     })
     .superRefine((v, ctx) => {
@@ -419,7 +398,6 @@ export const promotionForm: EntityForm = {
       fields: [
         { name: "title", label: "Заглавие", type: "text" },
         slugField("title", "Вътрешен ключ на промоцията."),
-        sortField,
         { name: "description", label: "Описание", type: "textarea" },
         { name: "price", label: "Цена (€)", type: "money", span: 3, helperText: "Празно = без цена." },
         { name: "original_price", label: "Стара цена (€)", type: "money", span: 3, helperText: "Показва се зачеркната." },

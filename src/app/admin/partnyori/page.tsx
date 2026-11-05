@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "@mui/material/Link";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { DataTable } from "@/components/admin/DataTable";
+import { orderColumn } from "@/components/admin/orderColumn";
 import { StatusChip } from "@/components/admin/StatusChip";
 import { partnerKindLabels } from "@/lib/admin/forms";
 import { adminRoutes, itemPath, newPath } from "@/lib/admin/routes";
@@ -11,7 +12,7 @@ export const metadata: Metadata = { title: "Партньори" };
 
 export default async function AdminPartnersPage() {
   const { supabase } = await requireAdminPage();
-  const { data } = await supabase.from("partners").select("id, name, kind, website_url, sort_order, is_published").order("sort_order").order("name");
+  const { data } = await supabase.from("partners").select("id, name, kind, website_url, is_published").order("sort_order").order("name");
   return (
     <>
       <AdminPageHeader
@@ -27,6 +28,7 @@ export default async function AdminPartnersPage() {
           { label: "Име", render: (r) => <Link href={itemPath(adminRoutes.partners, r.id)}>{r.name}</Link> },
           { label: "Вид", render: (r) => partnerKindLabels[r.kind as keyof typeof partnerKindLabels] ?? r.kind },
           { label: "Уебсайт", render: (r) => r.website_url ?? "—" },
+          orderColumn("partner", data ?? [], (r) => r.name),
           { label: "Статус", render: (r) => <StatusChip {...(r.is_published ? { label: "Публикуван", tone: "success" } : { label: "Скрит" })} /> },
         ]}
       />

@@ -3,12 +3,13 @@ import Button from "@mui/material/Button";
 import { AppLink, TextLink } from "@/components/ui/AppLink";
 import Typography from "@mui/material/Typography";
 import { FaqList } from "@/components/faq/FaqList";
-import { faqs } from "@/content/faq";
+import { listFaqs } from "@/lib/content/queries";
 import { routes } from "@/lib/routes";
 
 const panelPadding = { px: { xs: 2, sm: 3, md: 7 }, py: { xs: 5, md: 7 } };
 
-export function FaqAndDonate() {
+export async function FaqAndDonate() {
+  const { items } = await listFaqs();
   return (
     <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" } }}>
       <Box component="section" aria-labelledby="faq-title" sx={{ bgcolor: "brand.sand", ...panelPadding }}>
@@ -17,7 +18,7 @@ export function FaqAndDonate() {
           <Typography id="faq-title" variant="h3" component="h2">
             Често задавани въпроси
           </Typography>
-          <FaqList items={faqs.slice(0, 5)} idPrefix="faq" />
+          <FaqList items={items.slice(0, 5)} idPrefix="faq" />
           <AppLink href={routes.faq} sx={{ fontWeight: 600, fontSize: 14, alignSelf: "flex-start" }}>
             Всички въпроси
           </AppLink>

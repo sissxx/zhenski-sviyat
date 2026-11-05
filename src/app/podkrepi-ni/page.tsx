@@ -7,12 +7,14 @@ import { Panel } from "@/components/ui/Panel";
 import { Placeholder } from "@/components/ui/Placeholder";
 import { Section } from "@/components/ui/Section";
 import { partnerSlots, supportOptions } from "@/content/support";
+import { listPartners, type PublicPartner } from "@/lib/content/queries";
 import { contactPath } from "@/lib/routes";
 import { pageMetadata } from "@/lib/seo/metadata";
 
 export const metadata: Metadata = pageMetadata("support");
 
-export default function SupportPage() {
+export default async function SupportPage() {
+  const partners = await listPartners();
   return (
     <>
       <PageIntro
@@ -30,13 +32,23 @@ export default function SupportPage() {
             <Typography sx={{ fontSize: 14 }}>
               Организациите и специалистите, които подкрепят дейността на сдружението.
             </Typography>
-            {/* Logo slots until NSJS sends partner names and original logo files. */}
-            <Box aria-hidden sx={{ width: "100%", display: "grid", gap: 1.5, gridTemplateColumns: "repeat(3, 1fr)" }}>
-              {Array.from({ length: partnerSlots }, (_, index) => (
-                <Box key={index} sx={{ aspectRatio: "3 / 2", borderRadius: "10px", bgcolor: "background.paper", border: "1px dashed", borderColor: "brand.cardBorder" }} />
-              ))}
-            </Box>
-            <Placeholder>Имената и логата на партньорите ще бъдат добавени след потвърждение.</Placeholder>
+            {partners.length > 0 ? (
+              <Box component="ul" sx={{ listStyle: "none", m: 0, p: 0, width: "100%", display: "grid", gap: 1.5, gridTemplateColumns: { xs: "repeat(2, 1fr)", sm: "repeat(3, 1fr)" } }}>
+                {partners.map((partner) => (
+                  <PartnerTile key={partner.id} partner={partner} />
+                ))}
+              </Box>
+            ) : (
+              <>
+                {/* Logo slots until the first partner is published in the admin panel. */}
+                <Box aria-hidden sx={{ width: "100%", display: "grid", gap: 1.5, gridTemplateColumns: "repeat(3, 1fr)" }}>
+                  {Array.from({ length: partnerSlots }, (_, index) => (
+                    <Box key={index} sx={{ aspectRatio: "3 / 2", borderRadius: "10px", bgcolor: "background.paper", border: "1px dashed", borderColor: "brand.cardBorder" }} />
+                  ))}
+                </Box>
+                <Placeholder>Имената и логата на партньорите ще бъдат добавени след потвърждение.</Placeholder>
+              </>
+            )}
           </Panel>
 
           <Panel aria-labelledby="donate-title">
@@ -65,5 +77,38 @@ export default function SupportPage() {
         </Box>
       </Section>
     </>
+  );
+}
+
+/** A partner's logo (or name, without one) on a white tile; links to their website when there is one. */
+function PartnerTile({ partner }: { partner: PublicPartner }) {
+  const content = partner.logoUrl ? (
+    <Box component="img" src={partner.logoUrl} alt={partner.name} loading="lazy" sx={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
+  ) : (
+    <Typography sx={{ fontSize: 13, fontWeight: 600, textAlign: "center", color: "primary.main" }}>{partner.name}</Typography>
+  );
+  const tile = {
+    aspectRatio: "3 / 2",
+    borderRadius: "10px",
+    bgcolor: "background.paper",
+    border: "1px solid",
+    borderColor: "brand.cardBorder",
+    p: 1.25,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    color: "inherit",
+    textDecoration: "none",
+  } as const;
+  return (
+    <Box component="li" title={partner.description ?? partner.name}>
+      {partner.websiteUrl ? (
+        <Box component="a" href={partner.websiteUrl} target="_blank" rel="noopener noreferrer" sx={{ ...tile, "&:hover": { borderColor: "primary.main" } }}>
+          {content}
+        </Box>
+      ) : (
+        <Box sx={tile}>{content}</Box>
+      )}
+    </Box>
   );
 }

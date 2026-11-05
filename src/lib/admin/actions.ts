@@ -5,7 +5,7 @@ import { z } from "zod";
 import type { Database } from "@/lib/supabase/database.types";
 import { notifyConsultationCancelled, notifyLater, notifyPaymentConfirmed } from "@/lib/email/notifications";
 import { eurosToCents, type FormValues } from "./convert";
-import { deleteEntity as deleteRow, moveTeamMember as moveTeamMemberRow, writeEntity } from "./entities";
+import { deleteEntity as deleteRow, moveEntity as moveRow, writeEntity } from "./entities";
 import { adminErrorMessage, genericAdminError } from "./errors";
 import { entityForms, type EntityKey } from "./forms";
 import { availabilityRows, availabilitySchema, timeOffRow, timeOffSchema, type AvailabilityInput, type TimeOffInput } from "./schedule";
@@ -63,9 +63,10 @@ export async function deleteEntity(key: Exclude<EntityKey, "settings">, id: stri
   return run(async (supabase) => (await deleteRow(supabase, key, id)).error);
 }
 
-export async function moveTeamMember(id: string, direction: "up" | "down"): Promise<AdminResult> {
-  if (!uuid.safeParse(id).success || (direction !== "up" && direction !== "down")) return invalidInput;
-  return run(async (supabase) => (await moveTeamMemberRow(supabase, id, direction)).error);
+/** Moves an item one place up or down in its admin list (the order the public pages use). */
+export async function moveItem(key: Exclude<EntityKey, "settings">, id: string, direction: "up" | "down"): Promise<AdminResult> {
+  if (!(key in entityForms) || !uuid.safeParse(id).success || (direction !== "up" && direction !== "down")) return invalidInput;
+  return run(async (supabase) => (await moveRow(supabase, key, id, direction)).error);
 }
 
 export async function saveSettings(values: FormValues): Promise<AdminResult> {

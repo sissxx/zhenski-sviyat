@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { getCurrentUser } from "@/lib/auth/session";
 import { formatTime, formatWeekdayDayMonth, sofiaDateKey } from "@/lib/locale";
+import { mediaUrl } from "@/lib/supabase/media";
 import type { BookingRules, ConsultationService, ConsultationSlot } from "./types";
 
 /**
@@ -195,3 +196,22 @@ export function bookingActions(booking: Pick<MyBooking, "status" | "starts_at" |
     pastDeadline: upcoming && confirmed && !beforeDeadline,
   };
 }
+
+export type SpecialistProfile = { id: string; slug: string; name: string; title: string | null; bio: string | null; photoUrl: string | null };
+
+/** Active specialists with their photo and introduction from the admin panel, in admin order. */
+export const listSpecialistProfiles = cache(async (): Promise<SpecialistProfile[]> => {
+  const supabase = await client();
+  if (!supabase) return [];
+  const { data, error } = await supabase
+    .from("specialists")
+    .select("id, slug, full_name, title, bio, photo_path")
+    .eq("is_active", true)
+    .order("sort_order")
+    .order("full_name");
+  if (error) {
+    console.error("listSpecialistProfiles", error);
+    return [];
+  }
+  return data.map((s) => ({ id: s.id, slug: s.slug, name: s.full_name, title: s.title, bio: s.bio, photoUrl: mediaUrl(s.photo_path) }));
+});
