@@ -45,7 +45,7 @@ export function Topics() {
                 "&:hover": { borderColor: "primary.main", bgcolor: "brand.mint" },
               }}
             >
-              <Box aria-hidden sx={{ fontSize: 23, lineHeight: 1.2, color: "brand.accent" }}>
+              <Box aria-hidden sx={{ fontSize: 23, lineHeight: 1.2, color: "brand.terracotta" }}>
                 {topic.icon}
               </Box>
               <Typography variant="h6" component="h3" sx={{ fontSize: { xs: 14, sm: 15 }, overflowWrap: "anywhere" }}>

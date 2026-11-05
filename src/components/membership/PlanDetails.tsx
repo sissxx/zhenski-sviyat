@@ -29,7 +29,7 @@ export function PlanDetails({ plan, heading, intro, bg }: PlanDetailsProps) {
           <Box component="ul" sx={{ listStyle: "none", m: 0, p: 0, display: "flex", flexDirection: "column", gap: 1.25 }}>
             {plan.benefits.map((benefit) => (
               <Box component="li" key={benefit} sx={{ display: "flex", gap: 1.25, fontSize: 14 }}>
-                <Box component="span" aria-hidden sx={{ width: 24, flexShrink: 0, fontWeight: 600, color: "brand.accent" }}>
+                <Box component="span" aria-hidden sx={{ width: 24, flexShrink: 0, fontWeight: 600, color: "brand.terracotta" }}>
                   ✓
                 </Box>
                 {benefit}
