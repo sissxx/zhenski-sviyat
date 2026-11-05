@@ -44,7 +44,15 @@ export async function Events() {
             key={event.slug}
             sx={{ bgcolor: "brand.card", border: "1px solid", borderColor: "brand.cardBorder", borderRadius: "20px", overflow: "hidden", display: "flex", flexDirection: "column" }}
           >
-            {/* Image placeholder band from Figma; event photos come later. */}
+            {event.coverImageUrl && (
+              <Box
+                component="img"
+                src={event.coverImageUrl}
+                alt=""
+                loading="lazy"
+                sx={{ width: "100%", aspectRatio: "16 / 9", objectFit: "cover", display: "block" }}
+              />
+            )}
             <Box sx={{ bgcolor: "brand.sage", p: 1.75, textAlign: "center" }}>
               <Typography component="time" dateTime={event.startsAt} title={formatDate(event.startsAt)} sx={{ fontWeight: 600, fontSize: 14, color: "brand.dark" }}>
                 {formatDayMonthBadge(event.startsAt)}

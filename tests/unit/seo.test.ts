@@ -23,6 +23,7 @@ const event = (overrides: Partial<PublicEvent> = {}): PublicEvent => ({
   seatsLeft: 5,
   allowBankTransfer: true,
   registrationOpensAt: null,
+  coverImageUrl: null,
   availability: "open",
   ...overrides,
 });

@@ -25,7 +25,15 @@ export function EventCard({ event }: { event: PublicEvent }) {
         ...(event.availability === "past" && { opacity: 0.85 }),
       }}
     >
-      {/* Image placeholder band from Figma; event photos come later. */}
+      {event.coverImageUrl && (
+        <Box
+          component="img"
+          src={event.coverImageUrl}
+          alt=""
+          loading="lazy"
+          sx={{ width: "100%", aspectRatio: "16 / 9", objectFit: "cover", borderRadius: "10px", display: "block" }}
+        />
+      )}
       <Box sx={{ width: "100%", bgcolor: "brand.mint", p: 1.5, display: "flex", justifyContent: "space-between", gap: 1 }}>
         <Typography component="time" dateTime={event.startsAt} title={formatDate(event.startsAt)} sx={{ fontWeight: 600, fontSize: 14, color: "primary.main" }}>
           {formatDayMonthBadge(event.startsAt)}
