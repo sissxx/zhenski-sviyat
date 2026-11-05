@@ -29,7 +29,10 @@ async function run(work: (supabase: Supabase, userId: string) => Promise<DbError
     const { supabase, user } = await requireAdminAction();
     const result = await work(supabase, user.id);
     if (result && "ok" in result) return result;
-    if (result) return { ok: false, error: adminErrorMessage(result) };
+    if (result) {
+      console.error("admin action failed", result.code, result.message);
+      return { ok: false, error: adminErrorMessage(result) };
+    }
     // Public pages read the same tables, so refresh everything that may show the change.
     revalidatePath("/", "layout");
     return { ok: true };

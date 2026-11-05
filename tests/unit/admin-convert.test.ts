@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { adminErrorMessage, genericAdminError } from "@/lib/admin/errors";
 import {
   centsToEuros,
   emptyToNull,
@@ -93,5 +94,17 @@ describe("specialist schedule", () => {
       ends_at: "2027-08-14T15:00:00.000Z",
       reason: null,
     });
+  });
+});
+
+describe("admin error messages", () => {
+  it("says the database needs updating when a column is missing", () => {
+    const message = adminErrorMessage({ code: "PGRST204", message: "Could not find the 'event_reminder_hours' column of 'app_settings' in the schema cache" });
+    expect(message).toContain("Базата данни още не е обновена");
+    expect(adminErrorMessage({ code: "42703", message: "column does not exist" })).toBe(message);
+  });
+
+  it("keeps unknown errors generic", () => {
+    expect(adminErrorMessage({ code: "XX000", message: "boom" })).toBe(genericAdminError);
   });
 });
