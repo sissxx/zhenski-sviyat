@@ -7,7 +7,7 @@ Supabase (Postgres) schema for the Women's World / NSJS platform. Everything is 
 | Migration | What it adds |
 | --- | --- |
 | `…100000_foundation` | enums, `app_settings`, `profiles`, `user_roles`, role helpers |
-| `…100100_content` | page text, team/founders, FAQs, partners, announcements, promotions, contact messages |
+| `…100100_content` | page text, team/founders, FAQs, partners, promotions, contact messages |
 | `…100200_events` | events, private event details, registrations, `event_listing` view |
 | `…100300_consultations` | specialists, consultation types, weekly availability, time off, bookings |
 | `…100400_memberships` | membership plans, Viber groups and invite links, subscriptions, Viber access tracking |
@@ -18,6 +18,7 @@ Supabase (Postgres) schema for the Women's World / NSJS platform. Everything is 
 | `…100900_storage` | public `media` bucket for images, admin-only uploads |
 | `…101000_foreign_key_indexes` | indexes on foreign keys flagged by the Supabase performance advisor |
 | `…120000_admin_payment_review` | `resolve_payment_review` for the admin panel (see docs/admin.md) |
+| `20261105120000_drop_announcements` | drops `announcements` (the Обяви feature was removed) |
 
 `supabase/seed.sql` holds development data only (the provisional €8 / €21 plans, two Viber groups).
 `supabase/checks/database_checks.sql` checks RLS isolation, double-booking protection, payments and Viber access.
@@ -59,7 +60,7 @@ The first admin is created by hand once:
 Users can't change their own `status` or `email` (the email follows Supabase Auth).
 
 **Content.** `content_blocks` (keyed page text such as `home.hero.title`), `team_members` (founders),
-`faqs`, `partners`, `announcements`, `promotions`, `contact_messages`. Public reads published rows only.
+`faqs`, `partners`, `promotions`, `contact_messages`. Public reads published rows only.
 
 **Events.** `events` (draft → published → completed/cancelled, price, capacity, registration window,
 whether bank transfer is allowed, its own cancellation deadline), `event_private_details` (online link and

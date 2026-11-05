@@ -17,7 +17,7 @@ The service key is not used.
 | Потребители | `/admin/potrebiteli` | Search accounts; per user: their records, suspend / activate, admin role |
 | Видове консултации, Специалисти | `/admin/vidove-konsultatsii`, `/admin/spetsialisti` | Services; specialist profiles, which services they offer (own price), weekly hours, time off, login account |
 | Членство и планове | `/admin/chlenstvo` | Plans, prices, which Viber groups each plan opens. Stripe product and price ids fill in by themselves on the first card subscription (docs/payments.md) |
-| Съдържание | `/admin/vaprosi`, `partnyori`, `promotsii`, `ekip`, `obyavi` | FAQs, partners, promotions, founders/team, announcements |
+| Съдържание | `/admin/vaprosi`, `partnyori`, `promotsii`, `ekip` | FAQs, partners, promotions, founders/team |
 | Настройки | `/admin/nastroyki` | `app_settings`: consultation rules, cancel deadlines, holds, renewal window, bank account |
 
 ## Code

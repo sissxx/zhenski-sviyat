@@ -463,35 +463,6 @@ export const teamMemberForm: EntityForm = {
   ],
 };
 
-export const announcementForm: EntityForm = {
-  schema: z
-    .object({
-      title: reqText(200),
-      body: optText(4000),
-      link_url: z.string().trim().max(500),
-      image_path: optText(500),
-      starts_at: optDateTime,
-      ends_at: optDateTime,
-      is_published: bool,
-    })
-    .superRefine((v, ctx) => {
-      if (!later(v.starts_at, v.ends_at)) ctx.addIssue({ code: "custom", path: ["ends_at"], message: "Краят трябва да е след началото." });
-    }) as unknown as EntityForm["schema"],
-  sections: [
-    {
-      fields: [
-        { name: "title", label: "Заглавие", type: "text" },
-        { name: "body", label: "Текст", type: "textarea" },
-        { name: "link_url", label: "Линк (по избор)", type: "text", helperText: "Напр. /sabitiya или https://…" },
-        { name: "image_path", label: "Снимка", type: "image", folder: "announcements" },
-        { name: "starts_at", label: "Показвай от", type: "datetime", span: 3 },
-        { name: "ends_at", label: "Показвай до", type: "datetime", span: 3 },
-        publishedField(),
-      ],
-    },
-  ],
-};
-
 export const settingsForm: EntityForm = {
   schema: z.object({
     consultation_max_advance_days: intIn(1, 365),
@@ -593,7 +564,6 @@ export const entityForms = {
   partner: partnerForm,
   promotion: promotionForm,
   teamMember: teamMemberForm,
-  announcement: announcementForm,
   settings: settingsForm,
 } satisfies Record<string, EntityForm>;
 

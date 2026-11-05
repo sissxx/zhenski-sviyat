@@ -18,7 +18,6 @@ export const adminRoutes = {
   partners: `${base}/partnyori`,
   promotions: `${base}/promotsii`,
   team: `${base}/ekip`,
-  announcements: `${base}/obyavi`,
   settings: `${base}/nastroyki`,
 } as const;
 
@@ -56,7 +55,6 @@ export const adminNav: AdminNavGroup[] = [
       { label: "Партньори", href: adminRoutes.partners },
       { label: "Промоции", href: adminRoutes.promotions },
       { label: "Учредители и екип", href: adminRoutes.team },
-      { label: "Обяви", href: adminRoutes.announcements },
     ],
   },
   { title: "", items: [{ label: "Настройки", href: adminRoutes.settings }] },

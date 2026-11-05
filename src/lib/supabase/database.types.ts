@@ -14,45 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      announcements: {
-        Row: {
-          body: string | null
-          created_at: string
-          ends_at: string | null
-          id: string
-          image_path: string | null
-          is_published: boolean
-          link_url: string | null
-          starts_at: string | null
-          title: string
-          updated_at: string
-        }
-        Insert: {
-          body?: string | null
-          created_at?: string
-          ends_at?: string | null
-          id?: string
-          image_path?: string | null
-          is_published?: boolean
-          link_url?: string | null
-          starts_at?: string | null
-          title: string
-          updated_at?: string
-        }
-        Update: {
-          body?: string | null
-          created_at?: string
-          ends_at?: string | null
-          id?: string
-          image_path?: string | null
-          is_published?: boolean
-          link_url?: string | null
-          starts_at?: string | null
-          title?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
       app_settings: {
         Row: {
           bank_transfer_bank_name: string | null
