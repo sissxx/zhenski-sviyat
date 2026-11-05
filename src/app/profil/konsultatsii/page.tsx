@@ -4,7 +4,9 @@ import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
 import Typography from "@mui/material/Typography";
 import { CancelBookingButton } from "@/components/account/CancelBookingButton";
+import { AccountSectionHeader } from "@/components/account/AccountSectionHeader";
 import { EmptyState } from "@/components/account/EmptyState";
+import { PaymentDueNote } from "@/components/account/PaymentDueNote";
 import { FormAlert } from "@/components/forms/FormAlert";
 import { Panel } from "@/components/ui/Panel";
 import { bookingActions, getBookingRules, listMyBookings, type MyBooking } from "@/lib/consultations/queries";
@@ -22,12 +24,20 @@ const isUpcoming = (b: MyBooking) => new Date(b.ends_at).getTime() > Date.now();
 export default async function AccountConsultationsPage({ searchParams }: AccountConsultationsProps) {
   const { premestena } = await searchParams;
   const [bookings, rules] = await Promise.all([listMyBookings(), getBookingRules()]);
+  const header = (
+    <AccountSectionHeader title="Моите консултации">
+      Запазените ти часове при специалист. Оттук ги местиш или отказваш.
+    </AccountSectionHeader>
+  );
   if (bookings.length === 0) {
     return (
-      <EmptyState title="Моите консултации" action={{ label: "Запази консултация", href: routes.consultations }}>
-        Все още нямаш запазени консултации. След като запазиш час, тук ще виждаш датата, часа и специалиста, а също ще
-        можеш да го преместиш или откажеш.
-      </EmptyState>
+      <>
+        {header}
+        <EmptyState action={{ label: "Запази консултация", href: routes.consultations }}>
+          Все още нямаш запазени консултации. След като запазиш час, тук ще виждаш датата, часа и специалиста, а също ще
+          можеш да го преместиш или откажеш.
+        </EmptyState>
+      </>
     );
   }
 
@@ -36,6 +46,7 @@ export default async function AccountConsultationsPage({ searchParams }: Account
 
   return (
     <>
+      {header}
       {premestena && <FormAlert severity="success">Консултацията е преместена в новия час.</FormAlert>}
       <BookingGroup title="Предстоящи" items={current} rules={rules} empty="Нямаш предстоящи консултации." />
       {history.length > 0 && <BookingGroup title="История" items={history} rules={rules} />}
@@ -54,7 +65,7 @@ export default async function AccountConsultationsPage({ searchParams }: Account
 function BookingGroup({ title, items, rules, empty }: { title: string; items: MyBooking[]; rules: BookingRules; empty?: string }) {
   return (
     <Box component="section" sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
-      <Typography variant="h5" component="h2" sx={{ color: "primary.main" }}>
+      <Typography variant="h5" component="h3" sx={{ color: "primary.main" }}>
         {title}
       </Typography>
       {items.length === 0 && empty && <Typography sx={{ color: "text.secondary" }}>{empty}</Typography>}
@@ -77,7 +88,7 @@ function BookingCard({ booking, rules }: { booking: MyBooking; rules: BookingRul
   return (
     <Panel tone="card" sx={{ gap: 1.25 }}>
       <Box sx={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-start", gap: 1 }}>
-        <Typography variant="h6" component="h3" sx={{ color: "primary.main" }}>
+        <Typography variant="h6" component="h4" sx={{ color: "primary.main" }}>
           {service?.name ?? "Консултация"}
         </Typography>
         <Chip size="small" label={bookingStatusLabels[booking.status]} color={bookingStatusColors[booking.status]} />
@@ -90,9 +101,14 @@ function BookingCard({ booking, rules }: { booking: MyBooking; rules: BookingRul
         {booking.price_cents === 0
           ? "Безплатно"
           : `${formatPrice(booking.price_cents)} · ${booking.payment_method === "bank_transfer" ? "банков превод" : booking.payment_method ? "карта" : "плащане на място"}`}
-        {pending && payment?.provider === "bank_transfer" && payment.bank_reference && ` · основание ${payment.bank_reference}`}
-        {pending && booking.hold_expires_at && ` · срок за плащане ${formatDateTime(booking.hold_expires_at)}`}
       </Typography>
+      {pending && isUpcoming(booking) && (
+        <PaymentDueNote
+          amountCents={booking.price_cents}
+          deadline={booking.hold_expires_at}
+          reference={payment?.provider === "bank_transfer" ? payment.bank_reference : null}
+        />
+      )}
       {pastDeadline && (
         <Typography variant="body2" sx={{ color: "text.secondary" }}>
           Срокът за отказ и преместване е изтекъл. Ако не можеш да дойдеш, свържи се с нас.

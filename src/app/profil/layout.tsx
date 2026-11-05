@@ -6,7 +6,7 @@ import { AccountNav } from "@/components/account/AccountNav";
 import { FormAlert } from "@/components/forms/FormAlert";
 import { PageIntro } from "@/components/ui/PageIntro";
 import { Section } from "@/components/ui/Section";
-import { signOut } from "@/lib/auth/actions";
+import { getAccountAttention } from "@/lib/account/attention";
 import { isCurrentUserAdmin } from "@/lib/admin/session";
 import { requireUser } from "@/lib/auth/session";
 import { getMySpecialist } from "@/lib/specialist/session";
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 export default async function AccountLayout({ children }: { children: ReactNode }) {
   const { user, profile } = await requireUser();
   const name = profile?.first_name || user.email;
-  const [isAdmin, specialist] = await Promise.all([isCurrentUserAdmin(), getMySpecialist()]);
+  const [isAdmin, specialist, attention] = await Promise.all([isCurrentUserAdmin(), getMySpecialist(), getAccountAttention()]);
 
   return (
     <>
@@ -30,11 +30,6 @@ export default async function AccountLayout({ children }: { children: ReactNode 
             Администрация
           </Button>
         )}
-        <Box component="form" action={signOut} sx={{ display: { xs: "block", md: "none" }, mt: 2 }}>
-          <Button type="submit" variant="outlined" size="small">
-            Изход
-          </Button>
-        </Box>
       </PageIntro>
       <Section bg="brand.mintLight" sx={{ py: { xs: 3, md: 6 } }}>
         <Box
@@ -45,7 +40,7 @@ export default async function AccountLayout({ children }: { children: ReactNode 
             alignItems: "start",
           }}
         >
-          <AccountNav extraItems={specialist ? [specialistNavItem] : []} />
+          <AccountNav extraItems={specialist ? [specialistNavItem] : []} attention={attention} />
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5, minWidth: 0 }}>
             {profile?.status === "suspended" && (
               <FormAlert severity="warning">

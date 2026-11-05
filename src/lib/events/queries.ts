@@ -111,8 +111,8 @@ export async function getMyRegistration(registrationId: string) {
   return data ? withLatestPayment(data) : null;
 }
 
-/** All of the signed-in user's registrations, newest first. */
-export async function listMyRegistrations() {
+/** All of the signed-in user's registrations, newest first. Cached per request: the profile menu and page share it. */
+export const listMyRegistrations = cache(async () => {
   const ctx = await myRegistrationsQuery();
   if (!ctx) return [];
   const { data, error } = await ctx.query
@@ -123,7 +123,7 @@ export async function listMyRegistrations() {
     return [];
   }
   return data.map(withLatestPayment);
-}
+});
 
 /** Keeps the most recent payment, which is the one the user acts on. */
 function withLatestPayment(row: RawRegistration) {

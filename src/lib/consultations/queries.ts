@@ -159,8 +159,8 @@ export async function getMyBooking(bookingId: string) {
   return data ? withLatestPayment(data) : null;
 }
 
-/** All of the signed-in user's bookings, latest appointment first. */
-export async function listMyBookings() {
+/** All of the signed-in user's bookings, latest appointment first. Cached per request: the profile menu and page share it. */
+export const listMyBookings = cache(async () => {
   const ctx = await myBookingsQuery();
   if (!ctx) return [];
   const { data, error } = await ctx.query.eq("user_id", ctx.user.id).order("starts_at", { ascending: false });
@@ -169,7 +169,7 @@ export async function listMyBookings() {
     return [];
   }
   return data.map(withLatestPayment);
-}
+});
 
 /** Keeps the most recent payment, which is the one the user acts on. */
 function withLatestPayment(row: RawBooking) {
