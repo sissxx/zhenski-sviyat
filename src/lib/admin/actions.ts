@@ -326,3 +326,17 @@ export async function setRole(userId: string, role: "admin" | "specialist", gran
 export async function runMaintenance(): Promise<AdminResult> {
   return run(async (supabase) => (await supabase.rpc("run_maintenance")).error);
 }
+
+// --- Contact messages -------------------------------------------------------------------------------------
+
+/** Marks a contact-form message as answered, or back as new. */
+export async function setMessageHandled(messageId: string, handled: boolean): Promise<AdminResult> {
+  if (!uuid.safeParse(messageId).success) return invalidInput;
+  return run(async (supabase, adminId) => {
+    const { error } = await supabase
+      .from("contact_messages")
+      .update(handled ? { handled_at: new Date().toISOString(), handled_by: adminId } : { handled_at: null, handled_by: null })
+      .eq("id", messageId);
+    return error;
+  });
+}

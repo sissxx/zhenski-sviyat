@@ -20,11 +20,12 @@ export default async function AdminHomePage() {
   const inAWeek = new Date(now.getTime() + 7 * 24 * 3600 * 1000).toISOString();
   const count = { count: "exact", head: true } as const;
 
-  const [transfers, review, viber, activeSubs, { data: events }, { data: bookings }] = await Promise.all([
+  const [transfers, review, viber, activeSubs, messages, { data: events }, { data: bookings }] = await Promise.all([
     supabase.from("payments").select("id", count).eq("provider", "bank_transfer").eq("status", "pending"),
     supabase.from("payments").select("id", count).eq("needs_review", true),
     supabase.from("viber_access_actions").select("user_id", count),
     supabase.from("subscriptions").select("id", count).in("status", ["active", "trialing", "past_due"]),
+    supabase.from("contact_messages").select("id", count).is("handled_at", null),
     supabase
       .from("event_listing")
       .select("id, title, starts_at, capacity, seats_taken, status")
@@ -45,13 +46,14 @@ export default async function AdminHomePage() {
     { label: "Чакащи преводи", value: transfers.count ?? 0, href: `${adminRoutes.payments}?filtar=prevodi`, urgent: true },
     { label: "Плащания за преглед", value: review.count ?? 0, href: `${adminRoutes.payments}?filtar=pregled`, urgent: true },
     { label: "Viber задачи", value: viber.count ?? 0, href: adminRoutes.viber, urgent: true },
+    { label: "Нови съобщения", value: messages.count ?? 0, href: adminRoutes.messages, urgent: true },
     { label: "Активни абонаменти", value: activeSubs.count ?? 0, href: adminRoutes.subscriptions, urgent: false },
   ];
 
   return (
     <>
       <AdminPageHeader title="Табло" description="Какво чака действие от теб и какво предстои тази седмица." />
-      <Box sx={{ display: "grid", gap: 2, gridTemplateColumns: { xs: "1fr 1fr", lg: "repeat(4, 1fr)" } }}>
+      <Box sx={{ display: "grid", gap: 2, gridTemplateColumns: { xs: "1fr 1fr", lg: "repeat(5, 1fr)" } }}>
         {tiles.map((tile) => (
           <Panel key={tile.label} tone={tile.urgent && tile.value > 0 ? "mint" : "paper"} sx={{ gap: 0.5, p: { xs: 2, md: 2.5 } }}>
             <Typography variant="body2" sx={{ color: "text.secondary" }}>

@@ -1,5 +1,6 @@
 import "server-only";
 import { after } from "next/server";
+import { adminRoutes } from "@/lib/admin/routes";
 import { eventPath, routes } from "@/lib/routes";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { formatDate } from "@/lib/locale";
@@ -548,4 +549,35 @@ export async function sendSubscriptionRenewalReminder(subscriptionId: string, de
       bank: payment ? await bankInstructions(db, payment) : null,
     }),
   });
+}
+
+// --- Contact form -----------------------------------------------------------------------------------------
+
+/** A new contact-form message: one email to each active admin, with replies going to the sender. */
+export async function notifyContactMessage(messageId: string) {
+  const db = adminClient();
+  if (!db) return;
+  const { data: message } = await db.from("contact_messages").select("id, name, email, subject, message").eq("id", messageId).maybeSingle();
+  if (!message) return;
+  const { data: roles } = await db.from("user_roles").select("user_id").eq("role", "admin");
+  const adminIds = (roles ?? []).map((r) => r.user_id);
+  if (adminIds.length === 0) return;
+  const { data: admins } = await db.from("profiles").select("id, email, first_name, last_name").in("id", adminIds).eq("status", "active");
+
+  const content = t.contactMessageReceived({ ...message, inboxUrl: absoluteUrl(adminRoutes.messages) });
+  await Promise.all(
+    (admins ?? [])
+      .filter((admin) => admin.email)
+      .map((admin) =>
+        sendEmail({
+          template: "contact_message",
+          to: { email: admin.email!, name: [admin.first_name, admin.last_name].filter(Boolean).join(" ") || null },
+          userId: admin.id,
+          dedupeKey: `contact_message:${message.id}:${admin.id}`,
+          related: { table: "contact_messages", id: message.id },
+          replyTo: message.email,
+          content,
+        }),
+      ),
+  );
 }

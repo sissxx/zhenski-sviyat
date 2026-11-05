@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { AuthCard } from "@/components/auth/AuthCard";
 import { RegisterForm } from "@/components/auth/RegisterForm";
 import { TextLink } from "@/components/ui/AppLink";
-import { membershipPlans } from "@/content/plans";
 import { loginPath, routes, safeNextPath } from "@/lib/routes";
+import { listPublicPlans } from "@/lib/subscriptions/queries";
 
 export const metadata: Metadata = {
   title: "Регистрация",
@@ -15,9 +15,9 @@ type RegisterPageProps = { searchParams: Promise<{ plan?: string | string[]; nex
 
 export default async function RegisterPage({ searchParams }: RegisterPageProps) {
   const { plan, next } = await searchParams;
-  // Plans live in the database, so any slug-shaped value is accepted; the known ones also get their name.
+  // Plans live in the database, so any slug-shaped value is accepted; the plan's name is shown when it is found.
   const planSlug = typeof plan === "string" && /^[a-z0-9]+(-[a-z0-9]+)*$/.test(plan) ? plan : null;
-  const chosenPlan = Object.values(membershipPlans).find((item) => item.slug === planSlug);
+  const chosenPlan = planSlug ? (await listPublicPlans()).plans.find((item) => item.slug === planSlug) : undefined;
   // After confirming the email, a new member continues to their subscriptions to activate the chosen plan.
   const continueTo = planSlug
     ? `${routes.accountSubscriptions}?plan=${planSlug}`
@@ -29,7 +29,7 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
       title="Създай профил"
       lead={
         chosenPlan
-          ? `След като потвърдиш имейла си, ще можеш да активираш членството „${chosenPlan.title.replace(/[„“]/g, "")}“ от профила си.`
+          ? `След като потвърдиш имейла си, ще можеш да активираш членството „${chosenPlan.name.replace(/[„“]/g, "")}“ от профила си.`
           : planSlug
             ? "След като потвърдиш имейла си, ще можеш да активираш избраното членство от профила си."
             : "С профил се записваш за събития и консултации, следиш плащанията си и управляваш членството си."

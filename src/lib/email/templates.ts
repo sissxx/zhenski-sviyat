@@ -494,3 +494,35 @@ export function specialistBookingRescheduled(data: SpecialistNoticeData & { prev
     ],
   };
 }
+
+// --- Contact form -----------------------------------------------------------------------------------------
+
+export type ContactMessageData = {
+  name: string;
+  email: string;
+  subject: string | null;
+  message: string;
+  inboxUrl: string;
+};
+
+/** To the admins: a new message from the contact form. Replying goes straight to the sender. */
+export function contactMessageReceived(data: ContactMessageData): EmailContent {
+  return {
+    subject: `Ново съобщение: ${data.subject || "без тема"}`,
+    preheader: `От ${data.name} (${data.email}).`,
+    heading: "Ново съобщение от сайта",
+    blocks: [
+      {
+        kind: "details",
+        rows: [
+          { label: "От", value: data.name },
+          { label: "Имейл", value: data.email },
+          { label: "Тема", value: data.subject },
+        ],
+      },
+      { kind: "text", text: data.message },
+      { kind: "note", text: "Отговори направо на този имейл, за да пишеш на подателя." },
+      { kind: "button", label: "Всички съобщения", url: data.inboxUrl },
+    ],
+  };
+}
