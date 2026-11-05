@@ -8,7 +8,10 @@ type EmptyStateProps = { title: string; children: ReactNode; action?: { label: s
 /** Placeholder for an account section with nothing in it yet. */
 export function EmptyState({ title, children, action }: EmptyStateProps) {
   return (
-    <Panel tone="card" sx={{ alignItems: "flex-start", gap: 1.5, p: { xs: 2.5, md: 4 } }}>
+    <Panel
+      tone="card"
+      sx={{ alignItems: "flex-start", gap: 1.5, p: { xs: 2.5, md: 4 }, borderLeft: "4px solid", borderLeftColor: "brand.terracotta" }}
+    >
       <Typography variant="h5" component="h2" sx={{ color: "primary.main" }}>
         {title}
       </Typography>

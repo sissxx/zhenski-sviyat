@@ -18,7 +18,10 @@ export function AuthCard({ eyebrow, title, lead, children, footer }: AuthCardPro
   return (
     <Section bg="brand.mint" sx={{ py: { xs: 4, md: 8 } }}>
       <Box sx={{ maxWidth: 560, mx: "auto" }}>
-        <Panel aria-labelledby="auth-title" sx={{ p: { xs: 2.5, sm: 4 }, gap: 2.5, alignItems: "stretch" }}>
+        <Panel
+          aria-labelledby="auth-title"
+          sx={{ p: { xs: 2.5, sm: 4 }, gap: 2.5, alignItems: "stretch", borderTop: "4px solid", borderTopColor: "brand.terracotta" }}
+        >
           <Box>
             <Typography variant="eyebrow" sx={{ fontSize: { xs: 12, md: 13 }, mb: 1 }}>
               {eyebrow}

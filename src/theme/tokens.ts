@@ -34,4 +34,6 @@ export const brand = {
   terracottaDark: "#8A3A22",
   /** Pale terracotta tint for soft highlights behind dark text. */
   terracottaLight: "#F6E4DA",
+  /** Light terracotta for text on the dark green footer and panels (5.9:1 on brand.dark). */
+  terracottaSoft: "#EBB49C",
 } as const;

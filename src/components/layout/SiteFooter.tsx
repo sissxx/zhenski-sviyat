@@ -10,7 +10,13 @@ const linkSx = { color: "brand.sage", fontSize: 14, "&:hover": { color: "brand.p
 
 export function SiteFooter() {
   return (
-    <Box component="footer" sx={{ bgcolor: "brand.dark", color: "brand.paper", py: { xs: 5, md: 5.25 } }}>
+    <Box component="footer" sx={{
+        bgcolor: "brand.dark",
+        color: "brand.paper",
+        py: { xs: 5, md: 5.25 },
+        borderTop: "4px solid",
+        borderColor: "brand.terracotta",
+      }}>
       <Box sx={{ maxWidth: 1320, mx: "auto", px: { xs: 2, sm: 3, md: 4, xl: 0 } }}>
         <Box
           sx={{
@@ -31,7 +37,7 @@ export function SiteFooter() {
               <AppLink
                
                 href={group.title.href}
-                sx={{ display: "block", fontWeight: 600, fontSize: 14, color: "brand.paper", mb: 1.25 }}
+                sx={{ display: "block", fontWeight: 600, fontSize: 14, color: "brand.terracottaSoft", mb: 1.25 }}
               >
                 {group.title.label}
               </AppLink>

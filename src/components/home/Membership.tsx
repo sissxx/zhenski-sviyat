@@ -26,7 +26,7 @@ export function Membership() {
             </Typography>
             <Typography variant="body2">{plan.text}</Typography>
             <Box sx={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 1.25 }}>
-              <Typography sx={{ fontFamily: "var(--font-lora)", fontWeight: 700, fontSize: 26, color: "brand.dark" }}>
+              <Typography sx={{ fontFamily: "var(--font-lora)", fontWeight: 700, fontSize: 26, color: "brand.terracotta" }}>
                 {formatPrice(plan.priceCents)}
                 <Typography component="span" sx={{ fontFamily: "var(--font-inter)", fontWeight: 400, fontSize: 14, color: "text.secondary", ml: 1 }}>
                   / месец

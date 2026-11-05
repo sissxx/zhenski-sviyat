@@ -32,6 +32,7 @@ export function AdminPageHeader({ title, description, back, action, children }: 
         )}
         {children}
       </Box>
+      <Box aria-hidden sx={{ width: 48, height: 3, borderRadius: 2, bgcolor: "brand.terracotta" }} />
       {description && <Typography sx={{ color: "text.secondary", maxWidth: 760 }}>{description}</Typography>}
     </Box>
   );

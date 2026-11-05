@@ -40,7 +40,7 @@ export function PlanDetails({ plan, heading, intro, bg }: PlanDetailsProps) {
 
         <Panel aria-labelledby={`${plan.slug}-price`} sx={{ gap: 1.5 }}>
           <Typography sx={{ fontSize: 14, color: "text.secondary" }}>Месечен абонамент</Typography>
-          <Typography id={`${plan.slug}-price`} sx={{ fontFamily: "var(--font-lora)", fontWeight: 700, fontSize: 40, lineHeight: 1.2, color: "primary.main" }}>
+          <Typography id={`${plan.slug}-price`} sx={{ fontFamily: "var(--font-lora)", fontWeight: 700, fontSize: 40, lineHeight: 1.2, color: "brand.terracotta" }}>
             {formatPrice(plan.priceCents)}
             <Typography component="span" sx={{ fontSize: 14, color: "text.secondary", ml: 1 }}>
               / месец
@@ -56,7 +56,7 @@ export function PlanDetails({ plan, heading, intro, bg }: PlanDetailsProps) {
             />
           </Box>
 
-          <Button variant="contained" href={joinPlanPath(plan.slug)} sx={{ minWidth: 220 }}>
+          <Button variant="contained" color="secondary" href={joinPlanPath(plan.slug)} sx={{ minWidth: 220 }}>
             Стани член
           </Button>
           <Typography variant="body2" sx={{ color: "text.secondary" }}>

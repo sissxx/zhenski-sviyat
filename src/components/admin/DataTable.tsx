@@ -43,7 +43,14 @@ export function DataTable<T>({ rows, columns, rowKey, empty, caption }: DataTabl
               <TableCell
                 key={column.label}
                 align={column.align}
-                sx={{ fontWeight: 600, color: "primary.main", whiteSpace: "nowrap", bgcolor: "brand.mint" }}
+                sx={{
+                  fontWeight: 600,
+                  color: "primary.main",
+                  whiteSpace: "nowrap",
+                  bgcolor: "brand.mint",
+                  borderBottom: "2px solid",
+                  borderBottomColor: "brand.terracotta",
+                }}
               >
                 {column.label}
               </TableCell>

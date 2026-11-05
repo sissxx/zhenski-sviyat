@@ -55,7 +55,7 @@ export function EventRegistrationForm({ slug, priceCents, cardAvailable, bankAva
       )}
       {error && <FormAlert severity="error">{error}</FormAlert>}
       <Box sx={{ display: "flex", flexDirection: "column", gap: 1.25 }}>
-        <Button type="submit" variant="contained" disabled={pending || (paid && paymentMethod === "card" && !cardAvailable)} sx={{ minWidth: 260 }}>
+        <Button type="submit" variant="contained" color="secondary" disabled={pending || (paid && paymentMethod === "card" && !cardAvailable)} sx={{ minWidth: 260 }}>
           {pending
             ? "Изпращане…"
             : !paid

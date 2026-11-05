@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { Section } from "./Section";
 
@@ -22,6 +23,7 @@ export function PageIntro({ eyebrow, title, lead, children }: PageIntroProps) {
       >
         {title}
       </Typography>
+      <Box aria-hidden sx={{ width: 56, height: 3, borderRadius: 2, bgcolor: "brand.terracotta", mt: 2 }} />
       {lead && (
         <Typography sx={{ mt: 1.5, fontSize: { xs: 15, md: 16 }, maxWidth: 820 }}>{lead}</Typography>
       )}

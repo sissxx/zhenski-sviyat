@@ -113,7 +113,7 @@ export default async function EventConfirmationPage({ params, searchParams }: Co
               width: 48,
               height: 48,
               borderRadius: "50%",
-              bgcolor: outcome === "bank" || outcome === "card" || outcome === "ended" ? "brand.accent" : "primary.main",
+              bgcolor: outcome === "bank" || outcome === "card" || outcome === "ended" ? "brand.terracotta" : "primary.main",
               color: "brand.paper",
               display: "grid",
               placeItems: "center",

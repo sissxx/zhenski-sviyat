@@ -15,7 +15,7 @@ export function NextSteps() {
         Разгледай нашите събития, консултации и членства, за да откриеш как да се включиш в общността.
       </Typography>
       <Box sx={{ display: "grid", gap: 1.5, gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" } }}>
-        <Button variant="outlined" href={routes.events}>
+        <Button variant="outlined" color="secondary" href={routes.events}>
           Виж събитията
         </Button>
         <Button variant="contained" href={routes.consultations}>
