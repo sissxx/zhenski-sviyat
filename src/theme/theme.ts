@@ -43,7 +43,8 @@ const theme = createTheme(
     palette: {
       mode: "light",
       primary: { main: brand.primary, dark: "#00401F", light: "#2E7552", contrastText: brand.paper },
-      secondary: { main: brand.dark, contrastText: brand.paper },
+      // Terracotta accent for the few calls to action that should stand out from the green ones.
+      secondary: { main: brand.terracotta, dark: brand.terracottaDark, light: brand.terracottaLight, contrastText: brand.paper },
       // Light button for use on green panels (white fill, green label).
       onDark: { main: brand.paper, dark: brand.mint, light: brand.paper, contrastText: brand.primary },
       text: { primary: brand.text, secondary: brand.muted },
@@ -71,7 +72,7 @@ const theme = createTheme(
         fontSize: "0.75rem",
         letterSpacing: "0.06em",
         textTransform: "uppercase",
-        color: brand.accent,
+        color: brand.terracotta,
         display: "block",
       },
     },

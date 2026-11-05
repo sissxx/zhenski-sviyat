@@ -24,4 +24,14 @@ export const brand = {
   /** Cards on white sections. */
   card: "#F8F6EE",
   cardBorder: "#D5DFCD",
+  /**
+   * Terracotta accent, used sparingly next to the greens: eyebrow labels, the main sign-up and donate calls to
+   * action, small icons and markers, and the active-page indicator. 5.1:1 or more on every light background
+   * here (WCAG AA for normal text), so it is safe for text as well as fills with a light label.
+   */
+  terracotta: "#A8482C",
+  /** Hover and pressed state of terracotta buttons. */
+  terracottaDark: "#8A3A22",
+  /** Pale terracotta tint for soft highlights behind dark text. */
+  terracottaLight: "#F6E4DA",
 } as const;

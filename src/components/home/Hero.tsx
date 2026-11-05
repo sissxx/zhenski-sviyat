@@ -55,6 +55,7 @@ export function Hero() {
           }}
         >
           <Box aria-hidden sx={{ display: { xs: "none", md: "block" }, width: 120, height: 120, borderRadius: "50%", bgcolor: "brand.sage", mx: "auto" }} />
+          <Box aria-hidden sx={{ width: 48, height: 3, borderRadius: 2, bgcolor: "brand.terracotta" }} />
           <Typography
             component="p"
             sx={{ fontFamily: "var(--font-lora)", fontWeight: 500, fontSize: { xs: 22, md: 32 }, lineHeight: 1.2, color: "brand.dark" }}

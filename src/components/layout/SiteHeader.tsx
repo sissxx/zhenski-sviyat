@@ -77,6 +77,11 @@ export function SiteHeader() {
                     fontWeight: active ? 600 : 500,
                     color: active ? "brand.dark" : "text.primary",
                     whiteSpace: "nowrap",
+                    // A terracotta underline marks the current section.
+                    textDecoration: active ? "underline" : undefined,
+                    textDecorationColor: active ? "var(--mui-palette-secondary-main)" : undefined,
+                    textDecorationThickness: active ? 2 : undefined,
+                    textUnderlineOffset: active ? 6 : undefined,
                   }}
                 >
                   {item.label}
@@ -102,6 +107,7 @@ export function SiteHeader() {
               </Button>
               <Button
                 variant="contained"
+                color="secondary"
                 href={routes.register}
                 sx={{ display: { xs: "none", md: "inline-flex" } }}
               >
@@ -161,7 +167,7 @@ export function SiteHeader() {
             </Button>
           ) : (
             <>
-              <Button variant="contained" fullWidth href={routes.register} onClick={() => setOpen(false)}>
+              <Button variant="contained" color="secondary" fullWidth href={routes.register} onClick={() => setOpen(false)}>
                 Стани част от нас
               </Button>
               <Button variant="outlined" fullWidth href={routes.login} onClick={() => setOpen(false)}>

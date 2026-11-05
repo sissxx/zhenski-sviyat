@@ -34,7 +34,13 @@ export function AccountNav({ extraItems = [] }: { extraItems?: NavItem[] }) {
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 variant={active ? "contained" : "text"}
-                sx={{ justifyContent: "flex-start", whiteSpace: "nowrap", width: { md: "100%" } }}
+                sx={{
+                  justifyContent: "flex-start",
+                  whiteSpace: "nowrap",
+                  width: { md: "100%" },
+                  // Terracotta edge on the current page.
+                  boxShadow: active ? "inset 3px 0 0 var(--mui-palette-secondary-main)" : undefined,
+                }}
               >
                 {item.label}
               </Button>

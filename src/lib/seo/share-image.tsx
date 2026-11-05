@@ -106,7 +106,7 @@ export async function renderShareImage({ eyebrow, title, text, facts = [], heade
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 18, maxWidth: 840 }}>
-            <div style={{ fontSize: 22, fontWeight: 600, letterSpacing: 2, textTransform: "uppercase", color: brand.accent }}>
+            <div style={{ fontSize: 22, fontWeight: 600, letterSpacing: 2, textTransform: "uppercase", color: brand.terracotta }}>
               {clip(eyebrow, 48)}
             </div>
             <div style={{ fontFamily: serif, fontWeight: 700, fontSize: titleSize(headline), lineHeight: 1.12, color: brand.primary }}>

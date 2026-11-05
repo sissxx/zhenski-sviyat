@@ -73,7 +73,7 @@ export default async function MembershipPage() {
         <Box component="ol" sx={{ listStyle: "none", m: 0, p: 0, display: "grid", gap: 2, gridTemplateColumns: { xs: "1fr", md: "repeat(3, 1fr)" } }}>
           {steps.map((step, index) => (
             <Panel key={step.title} component="li" tone="card" sx={{ gap: 1 }}>
-              <Typography aria-hidden sx={{ fontFamily: "var(--font-lora)", fontWeight: 700, fontSize: 28, color: "brand.accent", lineHeight: 1 }}>
+              <Typography aria-hidden sx={{ fontFamily: "var(--font-lora)", fontWeight: 700, fontSize: 28, color: "brand.terracotta", lineHeight: 1 }}>
                 {index + 1}
               </Typography>
               <Typography variant="h5" component="h3" sx={{ color: "primary.main" }}>
@@ -130,7 +130,7 @@ function PlanCard({ plan }: { plan: PublicPlan }) {
         <Box component="ul" sx={{ listStyle: "none", m: 0, p: 0, display: "flex", flexDirection: "column", gap: 1 }}>
           {plan.features.map((feature) => (
             <Box component="li" key={feature} sx={{ display: "flex", gap: 1.25, fontSize: 14 }}>
-              <Box component="span" aria-hidden sx={{ width: 20, flexShrink: 0, fontWeight: 600, color: "brand.accent" }}>
+              <Box component="span" aria-hidden sx={{ width: 20, flexShrink: 0, fontWeight: 600, color: "brand.terracotta" }}>
                 ✓
               </Box>
               {feature}

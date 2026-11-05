@@ -1,6 +1,7 @@
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
+import { routes } from "@/lib/routes";
 import { Section } from "@/components/ui/Section";
 import { services } from "@/content/home";
 
@@ -32,7 +33,12 @@ export function Services() {
             <Typography variant="body2" sx={{ flexGrow: 1 }}>
               {service.text}
             </Typography>
-            <Button variant={service.primary ? "contained" : "outlined"} href={service.cta.href}>
+            <Button
+              variant={service.primary ? "contained" : "outlined"}
+              // Donating is the one call to action in terracotta, so it stands apart from booking.
+              color={service.cta.href === routes.support ? "secondary" : "primary"}
+              href={service.cta.href}
+            >
               {service.cta.label}
             </Button>
           </Box>
