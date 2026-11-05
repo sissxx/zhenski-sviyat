@@ -23,7 +23,7 @@ test.describe("membership", () => {
     const { plan, group, inviteLink } = await createPlanWithViberGroup();
 
     await login(page, member, `/profil/abonamenti?plan=${plan.slug}`);
-    await expect(page.getByText("Линковете към Viber групите се появяват тук, когато имаш активно членство.")).toBeVisible();
+    await expect(page.getByText(/Все още нямаш членство\./)).toBeVisible();
     await planCard(page, plan.name).getByRole("button", { name: "Банков превод" }).click();
 
     await expect(page).toHaveURL(/\/profil\/abonamenti\?prevod=/);

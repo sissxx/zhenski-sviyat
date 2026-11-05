@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
+import { AccountSectionHeader } from "@/components/account/AccountSectionHeader";
 import { ProfileForm } from "@/components/account/ProfileForm";
 import { FormAlert } from "@/components/forms/FormAlert";
 import { Panel } from "@/components/ui/Panel";
@@ -21,8 +22,9 @@ export default async function AccountDetailsPage({ searchParams }: AccountDetail
     <>
       {potvarden && <FormAlert severity="success">Имейлът ти е потвърден. Добре дошла в общността!</FormAlert>}
       {parola === "promenena" && <FormAlert severity="success">Паролата ти е сменена.</FormAlert>}
+      <AccountSectionHeader title="Моите данни">Името и телефона ти, имейлите от нас и паролата за вход.</AccountSectionHeader>
       <Panel aria-labelledby="details-title" sx={{ p: { xs: 2.5, md: 3.5 }, gap: 2.25, alignItems: "stretch" }}>
-        <Typography id="details-title" variant="h4" component="h2" sx={{ color: "primary.main" }}>
+        <Typography id="details-title" variant="h5" component="h3" sx={{ color: "primary.main" }}>
           Лични данни
         </Typography>
         <ProfileForm
@@ -36,7 +38,7 @@ export default async function AccountDetailsPage({ searchParams }: AccountDetail
         />
       </Panel>
       <Panel aria-labelledby="security-title" sx={{ p: { xs: 2.5, md: 3.5 } }}>
-        <Typography id="security-title" variant="h5" component="h2" sx={{ color: "primary.main" }}>
+        <Typography id="security-title" variant="h5" component="h3" sx={{ color: "primary.main" }}>
           Парола и сигурност
         </Typography>
         <Box>

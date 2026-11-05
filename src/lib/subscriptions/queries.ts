@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
@@ -71,7 +72,8 @@ export async function listMyViberGroups(): Promise<MyViberGroup[]> {
   return data ?? [];
 }
 
-export async function listMySubscriptions() {
+/** The signed-in user's subscriptions, newest first. Cached per request: the profile menu and page share it. */
+export const listMySubscriptions = cache(async () => {
   const user = await getCurrentUser();
   if (!user) return [];
   const supabase = await createClient();
@@ -90,7 +92,7 @@ export async function listMySubscriptions() {
     ...rest,
     pendingPayment: payments.filter((p) => p.status === "pending").sort((a, b) => b.created_at.localeCompare(a.created_at))[0] ?? null,
   }));
-}
+});
 
 export type MySubscription = Awaited<ReturnType<typeof listMySubscriptions>>[number];
 

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
 import Typography from "@mui/material/Typography";
+import { AccountSectionHeader } from "@/components/account/AccountSectionHeader";
 import { CardSubscriptionToggle, SubscribeButtons } from "@/components/account/SubscriptionButtons";
 import { ViberGroupCard } from "@/components/account/ViberGroups";
 import { BankTransferDetails } from "@/components/events/BankTransferDetails";
@@ -75,13 +76,18 @@ export default async function AccountSubscriptionsPage({ searchParams }: Props) 
         <FormAlert severity="info">Плащането беше прекъснато и нищо не е таксувано. Можеш да опиташ отново.</FormAlert>
       )}
 
-      <Box component="section" sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
-        <Typography variant="h5" component="h2" sx={{ color: "primary.main" }}>
-          Моите абонаменти
+      <AccountSectionHeader title="Моите абонаменти">
+        Членството ти в общността, до кога е платено и линковете към Viber групите.
+      </AccountSectionHeader>
+
+      <Box component="section" aria-labelledby="my-membership-title" sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+        <Typography id="my-membership-title" variant="h5" component="h3" sx={{ color: "primary.main" }}>
+          Моето членство
         </Typography>
         {live.length === 0 ? (
           <Typography sx={{ color: "text.secondary" }}>
-            Все още нямаш активно членство. Когато се абонираш, тук ще виждаш до кога е платено.
+            Все още нямаш членство. Избери си едно по-долу. Щом е активно, тук ще виждаш до кога е платено и линковете към
+            Viber групите.
           </Typography>
         ) : (
           live.map((s) => (
@@ -96,33 +102,40 @@ export default async function AccountSubscriptionsPage({ searchParams }: Props) 
         )}
       </Box>
 
-      <Box component="section" aria-labelledby="viber-title" sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
-        <Typography id="viber-title" variant="h5" component="h2" sx={{ color: "primary.main" }}>
-          Моите Viber групи
-        </Typography>
-        {viberGroups.length === 0 ? (
-          <Typography sx={{ color: "text.secondary" }}>
-            {live.length > 0
-              ? "Членството ти още не дава достъп до Viber група. Ще се появи тук, щом е активно."
-              : "Линковете към Viber групите се появяват тук, когато имаш активно членство."}
+      {(live.length > 0 || viberGroups.length > 0) && (
+        <Box component="section" aria-labelledby="viber-title" sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+          <Typography id="viber-title" variant="h5" component="h3" sx={{ color: "primary.main" }}>
+            Моите Viber групи
           </Typography>
-        ) : (
-          <>
-            {viberGroups.map((group) => (
-              <ViberGroupCard key={group.viber_group_id} group={group} defaultPhone={profile?.phone ?? ""} />
-            ))}
-            <Typography variant="body2" sx={{ color: "text.secondary" }}>
-              Линковете са само за теб, не ги споделяй. Когато членството изтече, достъпът до групите спира и екипът те
-              премахва от тях.
+          {viberGroups.length === 0 ? (
+            <Typography sx={{ color: "text.secondary" }}>
+              Членството ти още не дава достъп до Viber група. Ще се появи тук, щом е активно.
             </Typography>
-          </>
-        )}
-      </Box>
+          ) : (
+            <>
+              {viberGroups.map((group) => (
+                <ViberGroupCard key={group.viber_group_id} group={group} defaultPhone={profile?.phone ?? ""} />
+              ))}
+              <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                Линковете са само за теб, не ги споделяй. Когато членството изтече, достъпът до групите спира и екипът те
+                премахва от тях.
+              </Typography>
+            </>
+          )}
+        </Box>
+      )}
 
-      <Box component="section" sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
-        <Typography variant="h5" component="h2" sx={{ color: "primary.main" }}>
-          Членства
+      <Box component="section" aria-labelledby="plans-title" sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+        <Typography id="plans-title" variant="h5" component="h3" sx={{ color: "primary.main" }}>
+          {live.length > 0 ? "Други членства" : "Избери членство"}
         </Typography>
+        {plans.length > 0 && (
+          <Typography variant="body2" sx={{ color: "text.secondary" }}>
+            <strong>С карта</strong> членството се подновява автоматично всеки месец и можеш да го прекратиш по всяко
+            време. <strong>С банков превод</strong> превеждаш таксата всеки месец, а достъпът се активира, щом екипът
+            потвърди плащането.
+          </Typography>
+        )}
         {plans.length === 0 ? (
           <Typography sx={{ color: "text.secondary" }}>
             Членствата скоро ще могат да се активират онлайн. Какво включват виж на страница{" "}
@@ -142,15 +155,11 @@ export default async function AccountSubscriptionsPage({ searchParams }: Props) 
             ))}
           </Box>
         )}
-        <Typography variant="body2" sx={{ color: "text.secondary" }}>
-          С карта абонаментът се подновява автоматично всеки месец и можеш да го прекратиш по всяко време. По банков път
-          превеждаш таксата всеки месец, а достъпът се активира, щом екипът потвърди плащането.
-        </Typography>
       </Box>
 
       {past.length > 0 && (
         <Box component="section" sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-          <Typography variant="h6" component="h2" sx={{ color: "primary.main" }}>
+          <Typography variant="h6" component="h3" sx={{ color: "primary.main" }}>
             Предишни
           </Typography>
           {past.map((s) => (
@@ -184,7 +193,7 @@ function SubscriptionCard({
   return (
     <Panel tone="card" sx={{ gap: 1.25 }}>
       <Box sx={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-start", gap: 1 }}>
-        <Typography variant="h6" component="h3" sx={{ color: "primary.main" }}>
+        <Typography variant="h6" component="h4" sx={{ color: "primary.main" }}>
           {s.plan?.name ?? "Членство"}
         </Typography>
         <Chip size="small" label={status.label} color={status.color} />
@@ -238,7 +247,7 @@ function PlanCard({
   const features = planFeatures(plan.features);
   return (
     <Panel tone={highlighted ? "mint" : "card"} sx={{ gap: 1.25 }}>
-      <Typography variant="h6" component="h3" sx={{ color: "primary.main" }}>
+      <Typography variant="h6" component="h4" sx={{ color: "primary.main" }}>
         {plan.name}
       </Typography>
       <Typography sx={{ fontWeight: 600 }}>

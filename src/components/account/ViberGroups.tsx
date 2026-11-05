@@ -50,7 +50,7 @@ export function ViberGroupCard({ group, defaultPhone }: { group: MyViberGroup; d
   return (
     <Panel tone="card" sx={{ gap: 1.25 }}>
       <Box sx={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-start", gap: 1, width: "100%" }}>
-        <Typography variant="h6" component="h3" sx={{ color: "primary.main" }}>
+        <Typography variant="h6" component="h4" sx={{ color: "primary.main" }}>
           {group.name}
         </Typography>
         {status && <Chip size="small" label={statusLabels[status]} color={status === "joined" ? "success" : "default"} />}

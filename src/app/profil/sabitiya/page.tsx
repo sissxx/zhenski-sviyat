@@ -4,7 +4,9 @@ import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
 import Typography from "@mui/material/Typography";
 import { CancelRegistrationButton } from "@/components/account/CancelRegistrationButton";
+import { AccountSectionHeader } from "@/components/account/AccountSectionHeader";
 import { EmptyState } from "@/components/account/EmptyState";
+import { PaymentDueNote } from "@/components/account/PaymentDueNote";
 import { AppLink } from "@/components/ui/AppLink";
 import { Panel } from "@/components/ui/Panel";
 import { listMyRegistrations, type MyRegistration } from "@/lib/events/queries";
@@ -26,11 +28,17 @@ const isUpcoming = (r: MyRegistration) => !!r.event && new Date(r.event.starts_a
 
 export default async function AccountEventsPage() {
   const registrations = await listMyRegistrations();
+  const header = (
+    <AccountSectionHeader title="Моите събития">Събитията, за които си записана, и плащането за тях.</AccountSectionHeader>
+  );
   if (registrations.length === 0) {
     return (
-      <EmptyState title="Моите събития" action={{ label: "Виж предстоящите събития", href: routes.events }}>
-        Все още нямаш записвания. Когато се запишеш за събитие, тук ще виждаш датата, мястото и статуса на плащането.
-      </EmptyState>
+      <>
+        {header}
+        <EmptyState action={{ label: "Виж предстоящите събития", href: routes.events }}>
+          Все още нямаш записвания. Когато се запишеш за събитие, тук ще виждаш датата, мястото и статуса на плащането.
+        </EmptyState>
+      </>
     );
   }
 
@@ -41,6 +49,7 @@ export default async function AccountEventsPage() {
 
   return (
     <>
+      {header}
       <RegistrationGroup title="Предстоящи" items={current} empty="Нямаш записвания за предстоящи събития." />
       {history.length > 0 && <RegistrationGroup title="История" items={history} />}
       <Button variant="outlined" href={routes.events} sx={{ alignSelf: "flex-start" }}>
@@ -53,7 +62,7 @@ export default async function AccountEventsPage() {
 function RegistrationGroup({ title, items, empty }: { title: string; items: MyRegistration[]; empty?: string }) {
   return (
     <Box component="section" sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
-      <Typography variant="h5" component="h2" sx={{ color: "primary.main" }}>
+      <Typography variant="h5" component="h3" sx={{ color: "primary.main" }}>
         {title}
       </Typography>
       {items.length === 0 && empty && <Typography sx={{ color: "text.secondary" }}>{empty}</Typography>}
@@ -77,7 +86,7 @@ function RegistrationCard({ registration }: { registration: MyRegistration }) {
   return (
     <Panel tone="card" sx={{ gap: 1.25 }}>
       <Box sx={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-start", gap: 1 }}>
-        <Typography variant="h6" component="h3" sx={{ color: "primary.main" }}>
+        <Typography variant="h6" component="h4" sx={{ color: "primary.main" }}>
           <AppLink href={eventPath(event.slug)} sx={{ color: "inherit" }}>
             {event.title}
           </AppLink>
@@ -96,9 +105,14 @@ function RegistrationCard({ registration }: { registration: MyRegistration }) {
         {registration.price_cents === 0
           ? "Безплатно"
           : `${formatPrice(registration.price_cents)} · ${registration.payment_method === "bank_transfer" ? "банков превод" : "карта"}`}
-        {pending && payment?.provider === "bank_transfer" && payment.bank_reference && ` · основание ${payment.bank_reference}`}
-        {pending && registration.hold_expires_at && ` · срок за плащане ${formatDateTime(registration.hold_expires_at)}`}
       </Typography>
+      {pending && isUpcoming(registration) && (
+        <PaymentDueNote
+          amountCents={registration.price_cents}
+          deadline={registration.hold_expires_at}
+          reference={payment?.provider === "bank_transfer" ? payment.bank_reference : null}
+        />
+      )}
       <Box sx={{ display: "flex", flexWrap: "wrap", alignItems: "flex-start", gap: 1.5 }}>
         {isActive(registration) && (
           <Button size="small" variant={pending ? "contained" : "outlined"} href={`${eventConfirmationPath(event.slug)}?zapisvane=${registration.id}`}>
