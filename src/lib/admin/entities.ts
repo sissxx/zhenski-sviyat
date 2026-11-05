@@ -35,8 +35,11 @@ type EntityConfig = {
   defaults: FormValues;
   toRow: (v: FormValues) => Row;
   toForm: (row: Row) => FormValues;
-  /** Adds fields to a new item's row before it is inserted (e.g. its place at the end of a list). */
-  beforeInsert?: (supabase: Client, row: Row) => Promise<Row>;
+  /**
+   * Lists ordered with up/down arrows in the admin instead of typed numbers. New items go to the end
+   * (of their group, when `group` is set); `name` breaks ties between rows with the same number.
+   */
+  ordering?: { name: string; group?: string };
   /** Writes to the item's satellite tables after the main row is saved. */
   afterSave?: (supabase: Client, id: string, v: FormValues) => Promise<{ error: { code?: string; message?: string } | null }>;
   /** Reads the satellite tables into form values. */
@@ -50,7 +53,6 @@ const str = (v: FormValues, key: string) => {
 const text = (v: FormValues, key: string) => str(v, key).trim();
 const opt = (v: FormValues, key: string) => emptyToNull(str(v, key));
 const flag = (v: FormValues, key: string) => v[key] === true;
-const sort = (v: FormValues) => optionalInt(str(v, "sort_order")) ?? 0;
 
 const s = (row: Row, key: string) => (row[key] === null || row[key] === undefined ? "" : String(row[key]));
 const b = (row: Row, key: string) => row[key] === true;
@@ -131,9 +133,10 @@ export const entities: Record<Exclude<EntityKey, "settings">, EntityConfig> = {
   consultationType: {
     table: "consultation_types",
     listPath: adminRoutes.consultationTypes,
+    ordering: { name: "name" },
     defaults: {
       name: "", slug: "", description: "", duration_minutes: "60", buffer_minutes: "0", price: "0",
-      requires_prepayment: true, allow_bank_transfer: false, location_info: "", is_active: true, sort_order: "0",
+      requires_prepayment: true, allow_bank_transfer: false, location_info: "", is_active: true,
     },
     toRow: (v) => ({
       name: text(v, "name"),
@@ -146,7 +149,6 @@ export const entities: Record<Exclude<EntityKey, "settings">, EntityConfig> = {
       allow_bank_transfer: flag(v, "allow_bank_transfer"),
       location_info: opt(v, "location_info"),
       is_active: flag(v, "is_active"),
-      sort_order: sort(v),
     }),
     toForm: (row) => ({
       name: s(row, "name"),
@@ -159,15 +161,15 @@ export const entities: Record<Exclude<EntityKey, "settings">, EntityConfig> = {
       allow_bank_transfer: b(row, "allow_bank_transfer"),
       location_info: s(row, "location_info"),
       is_active: b(row, "is_active"),
-      sort_order: s(row, "sort_order"),
     }),
   },
 
   specialist: {
     table: "specialists",
     listPath: adminRoutes.specialists,
+    ordering: { name: "full_name" },
     defaults: {
-      full_name: "", slug: "", title: "", bio: "", photo_path: "", is_active: true, sort_order: "0",
+      full_name: "", slug: "", title: "", bio: "", photo_path: "", is_active: true,
       login_email: "", notification_email: "", phone: "", internal_note: "",
     },
     toRow: (v) => ({
@@ -177,7 +179,6 @@ export const entities: Record<Exclude<EntityKey, "settings">, EntityConfig> = {
       bio: opt(v, "bio"),
       photo_path: opt(v, "photo_path"),
       is_active: flag(v, "is_active"),
-      sort_order: sort(v),
     }),
     toForm: (row) => ({
       full_name: s(row, "full_name"),
@@ -186,7 +187,6 @@ export const entities: Record<Exclude<EntityKey, "settings">, EntityConfig> = {
       bio: s(row, "bio"),
       photo_path: s(row, "photo_path"),
       is_active: b(row, "is_active"),
-      sort_order: s(row, "sort_order"),
     }),
     afterSave: async (supabase, id, v) => {
       const { error } = await supabase.from("specialist_private").upsert({
@@ -215,9 +215,10 @@ export const entities: Record<Exclude<EntityKey, "settings">, EntityConfig> = {
   plan: {
     table: "membership_plans",
     listPath: adminRoutes.plans,
+    ordering: { name: "name" },
     defaults: {
       name: "", slug: "", description: "", features: "", price: "", billing_interval: "month", stripe_price_id: "",
-      allow_bank_transfer: true, is_active: true, sort_order: "0",
+      allow_bank_transfer: true, is_active: true,
     },
     toRow: (v) => ({
       name: text(v, "name"),
@@ -229,7 +230,6 @@ export const entities: Record<Exclude<EntityKey, "settings">, EntityConfig> = {
       stripe_price_id: opt(v, "stripe_price_id"),
       allow_bank_transfer: flag(v, "allow_bank_transfer"),
       is_active: flag(v, "is_active"),
-      sort_order: sort(v),
     }),
     toForm: (row) => ({
       name: s(row, "name"),
@@ -241,27 +241,25 @@ export const entities: Record<Exclude<EntityKey, "settings">, EntityConfig> = {
       stripe_price_id: s(row, "stripe_price_id"),
       allow_bank_transfer: b(row, "allow_bank_transfer"),
       is_active: b(row, "is_active"),
-      sort_order: s(row, "sort_order"),
     }),
   },
 
   viberGroup: {
     table: "viber_groups",
     listPath: adminRoutes.viber,
-    defaults: { name: "", slug: "", description: "", invite_link: "", join_instructions: "", is_active: true, sort_order: "0" },
+    ordering: { name: "name" },
+    defaults: { name: "", slug: "", description: "", invite_link: "", join_instructions: "", is_active: true },
     toRow: (v) => ({
       name: text(v, "name"),
       slug: text(v, "slug"),
       description: opt(v, "description"),
       is_active: flag(v, "is_active"),
-      sort_order: sort(v),
     }),
     toForm: (row) => ({
       name: s(row, "name"),
       slug: s(row, "slug"),
       description: s(row, "description"),
       is_active: b(row, "is_active"),
-      sort_order: s(row, "sort_order"),
     }),
     afterSave: async (supabase, id, v) => {
       const { error } = await supabase.from("viber_group_invites").upsert({
@@ -280,19 +278,18 @@ export const entities: Record<Exclude<EntityKey, "settings">, EntityConfig> = {
   faq: {
     table: "faqs",
     listPath: adminRoutes.faqs,
-    defaults: { question: "", answer: "", category: "", sort_order: "0", is_published: false },
+    ordering: { name: "question" },
+    defaults: { question: "", answer: "", category: "", is_published: true },
     toRow: (v) => ({
       question: text(v, "question"),
       answer: text(v, "answer"),
       category: opt(v, "category"),
-      sort_order: sort(v),
       is_published: flag(v, "is_published"),
     }),
     toForm: (row) => ({
       question: s(row, "question"),
       answer: s(row, "answer"),
       category: s(row, "category"),
-      sort_order: s(row, "sort_order"),
       is_published: b(row, "is_published"),
     }),
   },
@@ -300,14 +297,14 @@ export const entities: Record<Exclude<EntityKey, "settings">, EntityConfig> = {
   partner: {
     table: "partners",
     listPath: adminRoutes.partners,
-    defaults: { name: "", kind: "partner", description: "", logo_path: "", website_url: "", sort_order: "0", is_published: false },
+    ordering: { name: "name" },
+    defaults: { name: "", kind: "partner", description: "", logo_path: "", website_url: "", is_published: true },
     toRow: (v) => ({
       name: text(v, "name"),
       kind: str(v, "kind"),
       description: opt(v, "description"),
       logo_path: opt(v, "logo_path"),
       website_url: opt(v, "website_url"),
-      sort_order: sort(v),
       is_published: flag(v, "is_published"),
     }),
     toForm: (row) => ({
@@ -316,7 +313,6 @@ export const entities: Record<Exclude<EntityKey, "settings">, EntityConfig> = {
       description: s(row, "description"),
       logo_path: s(row, "logo_path"),
       website_url: s(row, "website_url"),
-      sort_order: s(row, "sort_order"),
       is_published: b(row, "is_published"),
     }),
   },
@@ -324,9 +320,10 @@ export const entities: Record<Exclude<EntityKey, "settings">, EntityConfig> = {
   promotion: {
     table: "promotions",
     listPath: adminRoutes.promotions,
+    ordering: { name: "title" },
     defaults: {
       title: "", slug: "", description: "", price: "", original_price: "", valid_from: "", valid_until: "",
-      cta_label: "", cta_url: "", image_path: "", sort_order: "0", is_published: false,
+      cta_label: "", cta_url: "", image_path: "", is_published: true,
     },
     toRow: (v) => ({
       title: text(v, "title"),
@@ -339,7 +336,6 @@ export const entities: Record<Exclude<EntityKey, "settings">, EntityConfig> = {
       cta_label: opt(v, "cta_label"),
       cta_url: opt(v, "cta_url"),
       image_path: opt(v, "image_path"),
-      sort_order: sort(v),
       is_published: flag(v, "is_published"),
     }),
     toForm: (row) => ({
@@ -353,7 +349,6 @@ export const entities: Record<Exclude<EntityKey, "settings">, EntityConfig> = {
       cta_label: s(row, "cta_label"),
       cta_url: s(row, "cta_url"),
       image_path: s(row, "image_path"),
-      sort_order: s(row, "sort_order"),
       is_published: b(row, "is_published"),
     }),
   },
@@ -361,6 +356,7 @@ export const entities: Record<Exclude<EntityKey, "settings">, EntityConfig> = {
   teamMember: {
     table: "team_members",
     listPath: adminRoutes.team,
+    ordering: { name: "full_name", group: "member_group" },
     // Published by default; the order is set automatically (end of the group) and changed with the list's arrows.
     defaults: { full_name: "", slug: "", role_title: "", bio: "", photo_path: "", member_group: "founder", is_published: true },
     toRow: (v) => ({
@@ -372,16 +368,6 @@ export const entities: Record<Exclude<EntityKey, "settings">, EntityConfig> = {
       member_group: str(v, "member_group"),
       is_published: flag(v, "is_published"),
     }),
-    beforeInsert: async (supabase, row) => {
-      const { data } = await supabase
-        .from("team_members")
-        .select("sort_order")
-        .eq("member_group", String(row.member_group))
-        .order("sort_order", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      return { ...row, sort_order: (data?.sort_order ?? 0) + 1 };
-    },
     toForm: (row) => ({
       full_name: s(row, "full_name"),
       slug: s(row, "slug"),
@@ -434,7 +420,7 @@ export async function loadEntityForm(supabase: Client, key: Exclude<EntityKey, "
 export async function writeEntity(supabase: Client, key: Exclude<EntityKey, "settings">, id: string | null, values: FormValues) {
   const config = entities[key];
   let row = config.toRow(values);
-  if (!id && config.beforeInsert) row = await config.beforeInsert(supabase, row);
+  if (!id && config.ordering) row = { ...row, sort_order: await nextSortOrder(supabase, config.table, config.ordering, row) };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- the table name is chosen at runtime from the registry
   const table = supabase.from(config.table) as any;
   const { data, error } = id
@@ -455,29 +441,42 @@ export async function deleteEntity(supabase: Client, key: Exclude<EntityKey, "se
   return { error };
 }
 
+/** One more than the highest number in the list (or in the new item's group), so the new item goes last. */
+async function nextSortOrder(supabase: Client, table: TableName, ordering: NonNullable<EntityConfig["ordering"]>, row: Row) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- the table name is chosen at runtime from the registry
+  let query = (supabase.from(table) as any).select("sort_order");
+  if (ordering.group) query = query.eq(ordering.group, String(row[ordering.group]));
+  const { data } = await query.order("sort_order", { ascending: false }).limit(1).maybeSingle();
+  return ((data as { sort_order: number } | null)?.sort_order ?? 0) + 1;
+}
+
 /**
- * Moves a team member one place up or down within their group. The group is renumbered 1, 2, 3… in its
- * current order first, so older rows that share the same number still move predictably.
+ * Moves an item one place up or down in its list (within its group, if the list has groups). The list is
+ * renumbered 1, 2, 3… in its current order first, so older rows that share the same number still move predictably.
  */
-export async function moveTeamMember(supabase: Client, id: string, direction: "up" | "down") {
-  const { data: member, error } = await supabase.from("team_members").select("member_group").eq("id", id).single();
-  if (error || !member) return { error: error ?? { code: "PGRST116" } };
-  const { data: group, error: listError } = await supabase
-    .from("team_members")
-    .select("id, sort_order")
-    .eq("member_group", member.member_group)
-    .order("sort_order", { ascending: true })
-    .order("full_name", { ascending: true });
-  if (listError || !group) return { error: listError ?? { code: "PGRST116" } };
-  const ids = group.map((r) => r.id);
-  const from = ids.indexOf(id);
-  const to = direction === "up" ? from - 1 : from + 1;
-  if (from < 0 || to < 0 || to >= ids.length) return ok;
-  [ids[from], ids[to]] = [ids[to]!, ids[from]!];
-  const current = new Map(group.map((r) => [r.id, r.sort_order]));
+export async function moveEntity(supabase: Client, key: Exclude<EntityKey, "settings">, id: string, direction: "up" | "down") {
+  const { table, ordering } = entities[key];
+  if (!ordering) return { error: { code: "admin", message: "not_ordered" } };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- the table name is chosen at runtime from the registry
+  const from = () => supabase.from(table) as any;
+  let list = from().select("id, sort_order");
+  if (ordering.group) {
+    const { data: item, error } = await from().select(ordering.group).eq("id", id).single();
+    if (error || !item) return { error: error ?? { code: "PGRST116" } };
+    list = list.eq(ordering.group, (item as Row)[ordering.group]);
+  }
+  const { data, error: listError } = await list.order("sort_order", { ascending: true }).order(ordering.name, { ascending: true });
+  if (listError || !data) return { error: listError ?? { code: "PGRST116" } };
+  const rows = data as { id: string; sort_order: number }[];
+  const ids = rows.map((r) => r.id);
+  const at = ids.indexOf(id);
+  const to = direction === "up" ? at - 1 : at + 1;
+  if (at < 0 || to < 0 || to >= ids.length) return ok;
+  [ids[at], ids[to]] = [ids[to]!, ids[at]!];
+  const current = new Map(rows.map((r) => [r.id, r.sort_order]));
   for (const [index, rowId] of ids.entries()) {
     if (current.get(rowId) === index + 1) continue;
-    const { error: updateError } = await supabase.from("team_members").update({ sort_order: index + 1 }).eq("id", rowId);
+    const { error: updateError } = await from().update({ sort_order: index + 1 }).eq("id", rowId);
     if (updateError) return { error: updateError };
   }
   return ok;

@@ -7,8 +7,9 @@ import { isStripeConfigured } from "@/lib/stripe/server";
 import { PageIntro } from "@/components/ui/PageIntro";
 import { Panel } from "@/components/ui/Panel";
 import { Section } from "@/components/ui/Section";
+import { TeamAvatar } from "@/components/team/TeamAvatar";
 import { getCurrentUser } from "@/lib/auth/session";
-import { getBookingRules, listConsultationServices } from "@/lib/consultations/queries";
+import { getBookingRules, listConsultationServices, listSpecialistProfiles } from "@/lib/consultations/queries";
 import { bookingPriceLabel, paymentModeOf, servicePriceLabel } from "@/lib/consultations/types";
 import { createClient } from "@/lib/supabase/server";
 import { routes } from "@/lib/routes";
@@ -36,7 +37,7 @@ async function viewerOf(): Promise<BookingViewer> {
 
 export default async function ConsultationsPage({ searchParams }: ConsultationsPageProps) {
   const { usluga, spetsialist } = await searchParams;
-  const [allServices, rules, viewer] = await Promise.all([listConsultationServices(), getBookingRules(), viewerOf()]);
+  const [allServices, rules, viewer, specialists] = await Promise.all([listConsultationServices(), getBookingRules(), viewerOf(), listSpecialistProfiles()]);
   const services: BookableService[] = allServices
     .filter((s) => s.specialists.length > 0)
     .map((s) => ({
@@ -111,6 +112,52 @@ export default async function ConsultationsPage({ searchParams }: ConsultationsP
           </Panel>
         </Box>
       </Section>
+
+      {specialists.length > 0 && (
+        <Section bg="brand.mintLight" aria-labelledby="specialists-title">
+          <Typography id="specialists-title" variant="h3" component="h2" sx={{ mb: 2.5 }}>
+            Нашите специалисти
+          </Typography>
+          <Box component="ul" sx={{ listStyle: "none", m: 0, p: 0, display: "grid", gap: 2.25, gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)", md: "repeat(3, 1fr)" } }}>
+            {specialists.map((specialist) => {
+              const offered = services.filter((s) => s.specialists.some((sp) => sp.id === specialist.id));
+              const first = offered[0];
+              return (
+                <Panel key={specialist.id} component="li" sx={{ gap: 1.25 }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1.75 }}>
+                    <TeamAvatar member={specialist} size={72} />
+                    <Box sx={{ minWidth: 0 }}>
+                      <Typography variant="h6" component="h3" sx={{ color: "primary.main", lineHeight: 1.25 }}>
+                        {specialist.name}
+                      </Typography>
+                      {specialist.title && (
+                        <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                          {specialist.title}
+                        </Typography>
+                      )}
+                    </Box>
+                  </Box>
+                  {specialist.bio && <Typography sx={{ fontSize: 14, whiteSpace: "pre-line" }}>{specialist.bio}</Typography>}
+                  {offered.length > 0 && (
+                    <Typography variant="body2">
+                      <Box component="span" sx={{ fontWeight: 600 }}>
+                        Консултации:
+                      </Box>{" "}
+                      {offered.map((s) => s.name).join(", ")}
+                    </Typography>
+                  )}
+                  <Box sx={{ flexGrow: 1 }} />
+                  {first && (
+                    <Button variant="outlined" href={`${routes.consultations}?usluga=${first.slug}&spetsialist=${specialist.slug}#booking-title`} aria-label={`Запази час при ${specialist.name}`}>
+                      Запази час
+                    </Button>
+                  )}
+                </Panel>
+              );
+            })}
+          </Box>
+        </Section>
+      )}
     </>
   );
 }

@@ -117,3 +117,14 @@ export function bankRenewalOpen(s: MySubscription, renewalWindowDays: number, no
     new Date(s.current_period_end).getTime() - renewalWindowDays * 86_400_000 <= now
   );
 }
+
+/**
+ * One plan for its own page (/klub-krasota-stil-estetika, /viber-obshtnost): the active plan with this slug
+ * from the admin panel, or the built-in one from src/content/plans.ts while there is no such plan.
+ */
+export async function getPublicPlan(slug: string): Promise<PublicPlan> {
+  const { plans } = await listPublicPlans();
+  const plan = plans.find((p) => p.slug === slug) ?? fallbackPlans().find((p) => p.slug === slug);
+  if (!plan) throw new Error(`Unknown plan ${slug}`);
+  return plan;
+}

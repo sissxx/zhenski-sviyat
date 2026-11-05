@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "@mui/material/Link";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { DataTable } from "@/components/admin/DataTable";
+import { orderColumn } from "@/components/admin/orderColumn";
 import { StatusChip } from "@/components/admin/StatusChip";
 import { adminRoutes, itemPath, newPath } from "@/lib/admin/routes";
 import { requireAdminPage } from "@/lib/admin/session";
@@ -38,6 +39,7 @@ export default async function AdminSpecialistsPage() {
             render: (r) => (r.specialist_availability.length ? `${r.specialist_availability.length} интервала` : <StatusChip label="Няма" tone="warning" />),
           },
           { label: "Вход", render: (r) => (r.user_id ? "Има профил" : "—") },
+          orderColumn("specialist", data ?? [], (r) => r.full_name),
           { label: "Статус", render: (r) => <StatusChip {...(r.is_active ? { label: "Активен", tone: "success" } : { label: "Скрит" })} /> },
         ]}
       />

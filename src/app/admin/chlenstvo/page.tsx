@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "@mui/material/Link";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { DataTable } from "@/components/admin/DataTable";
+import { orderColumn } from "@/components/admin/orderColumn";
 import { StatusChip } from "@/components/admin/StatusChip";
 import { billingIntervalLabels } from "@/lib/admin/forms";
 import { adminRoutes, itemPath, newPath } from "@/lib/admin/routes";
@@ -37,6 +38,7 @@ export default async function AdminPlansPage() {
           },
           { label: "Viber групи", render: (r) => r.plan_viber_groups.map((g) => g.viber_groups?.name).filter(Boolean).join(", ") || "—" },
           { label: "Карта", render: (r) => (r.stripe_price_id ? "Свързан със Stripe" : <StatusChip label="Без Stripe цена" tone="warning" />) },
+          orderColumn("plan", data ?? [], (r) => r.name),
           { label: "Статус", render: (r) => <StatusChip {...(r.is_active ? { label: "Активен", tone: "success" } : { label: "Скрит" })} /> },
         ]}
       />

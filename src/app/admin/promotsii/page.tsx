@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "@mui/material/Link";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { DataTable } from "@/components/admin/DataTable";
+import { orderColumn } from "@/components/admin/orderColumn";
 import { StatusChip } from "@/components/admin/StatusChip";
 import { adminRoutes, itemPath, newPath } from "@/lib/admin/routes";
 import { requireAdminPage } from "@/lib/admin/session";
@@ -15,7 +16,7 @@ export default async function AdminPromotionsPage() {
     .from("promotions")
     .select("id, title, price_cents, valid_from, valid_until, is_published")
     .order("sort_order")
-    .order("created_at", { ascending: false });
+    .order("title");
   const now = new Date().toISOString();
   return (
     <>
@@ -39,6 +40,7 @@ export default async function AdminPromotionsPage() {
                 ? `${r.valid_from ? formatDate(r.valid_from) : "…"} – ${r.valid_until ? formatDate(r.valid_until) : "…"}`
                 : "Без срок",
           },
+          orderColumn("promotion", data ?? [], (r) => r.title),
           {
             label: "Статус",
             render: (r) =>
