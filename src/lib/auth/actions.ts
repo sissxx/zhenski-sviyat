@@ -124,7 +124,7 @@ export async function updatePassword(values: NewPasswordValues): Promise<ActionR
   const { error } = await supabase.auth.updateUser({ password: parsed.data.password });
   if (error) return { ok: false, error: authErrorMessage(error), code: error.code };
 
-  redirect(`${routes.account}?parola=promenena`);
+  redirect(`${routes.accountDetails}?parola=promenena`);
 }
 
 export async function updateProfile(values: ProfileValues): Promise<ActionResult> {

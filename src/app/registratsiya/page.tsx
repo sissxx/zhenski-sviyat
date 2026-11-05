@@ -21,7 +21,7 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
   // After confirming the email, a new member continues to their subscriptions to activate the chosen plan.
   const continueTo = planSlug
     ? `${routes.accountSubscriptions}?plan=${planSlug}`
-    : safeNextPath(typeof next === "string" ? next : null, `${routes.account}?potvarden=1`);
+    : safeNextPath(typeof next === "string" ? next : null, `${routes.accountDetails}?potvarden=1`);
 
   return (
     <AuthCard

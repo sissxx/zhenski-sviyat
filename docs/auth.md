@@ -9,7 +9,7 @@ Supabase Auth with email and password. All pages are Bulgarian.
 | Forgot password | `/zabravena-parola` |
 | New password (from the reset email, or "Смени паролата" in the profile) | `/nova-parola` |
 | Email link landing (confirm, reset, email change) | `/auth/confirm` |
-| Account area: overview, details, events, consultations, subscriptions | `/profil/*` |
+| Account area: details (`/profil` opens it), events, consultations, subscriptions | `/profil/*` |
 | Privacy policy and terms (placeholders until NSJS sends the final text) | `/poveritelnost`, `/obshti-usloviya` |
 
 - Forms validate in the browser and again in the server actions (`src/lib/auth/actions.ts`) with the same Zod schemas.
