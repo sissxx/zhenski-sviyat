@@ -444,7 +444,6 @@ export const teamMemberForm: EntityForm = {
     bio: optText(),
     photo_path: optText(500),
     member_group: z.enum(["founder", "team", "ambassador"]),
-    sort_order: sortOrder,
     is_published: bool,
   }) as unknown as EntityForm["schema"],
   sections: [
@@ -456,7 +455,7 @@ export const teamMemberForm: EntityForm = {
         { name: "role_title", label: "Роля", type: "text" },
         { name: "bio", label: "Представяне", type: "textarea" },
         { name: "photo_path", label: "Снимка", type: "image", folder: "team" },
-        sortField,
+        // No order field: new people go to the end of their group; the list has up/down arrows to move them.
         publishedField(),
       ],
     },
