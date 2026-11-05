@@ -35,6 +35,8 @@ type EntityConfig = {
   defaults: FormValues;
   toRow: (v: FormValues) => Row;
   toForm: (row: Row) => FormValues;
+  /** Adds fields to a new item's row before it is inserted (e.g. its place at the end of a list). */
+  beforeInsert?: (supabase: Client, row: Row) => Promise<Row>;
   /** Writes to the item's satellite tables after the main row is saved. */
   afterSave?: (supabase: Client, id: string, v: FormValues) => Promise<{ error: { code?: string; message?: string } | null }>;
   /** Reads the satellite tables into form values. */
@@ -359,7 +361,8 @@ export const entities: Record<Exclude<EntityKey, "settings">, EntityConfig> = {
   teamMember: {
     table: "team_members",
     listPath: adminRoutes.team,
-    defaults: { full_name: "", slug: "", role_title: "", bio: "", photo_path: "", member_group: "founder", sort_order: "0", is_published: false },
+    // Published by default; the order is set automatically (end of the group) and changed with the list's arrows.
+    defaults: { full_name: "", slug: "", role_title: "", bio: "", photo_path: "", member_group: "founder", is_published: true },
     toRow: (v) => ({
       full_name: text(v, "full_name"),
       slug: text(v, "slug"),
@@ -367,9 +370,18 @@ export const entities: Record<Exclude<EntityKey, "settings">, EntityConfig> = {
       bio: opt(v, "bio"),
       photo_path: opt(v, "photo_path"),
       member_group: str(v, "member_group"),
-      sort_order: sort(v),
       is_published: flag(v, "is_published"),
     }),
+    beforeInsert: async (supabase, row) => {
+      const { data } = await supabase
+        .from("team_members")
+        .select("sort_order")
+        .eq("member_group", String(row.member_group))
+        .order("sort_order", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      return { ...row, sort_order: (data?.sort_order ?? 0) + 1 };
+    },
     toForm: (row) => ({
       full_name: s(row, "full_name"),
       slug: s(row, "slug"),
@@ -377,7 +389,6 @@ export const entities: Record<Exclude<EntityKey, "settings">, EntityConfig> = {
       bio: s(row, "bio"),
       photo_path: s(row, "photo_path"),
       member_group: s(row, "member_group"),
-      sort_order: s(row, "sort_order"),
       is_published: b(row, "is_published"),
     }),
   },
@@ -422,7 +433,8 @@ export async function loadEntityForm(supabase: Client, key: Exclude<EntityKey, "
 
 export async function writeEntity(supabase: Client, key: Exclude<EntityKey, "settings">, id: string | null, values: FormValues) {
   const config = entities[key];
-  const row = config.toRow(values);
+  let row = config.toRow(values);
+  if (!id && config.beforeInsert) row = await config.beforeInsert(supabase, row);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- the table name is chosen at runtime from the registry
   const table = supabase.from(config.table) as any;
   const { data, error } = id
@@ -441,4 +453,32 @@ export async function deleteEntity(supabase: Client, key: Exclude<EntityKey, "se
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- the table name is chosen at runtime from the registry
   const { error } = await (supabase.from(entities[key].table) as any).delete().eq("id", id);
   return { error };
+}
+
+/**
+ * Moves a team member one place up or down within their group. The group is renumbered 1, 2, 3… in its
+ * current order first, so older rows that share the same number still move predictably.
+ */
+export async function moveTeamMember(supabase: Client, id: string, direction: "up" | "down") {
+  const { data: member, error } = await supabase.from("team_members").select("member_group").eq("id", id).single();
+  if (error || !member) return { error: error ?? { code: "PGRST116" } };
+  const { data: group, error: listError } = await supabase
+    .from("team_members")
+    .select("id, sort_order")
+    .eq("member_group", member.member_group)
+    .order("sort_order", { ascending: true })
+    .order("full_name", { ascending: true });
+  if (listError || !group) return { error: listError ?? { code: "PGRST116" } };
+  const ids = group.map((r) => r.id);
+  const from = ids.indexOf(id);
+  const to = direction === "up" ? from - 1 : from + 1;
+  if (from < 0 || to < 0 || to >= ids.length) return ok;
+  [ids[from], ids[to]] = [ids[to]!, ids[from]!];
+  const current = new Map(group.map((r) => [r.id, r.sort_order]));
+  for (const [index, rowId] of ids.entries()) {
+    if (current.get(rowId) === index + 1) continue;
+    const { error: updateError } = await supabase.from("team_members").update({ sort_order: index + 1 }).eq("id", rowId);
+    if (updateError) return { error: updateError };
+  }
+  return ok;
 }

@@ -18,6 +18,8 @@ The service key is not used.
 | Видове консултации, Специалисти | `/admin/vidove-konsultatsii`, `/admin/spetsialisti` | Services; specialist profiles, which services they offer (own price), weekly hours, time off, login account |
 | Членство и планове | `/admin/chlenstvo` | Plans, prices, which Viber groups each plan opens. Stripe product and price ids fill in by themselves on the first card subscription (docs/payments.md) |
 | Съдържание | `/admin/vaprosi`, `partnyori`, `promotsii`, `ekip` | FAQs, partners, promotions, founders/team |
+
+Team members (`ekip`) have no order field: a new person is published by default and goes to the end of their group; the ↑/↓ arrows in the list move them (the group is renumbered 1, 2, 3…).
 | Настройки | `/admin/nastroyki` | `app_settings`: consultation rules, cancel deadlines, holds, renewal window, bank account |
 
 ## Code
