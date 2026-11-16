@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Link from "@mui/material/Link";
+import { AddToCalendarButton } from "@/components/ui/AddToCalendarButton";
 import Typography from "@mui/material/Typography";
 import { z } from "zod";
 import { EventFacts } from "@/components/events/EventFacts";
@@ -19,7 +20,7 @@ import {
   getMyRegistration,
   getPrivateEventDetails,
 } from "@/lib/events/queries";
-import { eventConfirmationPath, eventPath, loginPath, routes } from "@/lib/routes";
+import { eventCalendarPath, eventConfirmationPath, eventPath, loginPath, routes } from "@/lib/routes";
 import { formatDateTime } from "@/lib/locale";
 import { syncReturnedCheckout } from "@/lib/stripe/checkout";
 import { isStripeConfigured } from "@/lib/stripe/server";
@@ -127,6 +128,7 @@ export default async function EventConfirmationPage({ params, searchParams }: Co
             {title}
           </Typography>
           <Typography>{text}</Typography>
+          {outcome !== "ended" && <AddToCalendarButton href={eventCalendarPath(event.slug)} />}
 
           {outcome === "bank" && payment && (
             <BankTransferDetails

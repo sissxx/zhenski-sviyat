@@ -35,6 +35,9 @@ export const routes = {
 export const eventPath = (slug: string) => `${routes.events}/${slug}`;
 export const eventRegistrationPath = (slug: string) => `${eventPath(slug)}/zapisvane`;
 export const eventConfirmationPath = (slug: string) => `${eventPath(slug)}/potvarzhdenie`;
+/** Calendar file (.ics) for an event, and for one of the member's own consultations. */
+export const eventCalendarPath = (slug: string) => `${eventPath(slug)}/kalendar`;
+export const consultationCalendarPath = (bookingId: string) => `/profil/konsultatsii/${bookingId}/kalendar`;
 
 export const consultationConfirmationPath = (bookingId: string) => `${routes.consultations}/potvarzhdenie?zapis=${bookingId}`;
 export const consultationReschedulePath = (bookingId: string) => `${routes.accountConsultations}/${bookingId}/premesti`;

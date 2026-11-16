@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
+import { AddToCalendarButton } from "@/components/ui/AddToCalendarButton";
 import Typography from "@mui/material/Typography";
 import { CancelRegistrationButton } from "@/components/account/CancelRegistrationButton";
 import { AccountSectionHeader } from "@/components/account/AccountSectionHeader";
@@ -12,7 +13,7 @@ import { Panel } from "@/components/ui/Panel";
 import { listMyRegistrations, type MyRegistration } from "@/lib/events/queries";
 import { eventLocationLabel, registrationStatusLabels } from "@/lib/events/types";
 import { formatDateTime, formatPrice } from "@/lib/locale";
-import { eventConfirmationPath, eventPath, routes } from "@/lib/routes";
+import { eventCalendarPath, eventConfirmationPath, eventPath, routes } from "@/lib/routes";
 
 export const metadata: Metadata = { title: "Моите събития" };
 
@@ -119,6 +120,7 @@ function RegistrationCard({ registration }: { registration: MyRegistration }) {
             {pending ? (payment?.provider === "stripe" ? "Довърши плащането" : "Данни за превода") : "Подробности"}
           </Button>
         )}
+        {isActive(registration) && isUpcoming(registration) && <AddToCalendarButton href={eventCalendarPath(event.slug)} size="small" />}
         {canCancel && <CancelRegistrationButton registrationId={registration.id} paid={registration.status === "confirmed" && registration.price_cents > 0} />}
       </Box>
     </Panel>

@@ -78,6 +78,8 @@ export type EventRegistrationData = {
   place: string | null;
   eventUrl: string;
   accountUrl: string;
+  /** Calendar file (.ics) for the event. */
+  calendarUrl?: string;
   /** Only for confirmed registrations. */
   onlineUrl?: string | null;
   attendeeInstructions?: string | null;
@@ -112,6 +114,7 @@ export function eventRegistrationConfirmed(data: EventRegistrationData): EmailCo
       eventDetails(data),
       ...attendeeBlocks(data),
       { kind: "button", label: "Виж събитието", url: data.eventUrl },
+      ...(data.calendarUrl ? [{ kind: "note", text: `Добави го в календара си: ${data.calendarUrl}` } as const] : []),
       { kind: "note", text: `Записванията си можеш да видиш и откажеш в профила си: ${data.accountUrl}` },
     ],
   };
@@ -310,6 +313,8 @@ export type ConsultationData = {
   locationInfo: string | null;
   priceCents: number;
   accountUrl: string;
+  /** Calendar file (.ics) for the booking; opens after login. */
+  calendarUrl?: string;
 };
 
 function consultationDetails(data: ConsultationData, extra: { label: string; value: string | null }[] = []): EmailBlock {
@@ -344,6 +349,7 @@ export function consultationBooked(data: ConsultationData & { cancelDeadlineHour
           ]
         : []),
       { kind: "button", label: "Моите консултации", url: data.accountUrl },
+      ...(data.calendarUrl ? [{ kind: "note", text: `Добави часа в календара си: ${data.calendarUrl}` } as const] : []),
     ],
   };
 }

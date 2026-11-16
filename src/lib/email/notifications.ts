@@ -1,7 +1,7 @@
 import "server-only";
 import { after } from "next/server";
 import { adminRoutes } from "@/lib/admin/routes";
-import { eventPath, routes } from "@/lib/routes";
+import { consultationCalendarPath, eventCalendarPath, eventPath, routes } from "@/lib/routes";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { formatDate } from "@/lib/locale";
 import { absoluteUrl, sendEmail } from "./send";
@@ -209,6 +209,7 @@ function eventData(event: EventRow, firstName: string | null): t.EventRegistrati
     endsAt: event.ends_at,
     place: eventPlace(event),
     eventUrl: absoluteUrl(eventPath(event.slug)),
+    calendarUrl: absoluteUrl(eventCalendarPath(event.slug)),
     accountUrl: absoluteUrl(routes.accountEvents),
   };
 }
@@ -440,6 +441,7 @@ function clientData(b: Booking): t.ConsultationData {
     locationInfo: b.service.location_info,
     priceCents: b.price_cents,
     accountUrl: absoluteUrl(routes.accountConsultations),
+    calendarUrl: absoluteUrl(consultationCalendarPath(b.id)),
   };
 }
 

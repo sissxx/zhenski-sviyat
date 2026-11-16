@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
+import { AddToCalendarButton } from "@/components/ui/AddToCalendarButton";
 import Typography from "@mui/material/Typography";
 import { CancelBookingButton } from "@/components/account/CancelBookingButton";
 import { AccountSectionHeader } from "@/components/account/AccountSectionHeader";
@@ -12,7 +13,7 @@ import { Panel } from "@/components/ui/Panel";
 import { bookingActions, getBookingRules, listMyBookings, type MyBooking } from "@/lib/consultations/queries";
 import { bookingStatusColors, bookingStatusLabels, specialistLabel, type BookingRules } from "@/lib/consultations/types";
 import { formatDateTime, formatPrice, formatTime } from "@/lib/locale";
-import { consultationConfirmationPath, consultationReschedulePath, routes } from "@/lib/routes";
+import { consultationCalendarPath, consultationConfirmationPath, consultationReschedulePath, routes } from "@/lib/routes";
 
 export const metadata: Metadata = { title: "Моите консултации" };
 
@@ -125,6 +126,7 @@ function BookingCard({ booking, rules }: { booking: MyBooking; rules: BookingRul
             Премести
           </Button>
         )}
+        {isActive(booking) && isUpcoming(booking) && <AddToCalendarButton href={consultationCalendarPath(booking.id)} size="small" />}
         {canCancel && <CancelBookingButton bookingId={booking.id} paid={payment?.status === "succeeded"} />}
       </Box>
     </Panel>
