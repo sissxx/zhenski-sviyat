@@ -11,6 +11,16 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     "/og/sabitiya/[slug]": ["./src/assets/og/**/*"],
   },
+  // Pages merged into others (site review, 2026-11): old links and search results land on the right section.
+  async redirects() {
+    return [
+      { source: "/uchrediteli", destination: "/za-nas#ekip", permanent: true },
+      { source: "/tseli-i-sabitiya", destination: "/za-nas#tseli", permanent: true },
+      { source: "/nashata-obshtnost", destination: "/chlenstvo", permanent: true },
+      { source: "/klub-krasota-stil-estetika", destination: "/chlenstvo#plan-klub-krasota", permanent: true },
+      { source: "/viber-obshtnost", destination: "/chlenstvo#plan-viber-obshtnost", permanent: true },
+    ];
+  },
   async headers() {
     // Previews and local builds: keep every response (pages, images, files) out of search indexes.
     if (isIndexable()) return [];

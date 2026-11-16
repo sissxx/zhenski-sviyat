@@ -18,22 +18,17 @@ const optionalPhone = z
   .trim()
   .regex(/^(\+?[\d\s()-]{6,20})?$/, "Моля, въведи валиден телефонен номер.");
 
-export const registerSchema = z
-  .object({
-    firstName: personName("Моля, въведи името си."),
-    lastName: personName("Моля, въведи фамилията си."),
-    email,
-    phone: optionalPhone,
-    password,
-    confirmPassword: z.string(),
-    consent,
-    marketingConsent: z.boolean(),
-    next: z.string().optional(),
-  })
-  .refine((values) => values.password === values.confirmPassword, {
-    path: ["confirmPassword"],
-    message: "Паролите не съвпадат.",
-  });
+/** Sign-up asks for the password once: the field's eye button lets people check what they typed. */
+export const registerSchema = z.object({
+  firstName: personName("Моля, въведи името си."),
+  lastName: personName("Моля, въведи фамилията си."),
+  email,
+  phone: optionalPhone,
+  password,
+  consent,
+  marketingConsent: z.boolean(),
+  next: z.string().optional(),
+});
 
 export const loginSchema = z.object({
   email,

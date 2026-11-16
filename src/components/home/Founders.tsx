@@ -25,7 +25,7 @@ export async function Founders() {
         {founders.map((member) => (
           <li key={member.id}>
             <AppLink
-              href={routes.founders}
+              href={routes.aboutTeam}
               underline="none"
               sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 1, p: 1, borderRadius: "12px", "&:hover": { bgcolor: "brand.mint" } }}
             >

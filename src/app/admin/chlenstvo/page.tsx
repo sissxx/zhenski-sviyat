@@ -37,7 +37,7 @@ export default async function AdminPlansPage() {
             render: (r) => `${formatPrice(r.price_cents)} · ${billingIntervalLabels[r.billing_interval].toLowerCase()}`,
           },
           { label: "Viber групи", render: (r) => r.plan_viber_groups.map((g) => g.viber_groups?.name).filter(Boolean).join(", ") || "—" },
-          { label: "Карта", render: (r) => (r.stripe_price_id ? "Свързан със Stripe" : <StatusChip label="Без Stripe цена" tone="warning" />) },
+          { label: "Карта", render: (r) => (r.stripe_price_id ? "Свързан със Stripe" : "Цената в Stripe се създава при първото плащане") },
           orderColumn("plan", data ?? [], (r) => r.name),
           { label: "Статус", render: (r) => <StatusChip {...(r.is_active ? { label: "Активен", tone: "success" } : { label: "Скрит" })} /> },
         ]}

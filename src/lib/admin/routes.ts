@@ -31,15 +31,16 @@ export type AdminNavGroup = { title: string; items: { label: string; href: strin
 export const adminNav: AdminNavGroup[] = [
   { title: "", items: [{ label: "Табло", href: adminRoutes.home }] },
   {
-    title: "Дейност",
+    // What usually needs a daily look comes first: payments to confirm, Viber requests, messages.
+    title: "Всеки ден",
     items: [
-      { label: "Събития", href: adminRoutes.events },
-      { label: "Консултации", href: adminRoutes.bookings },
       { label: "Плащания", href: adminRoutes.payments },
-      { label: "Абонаменти", href: adminRoutes.subscriptions },
       { label: "Viber достъп", href: adminRoutes.viber },
-      { label: "Потребители", href: adminRoutes.users },
       { label: "Съобщения", href: adminRoutes.messages },
+      { label: "Консултации", href: adminRoutes.bookings },
+      { label: "Събития", href: adminRoutes.events },
+      { label: "Абонаменти", href: adminRoutes.subscriptions },
+      { label: "Потребители", href: adminRoutes.users },
     ],
   },
   {

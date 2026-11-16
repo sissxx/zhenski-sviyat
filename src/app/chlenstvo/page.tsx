@@ -7,7 +7,6 @@ import { PageIntro } from "@/components/ui/PageIntro";
 import { Panel } from "@/components/ui/Panel";
 import { Placeholder } from "@/components/ui/Placeholder";
 import { Section } from "@/components/ui/Section";
-import { membershipPlans } from "@/content/plans";
 import { formatPrice } from "@/lib/locale";
 import { joinPlanPath, routes } from "@/lib/routes";
 import { perInterval, type PublicPlan } from "@/lib/subscriptions/plans";
@@ -15,9 +14,6 @@ import { listPublicPlans } from "@/lib/subscriptions/queries";
 import { pageMetadata } from "@/lib/seo/metadata";
 
 export const metadata: Metadata = pageMetadata("membership");
-
-/** Plans that also have their own page with more about them. */
-const planPages = new Map<string, string>(Object.values(membershipPlans).map((plan) => [plan.slug, plan.href]));
 
 const steps = [
   { title: "Избери членство", text: "Създай безплатен профил или влез в своя и избери плана, който ти подхожда." },
@@ -52,7 +48,7 @@ export default async function MembershipPage() {
         <Typography id="plans-title" variant="h3" component="h2" sx={{ mb: 2.5 }}>
           Планове
         </Typography>
-        <Box sx={{ display: "grid", gap: 2.25, gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" } }}>
+        <Box sx={{ display: "grid", gap: 2.25, gridTemplateColumns: { xs: "1fr", md: "repeat(2, 1fr)", lg: `repeat(${Math.min(plans.length, 3)}, 1fr)` } }}>
           {plans.map((plan) => (
             <PlanCard key={plan.slug} plan={plan} />
           ))}
@@ -105,10 +101,10 @@ export default async function MembershipPage() {
 }
 
 function PlanCard({ plan }: { plan: PublicPlan }) {
-  const titleId = `plan-${plan.slug}`;
-  const morePage = planPages.get(plan.slug);
+  const titleId = `plan-${plan.slug}-title`;
   return (
-    <Panel component="section" aria-labelledby={titleId} sx={{ gap: 1.75, borderRadius: "22px" }}>
+    // The id is the anchor that the old club and Viber pages (and the homepage) link to.
+    <Panel id={`plan-${plan.slug}`} component="section" aria-labelledby={titleId} sx={{ gap: 1.75, borderRadius: "22px", scrollMarginTop: { xs: 72, md: 96 } }}>
       <Typography variant="eyebrow">{plan.billingInterval === "year" ? "Годишно членство" : "Месечно членство"}</Typography>
       <Typography id={titleId} variant="h4" component="h3" sx={{ color: "primary.main" }}>
         {plan.name}
@@ -155,11 +151,6 @@ function PlanCard({ plan }: { plan: PublicPlan }) {
         <Button variant="contained" color="secondary" href={joinPlanPath(plan.slug)}>
           Стани член
         </Button>
-        {morePage && (
-          <Button variant="outlined" href={morePage}>
-            Научи повече
-          </Button>
-        )}
       </Box>
     </Panel>
   );

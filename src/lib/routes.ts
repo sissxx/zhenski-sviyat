@@ -5,13 +5,11 @@
 export const routes = {
   home: "/",
   about: "/za-nas",
-  founders: "/uchrediteli",
-  goals: "/tseli-i-sabitiya",
-  community: "/nashata-obshtnost",
+  /** Sections of the За нас page (they used to be pages of their own, which now redirect here). */
+  aboutGoals: "/za-nas#tseli",
+  aboutTeam: "/za-nas#ekip",
   events: "/sabitiya",
   consultations: "/konsultatsii",
-  beautyClub: "/klub-krasota-stil-estetika",
-  viber: "/viber-obshtnost",
   membership: "/chlenstvo",
   packages: "/paketi-i-promotsii",
   faq: "/chesto-zadavani-vaprosi",
@@ -85,41 +83,43 @@ export const specialistNavItem: NavItem = { label: "Моят график", href
 /** The logo links home, so the desktop menu leaves "Начало" out; only the mobile menu shows it. */
 export const homeNavItem: NavItem = { label: "Начало", href: routes.home };
 
+/** Five links keep the header calm; Въпроси and Подкрепи ни live in the footer and on the homepage. */
 export const mainNav: NavItem[] = [
   { label: "За нас", href: routes.about },
-  { label: "Нашата общност", href: routes.community },
   { label: "Събития", href: routes.events },
   { label: "Консултации", href: routes.consultations },
   { label: "Членство", href: routes.membership },
+  { label: "Контакти", href: routes.contacts },
+];
+
+/** Pages the short desktop menu leaves to the footer; the phone menu lists them too, since the footer is far down. */
+export const mobileExtraNav: NavItem[] = [
   { label: "Въпроси", href: routes.faq },
   { label: "Подкрепи ни", href: routes.support },
-  { label: "Контакти", href: routes.contacts },
 ];
 
 export const footerNav: { title: NavItem; links: NavItem[] }[] = [
   {
     title: { label: "За сдружението", href: routes.about },
     links: [
-      { label: "Обща информация", href: routes.about },
-      { label: "Учредители", href: routes.founders },
-      { label: "Нашите цели", href: routes.goals },
+      { label: "За нас", href: routes.about },
+      { label: "Нашите цели", href: routes.aboutGoals },
+      { label: "Учредители и екип", href: routes.aboutTeam },
     ],
   },
   {
-    title: { label: "Нашата общност", href: routes.community },
+    title: { label: "Участвай", href: routes.membership },
     links: [
       { label: "Събития", href: routes.events },
       { label: "Консултации", href: routes.consultations },
       { label: "Членство", href: routes.membership },
-      { label: "Клуб „Красота, стил и естетика“", href: routes.beautyClub },
-      { label: "Viber общност", href: routes.viber },
+      { label: "Пакети и промоции", href: routes.packages },
     ],
   },
   {
     title: { label: "Полезно", href: routes.faq },
     links: [
       { label: "Често задавани въпроси", href: routes.faq },
-      { label: "Пакети и промоции", href: routes.packages },
       { label: "Подкрепи ни", href: routes.support },
       { label: "Контакти", href: routes.contacts },
     ],

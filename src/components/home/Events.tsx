@@ -31,8 +31,8 @@ export async function Events() {
             <Button variant="contained" href={routes.consultations}>
               Заяви консултация
             </Button>
-            <Button variant="outlined" href={routes.community}>
-              Виж общностите
+            <Button variant="outlined" href={routes.membership}>
+              Виж членствата
             </Button>
           </Box>
         </Panel>

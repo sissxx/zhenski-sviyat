@@ -10,7 +10,6 @@ test.describe("accounts", () => {
     await page.getByRole("textbox", { name: "Имейл" }).fill(email);
     await page.getByLabel("Телефон (по желание)").fill("+359 888 123 456");
     await page.getByLabel("Парола", { exact: true }).fill(password);
-    await page.getByLabel("Повтори паролата").fill(password);
     await page.getByRole("checkbox", { name: /Политиката за поверителност/ }).check();
     await page.getByRole("button", { name: "Създай профил" }).click();
 

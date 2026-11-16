@@ -3,7 +3,6 @@ import { AppLink } from "@/components/ui/AppLink";
 import Typography from "@mui/material/Typography";
 import { SiteWordmark } from "@/components/brand/Logo";
 import { footerNav, routes } from "@/lib/routes";
-import { NewsletterForm } from "./NewsletterForm";
 import { site } from "@/lib/site";
 
 const linkSx = { color: "brand.sage", fontSize: 14, "&:hover": { color: "brand.paper" } } as const;
@@ -54,7 +53,6 @@ export function SiteFooter() {
           ))}
 
           <Box>
-            <NewsletterForm />
             <Typography sx={{ fontSize: 14, color: "brand.sage" }}>
               <AppLink href={routes.privacy} sx={linkSx}>
                 Поверителност

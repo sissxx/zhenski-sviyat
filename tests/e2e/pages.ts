@@ -4,13 +4,8 @@ import { routes } from "../../src/lib/routes";
 export const publicPages = [
   routes.home,
   routes.about,
-  routes.founders,
-  routes.goals,
-  routes.community,
   routes.events,
   routes.consultations,
-  routes.beautyClub,
-  routes.viber,
   routes.membership,
   routes.packages,
   routes.faq,

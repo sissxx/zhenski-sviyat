@@ -28,11 +28,11 @@ Where each section shows on the public site:
 | --- | --- | --- |
 | Събития | `/sabitiya`, event pages, homepage | — |
 | Видове консултации, Специалисти | `/konsultatsii` (booking + „Нашите специалисти“ with photo and bio) | booking says „скоро“ |
-| Членство и планове, Viber групи | `/chlenstvo`, homepage, `/klub-krasota-stil-estetika` and `/viber-obshtnost` (plan with slug `klub-krasota` / `viber-obshtnost`) | the two plans from `src/content/plans.ts` |
+| Членство и планове, Viber групи | `/chlenstvo` (one card per plan, anchor `#plan-<slug>`) and the homepage | the two plans from `src/content/plans.ts` |
 | Въпроси (ЧЗВ) | `/chesto-zadavani-vaprosi`, homepage (first 5) | draft questions from `src/content/faq.ts` |
 | Партньори | `/podkrepi-ni` (logo tiles, link to website) | empty logo slots |
 | Пакети и промоции | `/paketi-i-promotsii` (photo, price, old price, dates, button); hidden after „Валидна до“ | the three draft packages from Figma |
-| Учредители и екип | `/uchrediteli`, homepage | the founders from `src/content/founders.ts` |
+| Учредители и екип | `/za-nas#ekip`, homepage | the founders from `src/content/founders.ts` |
 
 As soon as one item is published, the drafts from `src/content` disappear from that page.
 | Настройки | `/admin/nastroyki` | `app_settings`: consultation rules, cancel deadlines, holds, renewal window, bank account |

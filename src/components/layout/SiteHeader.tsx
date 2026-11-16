@@ -16,13 +16,21 @@ import SvgIcon from "@mui/material/SvgIcon";
 import Toolbar from "@mui/material/Toolbar";
 import { WomensWorldLogo } from "@/components/brand/Logo";
 import { useSignedIn } from "@/components/auth/useSignedIn";
-import { homeNavItem, mainNav, routes } from "@/lib/routes";
+import { homeNavItem, mainNav, mobileExtraNav, routes } from "@/lib/routes";
 import { site } from "@/lib/site";
 
 function MenuIcon() {
   return (
     <SvgIcon>
       <path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z" />
+    </SvgIcon>
+  );
+}
+
+function PersonIcon() {
+  return (
+    <SvgIcon>
+      <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8m0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4" />
     </SvgIcon>
   );
 }
@@ -52,7 +60,7 @@ export function SiteHeader() {
       <Toolbar
         component="nav"
         aria-label="Основна навигация"
-        sx={{ justifyContent: "space-between", gap: 2, px: { xs: 2, sm: 3, xl: 7.5 }, py: { xs: 1, lg: 3 } }}
+        sx={{ justifyContent: "space-between", gap: 2, px: { xs: 2, sm: 3, xl: 7.5 }, py: { xs: 1, md: 2, lg: 3 } }}
       >
         <AppLink
           href={routes.home}
@@ -63,7 +71,7 @@ export function SiteHeader() {
           <WomensWorldLogo />
         </AppLink>
 
-        <Box component="ul" sx={{ display: { xs: "none", lg: "flex" }, gap: { lg: 1.5, xl: 2.25 }, listStyle: "none", m: 0, p: 0 }}>
+        <Box component="ul" sx={{ display: { xs: "none", md: "flex" }, gap: { md: 2, lg: 3.5 }, listStyle: "none", m: 0, p: 0 }}>
           {mainNav.map((item) => {
             const active = isActive(pathname, item.href);
             return (
@@ -73,7 +81,7 @@ export function SiteHeader() {
                   href={item.href}
                   aria-current={active ? "page" : undefined}
                   sx={{
-                    fontSize: 14,
+                    fontSize: { md: 14, lg: 15 },
                     fontWeight: active ? 600 : 500,
                     color: active ? "brand.dark" : "text.primary",
                     whiteSpace: "nowrap",
@@ -115,12 +123,21 @@ export function SiteHeader() {
               </Button>
             </>
           )}
+          {/* On phones the profile (or login) stays one tap away instead of hiding in the menu. */}
+          <IconButton
+            component={NextLink}
+            href={signedIn ? routes.account : routes.login}
+            aria-label={signedIn ? "Моят профил" : "Вход"}
+            sx={{ display: { md: "none" }, color: "brand.dark" }}
+          >
+            <PersonIcon />
+          </IconButton>
           <IconButton
             aria-label="Отвори менюто"
             aria-expanded={open}
             aria-controls="mobile-menu"
             onClick={() => setOpen(true)}
-            sx={{ display: { lg: "none" }, color: "brand.dark" }}
+            sx={{ display: { md: "none" }, color: "brand.dark" }}
           >
             <MenuIcon />
           </IconButton>
@@ -140,7 +157,7 @@ export function SiteHeader() {
           </IconButton>
         </Box>
         <List component="nav" aria-label="Мобилна навигация" sx={{ px: 1 }}>
-          {[homeNavItem, ...mainNav].map((item) => {
+          {[homeNavItem, ...mainNav, ...mobileExtraNav].map((item) => {
             const active = isActive(pathname, item.href);
             return (
               <ListItemButton

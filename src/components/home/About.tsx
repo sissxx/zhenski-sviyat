@@ -33,9 +33,9 @@ export async function About() {
             Да изграждаме национална мрежа за взаимопомощ, която насърчава развитието, увереността и активното
             участие на жените.
           </Typography>
-          <Box component="dl" sx={{ display: "flex", flexWrap: "wrap", gap: 2.25, m: 0 }}>
+          <Box component="dl" sx={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: { xs: 1.5, sm: 2.25 }, m: 0 }}>
             {missionStats(founderCount).map((stat) => (
-              <Box key={stat.label} sx={{ minWidth: 120, display: "flex", flexDirection: "column-reverse", gap: 0.5 }}>
+              <Box key={stat.label} sx={{ minWidth: 0, display: "flex", flexDirection: "column-reverse", gap: 0.5 }}>
                 <Typography component="dt" sx={{ fontSize: 14, color: "text.secondary" }}>
                   {stat.label}
                 </Typography>

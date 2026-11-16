@@ -8,12 +8,12 @@ test("contact form shows Bulgarian errors and keeps the subject from a package l
   await expect(page.getByText("Необходимо е съгласие, за да продължиш.")).toBeVisible();
 });
 
-test("sign-up form checks passwords before sending", async ({ page }) => {
+test("sign-up form checks the password before sending", async ({ page }) => {
   await page.goto("/registratsiya");
-  await page.getByLabel("Парола", { exact: true }).fill("парола123");
-  await page.getByLabel("Повтори паролата").fill("друга123");
+  await expect(page.getByLabel("Повтори паролата")).toHaveCount(0);
+  await page.getByLabel("Парола", { exact: true }).fill("паролапарола");
   await page.getByRole("button", { name: "Създай профил" }).click();
-  await expect(page.getByText("Паролите не съвпадат.")).toBeVisible();
+  await expect(page.getByText("Паролата трябва да съдържа поне една цифра.")).toBeVisible();
 });
 
 test("login form asks for the email and password", async ({ page }) => {

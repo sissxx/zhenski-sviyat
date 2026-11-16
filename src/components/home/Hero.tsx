@@ -34,9 +34,6 @@ export function Hero() {
               Предстоящи събития
             </Button>
           </Box>
-          <Typography sx={{ fontSize: 13, fontWeight: 600, color: "text.secondary", letterSpacing: "0.04em" }}>
-            ПОДКРЕПА · ЗНАНИЕ · ВЗАИМОПОМОЩ
-          </Typography>
         </Box>
 
         {/* Image placeholder from Figma; replace with an approved photo. */}

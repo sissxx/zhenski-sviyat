@@ -34,7 +34,6 @@ describe("account schemas", () => {
     email: "maria@example.bg",
     phone: "",
     password: "парола123",
-    confirmPassword: "парола123",
     consent: true,
     marketingConsent: false,
   };
@@ -56,10 +55,7 @@ describe("account schemas", () => {
     );
   });
 
-  it("flags mismatched passwords on the confirm field", () => {
-    const issue = firstError(registerSchema, { ...valid, confirmPassword: "друга123" });
-    expect(issue?.path).toEqual(["confirmPassword"]);
-    expect(issue?.message).toBe("Паролите не съвпадат.");
+  it("flags mismatched passwords when a new password is set", () => {
     expect(firstError(newPasswordSchema, { password: "парола123", confirmPassword: "x" })?.path).toEqual(["confirmPassword"]);
   });
 
