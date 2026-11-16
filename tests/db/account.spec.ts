@@ -23,7 +23,7 @@ test.describe("accounts", () => {
   test("account pages need a login and come back after it", async ({ page }) => {
     const user = await createUser();
     await page.goto("/profil/zapisvaniya");
-    await expect(page).toHaveURL(/\/vhod\?next=%2Fprofil%2Fsabitiya/);
+    await expect(page).toHaveURL(/\/vhod\?next=%2Fprofil%2Fzapisvaniya/);
     await page.getByRole("textbox", { name: "Имейл" }).fill(user.email);
     await page.getByLabel("Парола", { exact: true }).fill(password);
     await page.getByRole("button", { name: "Вход", exact: true }).click();
