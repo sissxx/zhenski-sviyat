@@ -124,6 +124,11 @@ export default async function AboutPage() {
                     </Typography>
                     {member.role && <Typography sx={{ fontSize: 14, mt: 0.75, color: "secondary.main", fontWeight: 600 }}>{member.role}</Typography>}
                     {member.bio && <Typography sx={{ fontSize: 15, mt: 1, whiteSpace: "pre-line" }}>{member.bio}</Typography>}
+                    {member.bookingHref && (
+                      <AppLink href={member.bookingHref} sx={{ display: "inline-block", mt: 1.25, fontSize: 14, fontWeight: 600 }} aria-label={`Запиши час при ${member.name}`}>
+                        Запиши час <span aria-hidden>→</span>
+                      </AppLink>
+                    )}
                   </Box>
                 </Panel>
               ))}

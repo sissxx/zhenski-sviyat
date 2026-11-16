@@ -16,14 +16,14 @@ export const listTeamMembers = cache(async (): Promise<PublicTeamMember[]> => {
   await connection();
   if (isSupabaseConfigured()) {
     const supabase = await createClient();
-    const { data, error } = await supabase
-      .from("team_members")
-      .select("id, slug, full_name, role_title, bio, photo_path, member_group, sort_order")
-      .eq("is_published", true)
-      .order("sort_order", { ascending: true })
-      .order("full_name", { ascending: true });
+    const columns = "id, slug, full_name, role_title, bio, photo_path, member_group, sort_order";
+    const query = (select: string) =>
+      supabase.from("team_members").select(select).eq("is_published", true).order("sort_order", { ascending: true }).order("full_name", { ascending: true });
+    let { data, error } = await query(`${columns}, specialist:specialists(slug, title, bio, photo_path, is_active)`);
+    // Until the team_members.specialist_id migration is applied, read the list without the linked specialist.
+    if (error) ({ data, error } = await query(columns));
     if (error) console.error("listTeamMembers", error);
-    else if (data.length > 0) return data.map(toPublicTeamMember);
+    else if (data && data.length > 0) return (data as unknown as Parameters<typeof toPublicTeamMember>[0][]).map(toPublicTeamMember);
   }
   return draftFounders.map((f, i) => ({
     id: `draft-${i}`,

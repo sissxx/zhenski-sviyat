@@ -78,7 +78,11 @@ function Facts({ rows }: { rows: [string, string][] }) {
  * Visitors can browse times, and log in to book.
  */
 export function ConsultationBooking({ services, viewer, cardAvailable, initialServiceSlug, initialSpecialistSlug }: ConsultationBookingProps) {
-  const initialService = services.find((s) => s.slug === initialServiceSlug) ?? services[0];
+  // A link with only a specialist (e.g. from the team page) opens the first service that person offers.
+  const initialService =
+    services.find((s) => s.slug === initialServiceSlug) ??
+    (initialSpecialistSlug ? services.find((s) => s.specialists.some((sp) => sp.slug === initialSpecialistSlug)) : undefined) ??
+    services[0];
   const [serviceId, setServiceId] = useState(initialService.id);
   const [specialistId, setSpecialistId] = useState(
     initialService.specialists.find((s) => s.slug === initialSpecialistSlug)?.id ?? ANY,

@@ -1341,6 +1341,7 @@ export type Database = {
           role_title: string | null
           slug: string
           sort_order: number
+          specialist_id: string | null
           updated_at: string
         }
         Insert: {
@@ -1354,6 +1355,7 @@ export type Database = {
           role_title?: string | null
           slug: string
           sort_order?: number
+          specialist_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -1367,9 +1369,18 @@ export type Database = {
           role_title?: string | null
           slug?: string
           sort_order?: number
+          specialist_id?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "team_members_specialist_id_fkey"
+            columns: ["specialist_id"]
+            isOneToOne: true
+            referencedRelation: "specialists"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {

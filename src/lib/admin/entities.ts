@@ -358,7 +358,7 @@ export const entities: Record<Exclude<EntityKey, "settings">, EntityConfig> = {
     listPath: adminRoutes.team,
     ordering: { name: "full_name", group: "member_group" },
     // Published by default; the order is set automatically (end of the group) and changed with the list's arrows.
-    defaults: { full_name: "", slug: "", role_title: "", bio: "", photo_path: "", member_group: "founder", is_published: true },
+    defaults: { full_name: "", slug: "", role_title: "", bio: "", photo_path: "", member_group: "founder", specialist_id: "", is_published: true },
     toRow: (v) => ({
       full_name: text(v, "full_name"),
       slug: text(v, "slug"),
@@ -366,6 +366,7 @@ export const entities: Record<Exclude<EntityKey, "settings">, EntityConfig> = {
       bio: opt(v, "bio"),
       photo_path: opt(v, "photo_path"),
       member_group: str(v, "member_group"),
+      specialist_id: opt(v, "specialist_id"),
       is_published: flag(v, "is_published"),
     }),
     toForm: (row) => ({
@@ -375,6 +376,7 @@ export const entities: Record<Exclude<EntityKey, "settings">, EntityConfig> = {
       bio: s(row, "bio"),
       photo_path: s(row, "photo_path"),
       member_group: s(row, "member_group"),
+      specialist_id: s(row, "specialist_id"),
       is_published: b(row, "is_published"),
     }),
   },
