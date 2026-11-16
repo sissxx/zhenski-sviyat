@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { editableTexts } from "@/content/editable-texts";
 import { z } from "zod";
 import type { Database } from "@/lib/supabase/database.types";
 import { notifyConsultationCancelled, notifyLater, notifyPaymentConfirmed } from "@/lib/email/notifications";
@@ -338,5 +339,31 @@ export async function setMessageHandled(messageId: string, handled: boolean): Pr
       .update(handled ? { handled_at: new Date().toISOString(), handled_by: adminId } : { handled_at: null, handled_by: null })
       .eq("id", messageId);
     return error;
+  });
+}
+
+// --- Site texts -------------------------------------------------------------------------------------------
+
+/**
+ * Saves the texts from Текстове на сайта. A text equal to its default (or empty) is removed from
+ * content_blocks, so the built-in wording shows and later improvements to it reach the site.
+ */
+export async function saveSiteTexts(values: Record<string, string>): Promise<AdminResult> {
+  const known = new Map(editableTexts.map((t) => [t.key, t]));
+  const entries = Object.entries(values).filter(([key, value]) => known.has(key) && typeof value === "string" && value.length <= 5000);
+  return run(async (supabase, userId) => {
+    const reset = entries.filter(([key, value]) => !value.trim() || value.trim() === known.get(key)!.defaultValue.trim()).map(([key]) => key);
+    const changed = entries
+      .filter(([key]) => !reset.includes(key))
+      .map(([key, value]) => ({ key, value: value.trim(), description: known.get(key)!.label, is_published: true, updated_by: userId }));
+    if (reset.length > 0) {
+      const { error } = await supabase.from("content_blocks").delete().in("key", reset);
+      if (error) return error;
+    }
+    if (changed.length > 0) {
+      const { error } = await supabase.from("content_blocks").upsert(changed, { onConflict: "key" });
+      if (error) return error;
+    }
+    return null;
   });
 }

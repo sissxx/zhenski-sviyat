@@ -8,7 +8,8 @@ import { NextSteps } from "@/components/ui/NextSteps";
 import { PageIntro } from "@/components/ui/PageIntro";
 import { Panel } from "@/components/ui/Panel";
 import { Section } from "@/components/ui/Section";
-import { goals, supportAreas } from "@/content/about";
+import { supportAreas } from "@/content/about";
+import { getTexts, lines } from "@/lib/content/texts";
 import { routes } from "@/lib/routes";
 import { pageMetadata } from "@/lib/seo/metadata";
 import { listTeamMembers } from "@/lib/team/queries";
@@ -27,7 +28,8 @@ const sections = [
 const anchorOffset = { scrollMarginTop: { xs: 72, md: 96 } } as const;
 
 export default async function AboutPage() {
-  const members = await listTeamMembers();
+  const [members, t] = await Promise.all([listTeamMembers(), getTexts()]);
+  const goals = lines(t("about.goals"));
   const groups = teamGroups
     .map((group) => ({ group, members: members.filter((m) => m.group === group) }))
     .filter((g) => g.members.length > 0);
@@ -36,8 +38,8 @@ export default async function AboutPage() {
     <>
       <PageIntro
         eyebrow="За сдружението"
-        title="Подкрепа, развитие и взаимопомощ"
-        lead="Обединяваме жени и специалисти, за да създаваме пространство за разбиране, знания, личностно израстване и професионално развитие."
+        title={t("about.intro.title")}
+        lead={t("about.intro.lead")}
       />
 
       <Box component="nav" aria-label="На тази страница" sx={{ bgcolor: "background.paper", borderBottom: 1, borderColor: "divider" }}>

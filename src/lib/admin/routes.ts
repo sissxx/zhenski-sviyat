@@ -19,6 +19,7 @@ export const adminRoutes = {
   promotions: `${base}/promotsii`,
   team: `${base}/ekip`,
   messages: `${base}/saobshteniya`,
+  texts: `${base}/tekstove`,
   settings: `${base}/nastroyki`,
 } as const;
 
@@ -54,6 +55,7 @@ export const adminNav: AdminNavGroup[] = [
   {
     title: "Съдържание",
     items: [
+      { label: "Текстове на сайта", href: adminRoutes.texts },
       { label: "Въпроси (ЧЗВ)", href: adminRoutes.faqs },
       { label: "Партньори", href: adminRoutes.partners },
       { label: "Промоции", href: adminRoutes.promotions },

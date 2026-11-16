@@ -3,23 +3,22 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { Section } from "@/components/ui/Section";
 import { missionStats } from "@/content/home";
+import { getTexts } from "@/lib/content/texts";
 import { routes } from "@/lib/routes";
 import { listTeamMembers } from "@/lib/team/queries";
 
 export async function About() {
-  const founderCount = (await listTeamMembers()).filter((m) => m.group === "founder").length;
+  const [members, t] = await Promise.all([listTeamMembers(), getTexts()]);
+  const founderCount = members.filter((m) => m.group === "founder").length;
   return (
     <Section bg="brand.sand" aria-labelledby="about-title">
       <Box sx={{ display: "grid", gap: { xs: 3, md: 5 }, gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" }, alignItems: "start" }}>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2, alignItems: "flex-start" }}>
           <Typography variant="eyebrow">За сдружението</Typography>
           <Typography id="about-title" variant="h2">
-            Общност, която подкрепя и вдъхновява жените.
+            {t("home.about.title")}
           </Typography>
-          <Typography>
-            Създаваме пространство за взаимопомощ, професионално и личностно развитие и обмен на опит. Вярваме, че
-            когато жените се подкрепят, се отварят повече възможности за всички.
-          </Typography>
+          <Typography sx={{ whiteSpace: "pre-line" }}>{t("home.about.text")}</Typography>
           <Button variant="outlined" href={routes.about}>
             Научи повече за нас
           </Button>
@@ -29,10 +28,7 @@ export async function About() {
           <Typography variant="h4" component="h3">
             Нашата мисия
           </Typography>
-          <Typography>
-            Да изграждаме национална мрежа за взаимопомощ, която насърчава развитието, увереността и активното
-            участие на жените.
-          </Typography>
+          <Typography sx={{ whiteSpace: "pre-line" }}>{t("home.mission.text")}</Typography>
           <Box component="dl" sx={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: { xs: 1.5, sm: 2.25 }, m: 0 }}>
             {missionStats(founderCount).map((stat) => (
               <Box key={stat.label} sx={{ minWidth: 0, display: "flex", flexDirection: "column-reverse", gap: 0.5 }}>
