@@ -133,7 +133,7 @@ export function eventRegistrationPendingPayment(data: EventRegistrationData & { 
       },
       eventDetails(data),
       ...bankBlocks(data.bank, "мястото се освобождава"),
-      { kind: "button", label: "Моите събития", url: data.accountUrl },
+      { kind: "button", label: "Моите записвания", url: data.accountUrl },
     ],
   };
 }
@@ -348,7 +348,7 @@ export function consultationBooked(data: ConsultationData & { cancelDeadlineHour
             } as const,
           ]
         : []),
-      { kind: "button", label: "Моите консултации", url: data.accountUrl },
+      { kind: "button", label: "Моите записвания", url: data.accountUrl },
       ...(data.calendarUrl ? [{ kind: "note", text: `Добави часа в календара си: ${data.calendarUrl}` } as const] : []),
     ],
   };
@@ -367,7 +367,7 @@ export function consultationPendingPayment(data: ConsultationData & { bank: Bank
       },
       consultationDetails(data),
       ...bankBlocks(data.bank, "часът се освобождава"),
-      { kind: "button", label: "Моите консултации", url: data.accountUrl },
+      { kind: "button", label: "Моите записвания", url: data.accountUrl },
     ],
   };
 }
@@ -401,7 +401,7 @@ export function consultationRescheduled(data: ConsultationData & { previousStart
     blocks: [
       { kind: "text", text: "Преместихме консултацията ти. Ето новия час." },
       consultationDetails(data, [{ label: "Предишен час", value: formatDateTime(data.previousStartsAt) }]),
-      { kind: "button", label: "Моите консултации", url: data.accountUrl },
+      { kind: "button", label: "Моите записвания", url: data.accountUrl },
     ],
   };
 }
@@ -422,7 +422,7 @@ export function consultationReminder(data: ConsultationData & { cancelDeadlineHo
           ? `Ако няма да можеш да дойдеш, откажи или премести часа от профила си (до ${data.cancelDeadlineHours} ч. преди началото), или ни пиши, като отговориш на този имейл.`
           : "Ако няма да можеш да дойдеш, моля, кажи ни, като отговориш на този имейл.",
       },
-      { kind: "button", label: "Моите консултации", url: data.accountUrl },
+      { kind: "button", label: "Моите записвания", url: data.accountUrl },
     ],
   };
 }

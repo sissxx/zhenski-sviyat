@@ -56,7 +56,7 @@ export async function registerForEvent(input: z.infer<typeof registerSchema>): P
   if (!registration) return { ok: false, error: dbErrorMessage(null) };
 
   notifyLater(() => notifyEventRegistration(registration.registration_id));
-  revalidatePath(routes.accountEvents);
+  revalidatePath(routes.accountBookings);
   // Card: on to Stripe Checkout. An unfinished bank-transfer sign-up comes back as it was and goes to
   // its confirmation page with the transfer details.
   if (paid && paymentMethod === "card" && registration.payment_id) {
@@ -82,6 +82,6 @@ export async function cancelEventRegistration(registrationId: string): Promise<E
   // Close the Checkout page too, so nobody pays for a seat that was just given up.
   if (openCard && isStripeConfigured()) await expireOpenCheckout(openCard.id);
 
-  revalidatePath(routes.accountEvents);
+  revalidatePath(routes.accountBookings);
   return { ok: true };
 }

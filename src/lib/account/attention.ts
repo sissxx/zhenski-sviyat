@@ -21,12 +21,9 @@ export async function getAccountAttention(): Promise<Record<string, number>> {
     listMySubscriptions(),
   ]);
   return {
-    [routes.accountEvents]: registrations.filter(
-      (r) => r.status === "pending_payment" && !!r.event && new Date(r.event.starts_at).getTime() > now,
-    ).length,
-    [routes.accountConsultations]: bookings.filter(
-      (b) => b.status === "pending_payment" && new Date(b.ends_at).getTime() > now,
-    ).length,
+    [routes.accountBookings]:
+      registrations.filter((r) => r.status === "pending_payment" && !!r.event && new Date(r.event.starts_at).getTime() > now).length +
+      bookings.filter((b) => b.status === "pending_payment" && new Date(b.ends_at).getTime() > now).length,
     [routes.accountSubscriptions]: subscriptions.filter(subscriptionNeedsPayment).length,
   };
 }

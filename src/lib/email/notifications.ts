@@ -313,7 +313,7 @@ export async function notifyPaymentConfirmed(paymentId: string) {
           { label: "Къде", value: booking.service.location_info },
         ],
         url: absoluteUrl(routes.accountConsultations),
-        urlLabel: "Моите консултации",
+        urlLabel: "Моите записвания",
       };
     }
   } else if (payment.subscription_id) {

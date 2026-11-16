@@ -14,10 +14,10 @@ type ReschedulePageProps = { params: Promise<{ id: string }> };
 
 export default async function ReschedulePage({ params }: ReschedulePageProps) {
   const { id } = await params;
-  if (!z.uuid().safeParse(id).success) redirect(routes.accountConsultations);
+  if (!z.uuid().safeParse(id).success) redirect(routes.accountBookings);
   const [booking, rules] = await Promise.all([getMyBooking(id), getBookingRules()]);
   if (!booking?.service || !booking.specialist || !bookingActions(booking, rules).canReschedule) {
-    redirect(routes.accountConsultations);
+    redirect(routes.accountBookings);
   }
   const left = rules.maxReschedules - booking.reschedule_count;
 

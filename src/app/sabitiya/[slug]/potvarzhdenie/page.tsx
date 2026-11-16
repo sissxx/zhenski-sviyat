@@ -37,7 +37,7 @@ type Outcome = "free" | "paid" | "bank" | "card" | "ended";
 const outcomes: Record<Outcome, { title: string; text: string }> = {
   free: {
     title: "Мястото ти е запазено",
-    text: "Записването е потвърдено. Виждаш го и в профила си, в „Моите събития“.",
+    text: "Записването е потвърдено. Виждаш го и в профила си, в „Моите записвания“.",
   },
   paid: {
     title: "Плащането е потвърдено",
@@ -178,7 +178,7 @@ export default async function EventConfirmationPage({ params, searchParams }: Co
 
           <Box sx={{ display: "grid", gap: 1.5, gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, width: "100%" }}>
             <Button variant="contained" href={routes.accountEvents}>
-              Моите събития
+              Моите записвания
             </Button>
             <Button variant="outlined" href={routes.events}>
               Към всички събития

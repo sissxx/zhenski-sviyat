@@ -84,7 +84,7 @@ test.describe("events", () => {
     // In the profile, the menu flags the unpaid registration and the card says what is left to pay.
     await page.goto("/profil/sabitiya");
     const menu = page.getByRole("navigation", { name: "Моят профил" });
-    await expect(menu.getByRole("link", { name: "Моите събития (1 чака плащане)" })).toBeVisible();
+    await expect(menu.getByRole("link", { name: "Моите записвания (1 чака плащане)" })).toBeVisible();
     await expect(page.getByText(/Остава да платиш 25\s€/)).toBeVisible();
     await expect(page.getByText(payment!.bank_reference!)).toBeVisible();
     await page.goBack();

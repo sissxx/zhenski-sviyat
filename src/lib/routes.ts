@@ -22,8 +22,10 @@ export const routes = {
   authConfirm: "/auth/confirm",
   account: "/profil",
   accountDetails: "/profil/danni",
-  accountEvents: "/profil/sabitiya",
-  accountConsultations: "/profil/konsultatsii",
+  /** Events and consultations together; the two older addresses redirect here. */
+  accountBookings: "/profil/zapisvaniya",
+  accountEvents: "/profil/zapisvaniya#sabitiya",
+  accountConsultations: "/profil/zapisvaniya#konsultatsii",
   accountSubscriptions: "/profil/abonamenti",
   accountSpecialist: "/profil/spetsialist",
   privacy: "/poveritelnost",
@@ -40,7 +42,7 @@ export const eventCalendarPath = (slug: string) => `${eventPath(slug)}/kalendar`
 export const consultationCalendarPath = (bookingId: string) => `/profil/konsultatsii/${bookingId}/kalendar`;
 
 export const consultationConfirmationPath = (bookingId: string) => `${routes.consultations}/potvarzhdenie?zapis=${bookingId}`;
-export const consultationReschedulePath = (bookingId: string) => `${routes.accountConsultations}/${bookingId}/premesti`;
+export const consultationReschedulePath = (bookingId: string) => `/profil/konsultatsii/${bookingId}/premesti`;
 
 /**
  * "Стани член" for one plan: a visitor signs up and then lands on their subscriptions with the plan picked;
@@ -73,12 +75,12 @@ export function safeNextPath(next: string | null | undefined, fallback: string =
 
 export const accountNav: NavItem[] = [
   { label: "Моите данни", href: routes.accountDetails },
-  { label: "Моите събития", href: routes.accountEvents },
-  { label: "Моите консултации", href: routes.accountConsultations },
+  { label: "Моите записвания", href: routes.accountBookings, activeFor: ["/profil/konsultatsii", "/profil/sabitiya"] },
   { label: "Моите абонаменти", href: routes.accountSubscriptions },
 ];
 
-export type NavItem = { label: string; href: string };
+/** `activeFor`: other paths whose pages count as this section (e.g. moving a consultation). */
+export type NavItem = { label: string; href: string; activeFor?: string[] };
 
 /** Extra account section for people linked to a specialist profile. */
 export const specialistNavItem: NavItem = { label: "Моят график", href: routes.accountSpecialist };

@@ -30,7 +30,7 @@ type Outcome = "confirmed" | "bank" | "card" | "ended";
 const outcomes: Record<Outcome, { title: string; text: string }> = {
   confirmed: {
     title: "Часът ти е запазен",
-    text: "Консултацията е потвърдена. Виждаш я и в профила си, в „Моите консултации“, откъдето можеш да я преместиш или откажеш.",
+    text: "Консултацията е потвърдена. Виждаш я и в профила си, в „Моите записвания“, откъдето можеш да я преместиш или откажеш.",
   },
   bank: {
     title: "Заявката чака плащане",
@@ -138,7 +138,7 @@ export default async function ConsultationConfirmationPage({ searchParams }: Con
 
           <Box sx={{ display: "grid", gap: 1.5, gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, width: "100%" }}>
             <Button variant="contained" href={routes.accountConsultations}>
-              Моите консултации
+              Моите записвания
             </Button>
             <Button variant="outlined" href={routes.consultations}>
               Към консултациите
