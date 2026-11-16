@@ -526,3 +526,58 @@ export function contactMessageReceived(data: ContactMessageData): EmailContent {
     ],
   };
 }
+
+// --- Admin notices ----------------------------------------------------------------------------------------
+
+export type BankTransferRequestData = {
+  /** What the transfer is for, e.g. "Събитие: Женска сила" or "Членство: Клуб …". */
+  forWhat: string;
+  personName: string;
+  personEmail: string;
+  amountCents: number;
+  reference: string | null;
+  deadline: string | null;
+  paymentsUrl: string;
+};
+
+/** To the admins: someone chose bank transfer, so a payment will need confirming once the money arrives. */
+export function bankTransferRequested(data: BankTransferRequestData): EmailContent {
+  return {
+    subject: `Нова заявка за банков превод: ${formatPrice(data.amountCents)}`,
+    preheader: `${data.personName} · ${data.forWhat}`,
+    heading: "Нова заявка за банков превод",
+    blocks: [
+      {
+        kind: "details",
+        rows: [
+          { label: "За", value: data.forWhat },
+          { label: "От", value: `${data.personName} (${data.personEmail})` },
+          { label: "Сума", value: formatPrice(data.amountCents) },
+          { label: "Основание", value: data.reference, mono: true },
+          { label: "Срок", value: data.deadline ? formatDateTime(data.deadline) : null },
+        ],
+      },
+      { kind: "text", text: "Когато преводът пристигне по сметката, потвърди плащането в админ панела." },
+      { kind: "button", label: "Чакащи преводи", url: data.paymentsUrl },
+    ],
+  };
+}
+
+export type AdminDailySummaryData = {
+  rows: { label: string; value: number }[];
+  dashboardUrl: string;
+};
+
+/** To the admins, once a morning: what happened in the last 24 hours and what still waits for them. */
+export function adminDailySummary(data: AdminDailySummaryData): EmailContent {
+  return {
+    subject: "Дневен преглед: какво се случи на сайта",
+    preheader: data.rows.filter((r) => r.value > 0).map((r) => `${r.label}: ${r.value}`).join(" · "),
+    heading: "Дневен преглед",
+    blocks: [
+      { kind: "details", rows: data.rows.map((r) => ({ label: r.label, value: String(r.value) })) },
+      { kind: "button", label: "Към таблото", url: data.dashboardUrl },
+      { kind: "note", text: "Изпращаме този преглед само в дните, в които има нещо ново или чакащо." },
+    ],
+  };
+}
