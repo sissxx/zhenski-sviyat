@@ -36,3 +36,12 @@ and the recommended templates that link straight to the site, which work on any 
 
 (`type=recovery` for the reset template, `type=email_change` for email change). The built-in Supabase mailer sends only a
 few emails an hour; production should send through Brevo SMTP with the Bulgarian templates in `supabase/templates/`; the exact settings are in `docs/emails.md`.
+
+## Deleting an account
+
+Моите данни ends with "Изтрий профила". The member types their email to confirm; `deleteMyAccount()` (src/lib/account/delete.ts) then:
+
+- refuses for admins, and while the member has upcoming event sign-ups or consultations (they cancel those first, so specialists are told and refunds follow the usual rules);
+- deletes the member's Stripe customer, which cancels any card subscription at once (the later `customer.subscription.deleted` webhook finds no profile and is ignored);
+- deletes the login with the service key. The database cascades remove the profile, sign-ups, bookings, subscriptions and Viber access; payment rows stay with an empty user, for accounting;
+- signs out and shows a goodbye note on the login page.

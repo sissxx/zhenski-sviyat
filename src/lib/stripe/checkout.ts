@@ -286,6 +286,9 @@ export async function syncSubscription(subscription: Stripe.Subscription): Promi
     userId = data?.user_id ?? null;
   }
   if (!userId) throw new Error(`Subscription ${subscription.id} has no known user.`);
+  // A member who deleted their account: Stripe still reports the ended subscription, and there is nothing left to update.
+  const { data: profile } = await db.from("profiles").select("id").eq("id", userId).maybeSingle();
+  if (!profile) return;
 
   const item = subscription.items.data[0];
   if (!item) throw new Error(`Subscription ${subscription.id} has no items.`);
