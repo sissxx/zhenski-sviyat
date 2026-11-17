@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import { AddToCalendarButton } from "@/components/ui/AddToCalendarButton";
 import Typography from "@mui/material/Typography";
 import { z } from "zod";
 import { BookingFacts } from "@/components/consultations/BookingFacts";
@@ -13,7 +14,7 @@ import { Section } from "@/components/ui/Section";
 import { getCurrentUser } from "@/lib/auth/session";
 import { getMyBooking } from "@/lib/consultations/queries";
 import { getBankDetails } from "@/lib/events/queries";
-import { consultationConfirmationPath, loginPath, routes } from "@/lib/routes";
+import { consultationCalendarPath, consultationConfirmationPath, loginPath, routes } from "@/lib/routes";
 import { formatDateTime } from "@/lib/locale";
 import { syncReturnedCheckout } from "@/lib/stripe/checkout";
 import { isStripeConfigured } from "@/lib/stripe/server";
@@ -29,7 +30,7 @@ type Outcome = "confirmed" | "bank" | "card" | "ended";
 const outcomes: Record<Outcome, { title: string; text: string }> = {
   confirmed: {
     title: "Часът ти е запазен",
-    text: "Консултацията е потвърдена. Виждаш я и в профила си, в „Моите консултации“, откъдето можеш да я преместиш или откажеш.",
+    text: "Консултацията е потвърдена. Виждаш я и в профила си, в „Моите записвания“, откъдето можеш да я преместиш или откажеш.",
   },
   bank: {
     title: "Заявката чака плащане",
@@ -130,11 +131,14 @@ export default async function ConsultationConfirmationPage({ searchParams }: Con
               {booking.service?.name ?? "Консултация"}
             </Typography>
             <BookingFacts booking={booking} />
+            {(booking.status === "confirmed" || booking.status === "pending_payment") && (
+              <AddToCalendarButton href={consultationCalendarPath(booking.id)} size="small" />
+            )}
           </Panel>
 
           <Box sx={{ display: "grid", gap: 1.5, gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, width: "100%" }}>
             <Button variant="contained" href={routes.accountConsultations}>
-              Моите консултации
+              Моите записвания
             </Button>
             <Button variant="outlined" href={routes.consultations}>
               Към консултациите

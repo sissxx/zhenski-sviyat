@@ -78,6 +78,8 @@ export type EventRegistrationData = {
   place: string | null;
   eventUrl: string;
   accountUrl: string;
+  /** Calendar file (.ics) for the event. */
+  calendarUrl?: string;
   /** Only for confirmed registrations. */
   onlineUrl?: string | null;
   attendeeInstructions?: string | null;
@@ -112,6 +114,7 @@ export function eventRegistrationConfirmed(data: EventRegistrationData): EmailCo
       eventDetails(data),
       ...attendeeBlocks(data),
       { kind: "button", label: "Виж събитието", url: data.eventUrl },
+      ...(data.calendarUrl ? [{ kind: "note", text: `Добави го в календара си: ${data.calendarUrl}` } as const] : []),
       { kind: "note", text: `Записванията си можеш да видиш и откажеш в профила си: ${data.accountUrl}` },
     ],
   };
@@ -130,7 +133,7 @@ export function eventRegistrationPendingPayment(data: EventRegistrationData & { 
       },
       eventDetails(data),
       ...bankBlocks(data.bank, "мястото се освобождава"),
-      { kind: "button", label: "Моите събития", url: data.accountUrl },
+      { kind: "button", label: "Моите записвания", url: data.accountUrl },
     ],
   };
 }
@@ -310,6 +313,8 @@ export type ConsultationData = {
   locationInfo: string | null;
   priceCents: number;
   accountUrl: string;
+  /** Calendar file (.ics) for the booking; opens after login. */
+  calendarUrl?: string;
 };
 
 function consultationDetails(data: ConsultationData, extra: { label: string; value: string | null }[] = []): EmailBlock {
@@ -343,7 +348,8 @@ export function consultationBooked(data: ConsultationData & { cancelDeadlineHour
             } as const,
           ]
         : []),
-      { kind: "button", label: "Моите консултации", url: data.accountUrl },
+      { kind: "button", label: "Моите записвания", url: data.accountUrl },
+      ...(data.calendarUrl ? [{ kind: "note", text: `Добави часа в календара си: ${data.calendarUrl}` } as const] : []),
     ],
   };
 }
@@ -361,7 +367,7 @@ export function consultationPendingPayment(data: ConsultationData & { bank: Bank
       },
       consultationDetails(data),
       ...bankBlocks(data.bank, "часът се освобождава"),
-      { kind: "button", label: "Моите консултации", url: data.accountUrl },
+      { kind: "button", label: "Моите записвания", url: data.accountUrl },
     ],
   };
 }
@@ -395,7 +401,7 @@ export function consultationRescheduled(data: ConsultationData & { previousStart
     blocks: [
       { kind: "text", text: "Преместихме консултацията ти. Ето новия час." },
       consultationDetails(data, [{ label: "Предишен час", value: formatDateTime(data.previousStartsAt) }]),
-      { kind: "button", label: "Моите консултации", url: data.accountUrl },
+      { kind: "button", label: "Моите записвания", url: data.accountUrl },
     ],
   };
 }
@@ -416,7 +422,7 @@ export function consultationReminder(data: ConsultationData & { cancelDeadlineHo
           ? `Ако няма да можеш да дойдеш, откажи или премести часа от профила си (до ${data.cancelDeadlineHours} ч. преди началото), или ни пиши, като отговориш на този имейл.`
           : "Ако няма да можеш да дойдеш, моля, кажи ни, като отговориш на този имейл.",
       },
-      { kind: "button", label: "Моите консултации", url: data.accountUrl },
+      { kind: "button", label: "Моите записвания", url: data.accountUrl },
     ],
   };
 }
@@ -523,6 +529,61 @@ export function contactMessageReceived(data: ContactMessageData): EmailContent {
       { kind: "text", text: data.message },
       { kind: "note", text: "Отговори направо на този имейл, за да пишеш на подателя." },
       { kind: "button", label: "Всички съобщения", url: data.inboxUrl },
+    ],
+  };
+}
+
+// --- Admin notices ----------------------------------------------------------------------------------------
+
+export type BankTransferRequestData = {
+  /** What the transfer is for, e.g. "Събитие: Женска сила" or "Членство: Клуб …". */
+  forWhat: string;
+  personName: string;
+  personEmail: string;
+  amountCents: number;
+  reference: string | null;
+  deadline: string | null;
+  paymentsUrl: string;
+};
+
+/** To the admins: someone chose bank transfer, so a payment will need confirming once the money arrives. */
+export function bankTransferRequested(data: BankTransferRequestData): EmailContent {
+  return {
+    subject: `Нова заявка за банков превод: ${formatPrice(data.amountCents)}`,
+    preheader: `${data.personName} · ${data.forWhat}`,
+    heading: "Нова заявка за банков превод",
+    blocks: [
+      {
+        kind: "details",
+        rows: [
+          { label: "За", value: data.forWhat },
+          { label: "От", value: `${data.personName} (${data.personEmail})` },
+          { label: "Сума", value: formatPrice(data.amountCents) },
+          { label: "Основание", value: data.reference, mono: true },
+          { label: "Срок", value: data.deadline ? formatDateTime(data.deadline) : null },
+        ],
+      },
+      { kind: "text", text: "Когато преводът пристигне по сметката, потвърди плащането в админ панела." },
+      { kind: "button", label: "Чакащи преводи", url: data.paymentsUrl },
+    ],
+  };
+}
+
+export type AdminDailySummaryData = {
+  rows: { label: string; value: number }[];
+  dashboardUrl: string;
+};
+
+/** To the admins, once a morning: what happened in the last 24 hours and what still waits for them. */
+export function adminDailySummary(data: AdminDailySummaryData): EmailContent {
+  return {
+    subject: "Дневен преглед: какво се случи на сайта",
+    preheader: data.rows.filter((r) => r.value > 0).map((r) => `${r.label}: ${r.value}`).join(" · "),
+    heading: "Дневен преглед",
+    blocks: [
+      { kind: "details", rows: data.rows.map((r) => ({ label: r.label, value: String(r.value) })) },
+      { kind: "button", label: "Към таблото", url: data.dashboardUrl },
+      { kind: "note", text: "Изпращаме този преглед само в дните, в които има нещо ново или чакащо." },
     ],
   };
 }

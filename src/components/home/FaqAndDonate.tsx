@@ -4,12 +4,13 @@ import { AppLink, TextLink } from "@/components/ui/AppLink";
 import Typography from "@mui/material/Typography";
 import { FaqList } from "@/components/faq/FaqList";
 import { listFaqs } from "@/lib/content/queries";
+import { getTexts } from "@/lib/content/texts";
 import { routes } from "@/lib/routes";
 
 const panelPadding = { px: { xs: 2, sm: 3, md: 7 }, py: { xs: 5, md: 7 } };
 
 export async function FaqAndDonate() {
-  const { items } = await listFaqs();
+  const [{ items }, t] = await Promise.all([listFaqs(), getTexts()]);
   return (
     <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" } }}>
       <Box component="section" aria-labelledby="faq-title" sx={{ bgcolor: "brand.sand", ...panelPadding }}>
@@ -31,11 +32,9 @@ export async function FaqAndDonate() {
             Подкрепи ни
           </Typography>
           <Typography id="donate-title" variant="h2" sx={{ color: "brand.paper", lineHeight: 1.1 }}>
-            Бъди част от промяната.
+            {t("home.donate.title")}
           </Typography>
-          <Typography sx={{ color: "brand.paper" }}>
-            Всяко дарение помага да развиваме инициативи, да създаваме събития и да подкрепяме повече жени.
-          </Typography>
+          <Typography sx={{ color: "brand.paper", whiteSpace: "pre-line" }}>{t("home.donate.text")}</Typography>
           {/* Figma had a green button on the green panel (invisible); the light variant fixes that. */}
           <Button variant="contained" color="onDark" href={routes.support}>
             Направи дарение

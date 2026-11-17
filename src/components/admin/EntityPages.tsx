@@ -13,13 +13,15 @@ import { EntityForm } from "./EntityForm";
 type Key = Exclude<EntityKey, "settings">;
 
 /** "New item" page for any admin list. */
-export async function EntityNewPage({ entity, title, backLabel }: { entity: Key; title: string; backLabel: string }) {
+type FieldOptions = Record<string, { value: string; label: string }[]>;
+
+export async function EntityNewPage({ entity, title, backLabel, fieldOptions }: { entity: Key; title: string; backLabel: string; fieldOptions?: FieldOptions }) {
   await requireAdminPage();
   const config = entities[entity];
   return (
     <>
       <AdminPageHeader title={title} back={{ label: backLabel, href: config.listPath }} />
-      <EntityForm entity={entity} id={null} defaultValues={config.defaults} listPath={config.listPath} />
+      <EntityForm entity={entity} id={null} defaultValues={config.defaults} listPath={config.listPath} fieldOptions={fieldOptions} />
     </>
   );
 }
@@ -36,10 +38,11 @@ type EntityEditPageProps = {
   actions?: ReactNode;
   /** Extra panels under the form (schedules, linked groups…). */
   children?: ReactNode;
+  fieldOptions?: FieldOptions;
 };
 
 /** "Edit item" page for any admin list: the form, an optional delete button and extra panels. */
-export async function EntityEditPage({ entity, id, title, backLabel, saved, deleteConfirm, actions, children }: EntityEditPageProps) {
+export async function EntityEditPage({ entity, id, title, backLabel, saved, deleteConfirm, actions, children, fieldOptions }: EntityEditPageProps) {
   const { supabase } = await requireAdminPage();
   const config = entities[entity];
   const values = /^[0-9a-f-]{36}$/i.test(id) ? await loadEntityForm(supabase, entity, id) : null;
@@ -66,7 +69,7 @@ export async function EntityEditPage({ entity, id, title, backLabel, saved, dele
         )}
       </AdminPageHeader>
       {saved && <FormAlert severity="success">Записано.</FormAlert>}
-      <EntityForm entity={entity} id={id} defaultValues={values} listPath={config.listPath} />
+      <EntityForm entity={entity} id={id} defaultValues={values} listPath={config.listPath} fieldOptions={fieldOptions} />
       {children}
     </>
   );

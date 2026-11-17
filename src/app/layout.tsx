@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import Box from "@mui/material/Box";
@@ -57,6 +58,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <SiteFooter />
           <CookieNotice />
         </Providers>
+        {/* Vercel Web Analytics: page views without cookies or personal data. Only on Vercel, where its script is served. */}
+        {process.env.VERCEL && <Analytics />}
       </body>
     </html>
   );

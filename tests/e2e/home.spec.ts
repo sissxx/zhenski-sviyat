@@ -59,14 +59,15 @@ test("FAQ answers open and close", async ({ page }) => {
   await expect(question).toHaveAttribute("aria-expanded", "false");
 });
 
-test("newsletter form checks the email address", async ({ page }) => {
-  const footer = page.locator("footer");
-  const send = footer.getByRole("button", { name: "Изпрати" });
-  await send.click();
-  await expect(footer.getByRole("status")).toHaveText("Моля, въведи валиден имейл адрес.");
-  await footer.getByLabel("Абонирай се за новини").fill("maria@example.bg");
-  await send.click();
-  await expect(footer.getByRole("status")).toHaveText("Благодарим! Бюлетинът стартира скоро.");
+test("pages merged in the site review redirect to their new place", async ({ page }) => {
+  await page.goto("/uchrediteli");
+  await expect(page).toHaveURL("/za-nas#ekip");
+  await page.goto("/tseli-i-sabitiya");
+  await expect(page).toHaveURL("/za-nas#tseli");
+  await page.goto("/klub-krasota-stil-estetika");
+  await expect(page).toHaveURL("/chlenstvo#plan-klub-krasota");
+  await page.goto("/nashata-obshtnost");
+  await expect(page).toHaveURL("/chlenstvo");
 });
 
 test.describe("desktop navigation", () => {

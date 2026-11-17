@@ -2,9 +2,11 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { Section } from "@/components/ui/Section";
+import { getTexts } from "@/lib/content/texts";
 import { routes } from "@/lib/routes";
 
-export function Hero() {
+export async function Hero() {
+  const t = await getTexts();
   return (
     <Section bg="brand.mint" aria-labelledby="hero-title" sx={{ py: { xs: 6, md: 7.5 } }}>
       <Box
@@ -16,15 +18,12 @@ export function Hero() {
         }}
       >
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2.25, alignItems: "flex-start" }}>
-          <Typography variant="eyebrow">Общност · Подкрепа · Развитие</Typography>
-          <Typography id="hero-title" variant="h1">
-            Заедно
-            <br />
-            по-силни.
+          <Typography variant="eyebrow">{t("home.hero.eyebrow")}</Typography>
+          <Typography id="hero-title" variant="h1" sx={{ whiteSpace: "pre-line" }}>
+            {t("home.hero.title")}
           </Typography>
-          <Typography variant="subtitle1" sx={{ maxWidth: 620 }}>
-            Място за подкрепа, споделяне и развитие. Обединяваме жени, които искат да растат, да учат и да
-            създават промяна заедно.
+          <Typography variant="subtitle1" sx={{ maxWidth: 620, whiteSpace: "pre-line" }}>
+            {t("home.hero.lead")}
           </Typography>
           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5, width: { xs: "100%", sm: "auto" } }}>
             <Button variant="contained" href={routes.consultations} sx={{ flex: { xs: "1 1 180px", sm: "0 0 auto" } }}>
@@ -34,9 +33,6 @@ export function Hero() {
               Предстоящи събития
             </Button>
           </Box>
-          <Typography sx={{ fontSize: 13, fontWeight: 600, color: "text.secondary", letterSpacing: "0.04em" }}>
-            ПОДКРЕПА · ЗНАНИЕ · ВЗАИМОПОМОЩ
-          </Typography>
         </Box>
 
         {/* Image placeholder from Figma; replace with an approved photo. */}
@@ -58,11 +54,9 @@ export function Hero() {
           <Box aria-hidden sx={{ width: 48, height: 3, borderRadius: 2, bgcolor: "brand.terracotta" }} />
           <Typography
             component="p"
-            sx={{ fontFamily: "var(--font-lora)", fontWeight: 500, fontSize: { xs: 22, md: 32 }, lineHeight: 1.2, color: "brand.dark" }}
+            sx={{ fontFamily: "var(--font-lora)", fontWeight: 500, fontSize: { xs: 22, md: 32 }, lineHeight: 1.2, color: "brand.dark", whiteSpace: "pre-line" }}
           >
-            Жените са по-силни
-            <br />
-            когато са заедно.
+            {t("home.hero.quote")}
           </Typography>
         </Box>
       </Box>

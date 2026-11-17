@@ -21,6 +21,8 @@ All emails are Bulgarian, one column, readable on phones. Two kinds:
 | **Reminder**, 24 h before a confirmed consultation | client | `consultation_reminder` |
 | **Reminder**, 24 h before an event | everyone with a confirmed place | `event_reminder` (includes the online link / attendee notes) |
 | **Reminder**, 5 days before a bank-transfer membership month ends | member | `subscription_renewal_reminder` ("renew" link, or the transfer details again if the renewal was started but not paid) |
+| Someone chooses bank transfer (event, consultation or membership) | every active admin | `admin_bank_transfer` (who, what, amount, reference, link to Чакащи преводи) |
+| **Daily**, first reminder run after 8:00 Sofia time, only when there is news or something waiting | every active admin | `admin_daily_summary` (new sign-ups, bookings, members and messages in 24 h; pending transfers, Viber tasks, unread messages) |
 
 Specialists get mail at `specialist_private.notification_email`, or their login email when that is empty. A specialist
 without either gets no notices.

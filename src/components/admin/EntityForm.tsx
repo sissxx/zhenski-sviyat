@@ -27,6 +27,8 @@ type EntityFormProps = {
   /** List the item belongs to: a new item opens at `<listPath>/<id>` after saving. */
   listPath?: string;
   submitLabel?: string;
+  /** Choices for select fields that come from the database (e.g. the specialists), keyed by field name. */
+  fieldOptions?: Record<string, { value: string; label: string }[]>;
 };
 
 const inputType: Partial<Record<FieldConfig["type"], string>> = {
@@ -39,7 +41,7 @@ const inputType: Partial<Record<FieldConfig["type"], string>> = {
 const inputMode: Partial<Record<FieldConfig["type"], "numeric" | "decimal">> = { number: "numeric", money: "decimal" };
 
 /** Editor for one admin item, built from its definition in src/lib/admin/forms.ts. */
-export function EntityForm({ entity, id, defaultValues, listPath, submitLabel }: EntityFormProps) {
+export function EntityForm({ entity, id, defaultValues, listPath, submitLabel, fieldOptions }: EntityFormProps) {
   const router = useRouter();
   const config = entityForms[entity];
   const [result, setResult] = useState<{ ok: boolean; message: string } | null>(null);
@@ -143,7 +145,7 @@ export function EntityForm({ entity, id, defaultValues, listPath, submitLabel }:
                 value={value ?? ""}
                 registration={{ ...rest, ref, name: field.name, onChange: async (e) => rest.onChange(e), onBlur: async () => rest.onBlur() }}
               >
-                {field.options?.map((option) => (
+                {(fieldOptions?.[field.name] ?? field.options)?.map((option) => (
                   <MenuItem key={option.value} value={option.value}>
                     {option.label}
                   </MenuItem>

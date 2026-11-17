@@ -1,7 +1,7 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isEmailConfigured } from "./brevo";
-import { sendConsultationReminder, sendEventReminder, sendSubscriptionRenewalReminder } from "./notifications";
+import { sendAdminDailySummary, sendConsultationReminder, sendEventReminder, sendSubscriptionRenewalReminder } from "./notifications";
 import type { SendEmailResult } from "./send";
 
 /**
@@ -17,7 +17,13 @@ type Kind = "consultation" | "event" | "subscription";
 
 export type ReminderRunResult =
   | { status: "not_configured"; reason: string }
-  | { status: "done"; due: number; results: Record<Kind, Partial<Record<SendEmailResult, number>>> };
+  | {
+      status: "done";
+      due: number;
+      results: Record<Kind, Partial<Record<SendEmailResult, number>>>;
+      /** The admins' morning summary: "sent" on the first run after 8:00 Sofia time on days with news. */
+      adminSummary: "sent" | "skipped" | "failed";
+    };
 
 const senders: Record<Kind, (id: string, dedupeKey: string) => Promise<SendEmailResult>> = {
   consultation: sendConsultationReminder,
@@ -46,5 +52,12 @@ export async function sendDueReminders(): Promise<ReminderRunResult> {
     }
     results[kind][result] = (results[kind][result] ?? 0) + 1;
   }
-  return { status: "done", due: due?.length ?? 0, results };
+  let adminSummary: "sent" | "skipped" | "failed";
+  try {
+    adminSummary = await sendAdminDailySummary();
+  } catch (summaryError) {
+    console.error("admin daily summary failed", summaryError);
+    adminSummary = "failed";
+  }
+  return { status: "done", due: due?.length ?? 0, results, adminSummary };
 }

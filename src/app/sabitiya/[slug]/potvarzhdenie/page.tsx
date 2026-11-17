@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Link from "@mui/material/Link";
+import { AddToCalendarButton } from "@/components/ui/AddToCalendarButton";
 import Typography from "@mui/material/Typography";
 import { z } from "zod";
 import { EventFacts } from "@/components/events/EventFacts";
@@ -19,7 +20,7 @@ import {
   getMyRegistration,
   getPrivateEventDetails,
 } from "@/lib/events/queries";
-import { eventConfirmationPath, eventPath, loginPath, routes } from "@/lib/routes";
+import { eventCalendarPath, eventConfirmationPath, eventPath, loginPath, routes } from "@/lib/routes";
 import { formatDateTime } from "@/lib/locale";
 import { syncReturnedCheckout } from "@/lib/stripe/checkout";
 import { isStripeConfigured } from "@/lib/stripe/server";
@@ -36,7 +37,7 @@ type Outcome = "free" | "paid" | "bank" | "card" | "ended";
 const outcomes: Record<Outcome, { title: string; text: string }> = {
   free: {
     title: "Мястото ти е запазено",
-    text: "Записването е потвърдено. Виждаш го и в профила си, в „Моите събития“.",
+    text: "Записването е потвърдено. Виждаш го и в профила си, в „Моите записвания“.",
   },
   paid: {
     title: "Плащането е потвърдено",
@@ -127,6 +128,7 @@ export default async function EventConfirmationPage({ params, searchParams }: Co
             {title}
           </Typography>
           <Typography>{text}</Typography>
+          {outcome !== "ended" && <AddToCalendarButton href={eventCalendarPath(event.slug)} />}
 
           {outcome === "bank" && payment && (
             <BankTransferDetails
@@ -176,7 +178,7 @@ export default async function EventConfirmationPage({ params, searchParams }: Co
 
           <Box sx={{ display: "grid", gap: 1.5, gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, width: "100%" }}>
             <Button variant="contained" href={routes.accountEvents}>
-              Моите събития
+              Моите записвания
             </Button>
             <Button variant="outlined" href={routes.events}>
               Към всички събития

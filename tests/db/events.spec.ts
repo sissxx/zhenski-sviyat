@@ -39,7 +39,7 @@ test.describe("events", () => {
     const { data: listing } = await db.from("event_listing").select("seats_left").eq("id", event.id).single();
     expect(listing?.seats_left).toBe(4);
 
-    await page.goto("/profil/sabitiya");
+    await page.goto("/profil/zapisvaniya#sabitiya");
     const card = page.locator("li").filter({ hasText: event.title });
     await expect(card.getByText("Потвърдено")).toBeVisible();
     await card.getByRole("button", { name: "Откажи участие" }).click();
@@ -82,9 +82,9 @@ test.describe("events", () => {
     await expect(bank.getByText(payment!.bank_reference!)).toBeVisible();
 
     // In the profile, the menu flags the unpaid registration and the card says what is left to pay.
-    await page.goto("/profil/sabitiya");
+    await page.goto("/profil/zapisvaniya#sabitiya");
     const menu = page.getByRole("navigation", { name: "Моят профил" });
-    await expect(menu.getByRole("link", { name: "Моите събития (1 чака плащане)" })).toBeVisible();
+    await expect(menu.getByRole("link", { name: "Моите записвания (1 чака плащане)" })).toBeVisible();
     await expect(page.getByText(/Остава да платиш 25\s€/)).toBeVisible();
     await expect(page.getByText(payment!.bank_reference!)).toBeVisible();
     await page.goBack();

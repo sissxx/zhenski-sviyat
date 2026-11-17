@@ -1,5 +1,5 @@
 import { supportAreas } from "@/content/about";
-import { routes } from "@/lib/routes";
+import { contactPath, routes } from "@/lib/routes";
 
 /**
  * Homepage copy from the Figma homepage (frame 1:25). Events, plans, founders
@@ -25,15 +25,10 @@ export const services = [
   {
     title: "Фокус групи",
     text: "Безопасно пространство за споделяне, разговор и обмяна на опит.",
-    cta: { label: "Научи повече", href: routes.community },
+    cta: { label: "Пиши ни", href: contactPath("Фокус групи") },
     primary: false,
   },
-  {
-    title: "Подкрепи ни",
-    text: "Помогни ни да развиваме инициативи и да достигаме до повече жени.",
-    cta: { label: "Направи дарение", href: routes.support },
-    primary: true,
-  },
+
 ];
 
 /** Facts counted from the site's own content, so they stay true when that content changes. */

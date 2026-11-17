@@ -53,6 +53,6 @@ describe("navigation", () => {
   });
 
   it("uses Latin slugs", () => {
-    for (const path of known) expect(path).toMatch(/^\/[a-z0-9/-]*$/);
+    for (const path of known) expect(path).toMatch(/^\/[a-z0-9/-]*(#[a-z0-9-]+)?$/);
   });
 });

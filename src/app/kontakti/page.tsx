@@ -6,6 +6,7 @@ import { PageIntro } from "@/components/ui/PageIntro";
 import { Panel } from "@/components/ui/Panel";
 import { Placeholder } from "@/components/ui/Placeholder";
 import { Section } from "@/components/ui/Section";
+import { getTexts } from "@/lib/content/texts";
 import { pageMetadata } from "@/lib/seo/metadata";
 
 export const metadata: Metadata = pageMetadata("contacts");
@@ -15,6 +16,9 @@ type ContactPageProps = { searchParams: Promise<{ tema?: string | string[] }> };
 export default async function ContactPage({ searchParams }: ContactPageProps) {
   const { tema } = await searchParams;
   const subject = typeof tema === "string" ? tema.slice(0, 150) : "";
+  const t = await getTexts();
+  const phone = t("contacts.phone").trim();
+  const details = t("contacts.details").trim();
 
   return (
     <>
@@ -36,7 +40,13 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
                   Национален телефон за връзка
                 </Typography>
                 <Box component="dd" sx={{ m: 0, mt: 0.5 }}>
-                  <Placeholder>Телефонът предстои да бъде предоставен.</Placeholder>
+                  {phone ? (
+                    <Typography component="a" href={`tel:${phone.replace(/[^\d+]/g, "")}`} sx={{ fontWeight: 600, color: "primary.main" }}>
+                      {phone}
+                    </Typography>
+                  ) : (
+                    <Placeholder>Телефонът предстои да бъде предоставен.</Placeholder>
+                  )}
                 </Box>
               </Box>
               <Box>
@@ -44,7 +54,11 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
                   Имейл и адрес
                 </Typography>
                 <Box component="dd" sx={{ m: 0, mt: 0.5 }}>
-                  <Placeholder>Данните предстои да бъдат предоставени, ако ще бъдат публикувани.</Placeholder>
+                  {details ? (
+                    <Typography sx={{ whiteSpace: "pre-line" }}>{details}</Typography>
+                  ) : (
+                    <Placeholder>Данните предстои да бъдат предоставени, ако ще бъдат публикувани.</Placeholder>
+                  )}
                 </Box>
               </Box>
             </Box>

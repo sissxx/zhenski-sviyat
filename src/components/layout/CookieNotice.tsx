@@ -49,27 +49,29 @@ export function CookieNotice() {
       sx={{
         position: "fixed",
         zIndex: 1200,
-        left: { xs: 16, sm: 24 },
-        right: { xs: 16, sm: "auto" },
-        bottom: { xs: 16, sm: 24 },
-        maxWidth: 480,
+        // Phones: a slim full-width strip at the very bottom, so it never covers the page's buttons.
+        left: { xs: 0, sm: 24 },
+        right: { xs: 0, sm: "auto" },
+        bottom: { xs: 0, sm: 24 },
+        maxWidth: { sm: 480 },
         display: "flex",
-        flexDirection: { xs: "column", sm: "row" },
-        alignItems: { xs: "stretch", sm: "center" },
-        gap: 2,
-        p: 2,
+        flexDirection: "row",
+        alignItems: "center",
+        gap: { xs: 1.5, sm: 2 },
+        px: 2,
+        py: { xs: 1, sm: 2 },
         bgcolor: "background.paper",
         border: "1px solid",
         borderColor: "divider",
-        borderRadius: "14px",
+        borderRadius: { xs: 0, sm: "14px" },
         boxShadow: "0 8px 24px rgba(31, 69, 54, 0.16)",
       }}
     >
-      <Typography variant="body2" sx={{ flex: 1 }}>
-        Сайтът използва само необходими бисквитки, за да работи входът в профила. Не използваме рекламни или
-        аналитични бисквитки. <TextLink href={routes.cookies}>Научи повече</TextLink>
+      <Typography variant="body2" sx={{ flex: 1, fontSize: { xs: 13, sm: 14 } }}>
+        Ползваме само необходими бисквитки, без реклами и проследяване.{" "}
+        <TextLink href={routes.cookies}>Научи повече</TextLink>
       </Typography>
-      <Button variant="contained" size="small" onClick={dismiss} sx={{ flexShrink: 0, minWidth: { sm: 0 } }}>
+      <Button variant="contained" size="small" onClick={dismiss} sx={{ flexShrink: 0, minWidth: 0 }}>
         Разбрах
       </Button>
     </Box>

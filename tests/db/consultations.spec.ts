@@ -69,13 +69,13 @@ test.describe("consultations", () => {
     await expect(page.getByRole("heading", { name: "Часът ти е запазен" })).toBeVisible();
     const [before] = await bookingsOf(member.id);
 
-    await page.goto("/profil/konsultatsii");
+    await page.goto("/profil/zapisvaniya#konsultatsii");
     const card = page.locator("li").filter({ hasText: service.name });
     await expect(card.getByText("Потвърдена")).toBeVisible();
     await card.getByRole("link", { name: "Премести" }).click();
     await pickFirstSlot(page);
     await page.getByRole("button", { name: "Премести в избрания час" }).click();
-    await expect(page).toHaveURL(/\/profil\/konsultatsii\?premestena=1/);
+    await expect(page).toHaveURL(/\/profil\/zapisvaniya\?premestena=1/);
 
     const [moved] = await bookingsOf(member.id);
     expect(moved.id).toBe(before.id);

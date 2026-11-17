@@ -10,7 +10,6 @@ test.describe("accounts", () => {
     await page.getByRole("textbox", { name: "Имейл" }).fill(email);
     await page.getByLabel("Телефон (по желание)").fill("+359 888 123 456");
     await page.getByLabel("Парола", { exact: true }).fill(password);
-    await page.getByLabel("Повтори паролата").fill(password);
     await page.getByRole("checkbox", { name: /Политиката за поверителност/ }).check();
     await page.getByRole("button", { name: "Създай профил" }).click();
 
@@ -23,12 +22,12 @@ test.describe("accounts", () => {
 
   test("account pages need a login and come back after it", async ({ page }) => {
     const user = await createUser();
-    await page.goto("/profil/sabitiya");
-    await expect(page).toHaveURL(/\/vhod\?next=%2Fprofil%2Fsabitiya/);
+    await page.goto("/profil/zapisvaniya");
+    await expect(page).toHaveURL(/\/vhod\?next=%2Fprofil%2Fzapisvaniya/);
     await page.getByRole("textbox", { name: "Имейл" }).fill(user.email);
     await page.getByLabel("Парола", { exact: true }).fill(password);
     await page.getByRole("button", { name: "Вход", exact: true }).click();
-    await expect(page).toHaveURL(/\/profil\/sabitiya$/);
+    await expect(page).toHaveURL(/\/profil\/zapisvaniya$/);
     await expect(page.getByText("Все още нямаш записвания.")).toBeVisible();
   });
 

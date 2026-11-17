@@ -1,7 +1,6 @@
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import { routes } from "@/lib/routes";
 import { Section } from "@/components/ui/Section";
 import { services } from "@/content/home";
 
@@ -11,7 +10,7 @@ export function Services() {
       <Typography id="services-title" variant="h3" component="h2" sx={{ mb: 2.5 }}>
         Подкрепа според твоите нужди
       </Typography>
-      <Box sx={{ display: "grid", gap: 2.25, gridTemplateColumns: { xs: "1fr", md: "repeat(3, 1fr)" } }}>
+      <Box sx={{ display: "grid", gap: 2.25, gridTemplateColumns: { xs: "1fr", md: `repeat(${services.length}, 1fr)` } }}>
         {services.map((service) => (
           <Box
             key={service.title}
@@ -36,7 +35,7 @@ export function Services() {
             <Button
               variant={service.primary ? "contained" : "outlined"}
               // Donating is the one call to action in terracotta, so it stands apart from booking.
-              color={service.cta.href === routes.support ? "secondary" : "primary"}
+              color="primary"
               href={service.cta.href}
             >
               {service.cta.label}

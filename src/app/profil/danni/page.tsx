@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import { DeleteAccountPanel } from "@/components/account/DeleteAccountPanel";
 import Typography from "@mui/material/Typography";
 import { AccountSectionHeader } from "@/components/account/AccountSectionHeader";
 import { ProfileForm } from "@/components/account/ProfileForm";
@@ -50,6 +51,7 @@ export default async function AccountDetailsPage({ searchParams }: AccountDetail
           Смени паролата
         </Button>
       </Panel>
+      <DeleteAccountPanel />
     </>
   );
 }

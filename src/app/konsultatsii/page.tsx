@@ -66,7 +66,7 @@ export default async function ConsultationsPage({ searchParams }: ConsultationsP
             <Box component="ol" sx={{ m: 0, pl: 2.5, fontSize: 14, display: "flex", flexDirection: "column", gap: 0.75 }}>
               <li>Избираш направление, специалист и свободен час.</li>
               <li>Потвърждаваш с профила си. Платените консултации плащаш с карта или по банков път.</li>
-              <li>Часът се вижда в „Моят профил“ → „Моите консултации“, откъдето можеш да го преместиш или откажеш.</li>
+              <li>Часът се вижда в „Моят профил“ → „Моите записвания“, откъдето можеш да го преместиш или откажеш.</li>
             </Box>
             <Typography variant="h6" component="h3" sx={{ color: "primary.main", mt: 1 }}>
               Правила

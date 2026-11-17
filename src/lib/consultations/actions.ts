@@ -86,7 +86,7 @@ export async function bookConsultation(input: z.infer<typeof bookSchema>): Promi
   if (!booking) return { ok: false, error: dbErrorMessage(null) };
 
   notifyLater(() => notifyConsultationBooked(booking.booking_id));
-  revalidatePath(routes.accountConsultations);
+  revalidatePath(routes.accountBookings);
   if (prepaid && method === "card" && booking.payment_id) {
     return redirectToCheckout(booking.payment_id, user.id, { bookingId: booking.booking_id });
   }
@@ -112,7 +112,7 @@ export async function cancelConsultation(bookingId: string): Promise<Consultatio
 
   notifyLater(() => notifyConsultationCancelled(bookingId));
 
-  revalidatePath(routes.accountConsultations);
+  revalidatePath(routes.accountBookings);
   return { ok: true };
 }
 
@@ -128,6 +128,6 @@ export async function rescheduleConsultation(bookingId: string, startsAt: string
   if (error) return { ok: false, error: dbErrorMessage(error) };
 
   if (before) notifyLater(() => notifyConsultationRescheduled(bookingId, before.starts_at));
-  revalidatePath(routes.accountConsultations);
-  redirect(`${routes.accountConsultations}?premestena=1`);
+  revalidatePath(routes.accountBookings);
+  redirect(`${routes.accountBookings}?premestena=1#konsultatsii`);
 }

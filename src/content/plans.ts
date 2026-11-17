@@ -1,5 +1,3 @@
-import { routes } from "@/lib/routes";
-
 /**
  * Monthly memberships. Prices are euro cents; the €21 Viber price is still
  * provisional. Each plan grants access to one or more admin-managed Viber groups.
@@ -12,8 +10,6 @@ export const membershipPlans = {
     text: "Професионални съвети за лична грижа, красота и ежедневни навици.",
     priceCents: 800,
     priceProvisional: false,
-    href: routes.beautyClub,
-    ctaLabel: "Разгледай клуба",
     benefits: [
       "Професионални съвети за поддръжка на кожата, косата и ноктите",
       "Диагностика на кожата",
@@ -27,8 +23,6 @@ export const membershipPlans = {
     text: "Споделяне на опит, взаимна подкрепа и достъп до специално съдържание.",
     priceCents: 2100,
     priceProvisional: true,
-    href: routes.viber,
-    ctaLabel: "За общността",
     benefits: [
       "Затворено пространство за общуване и взаимопомощ",
       "Обмен на опит между членовете на общността",

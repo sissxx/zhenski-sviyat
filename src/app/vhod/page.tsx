@@ -11,10 +11,10 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-type LoginPageProps = { searchParams: Promise<{ next?: string | string[]; greshka?: string | string[] }> };
+type LoginPageProps = { searchParams: Promise<{ next?: string | string[]; greshka?: string | string[]; profil?: string }> };
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
-  const { next, greshka } = await searchParams;
+  const { next, greshka, profil } = await searchParams;
   const continueTo = safeNextPath(typeof next === "string" ? next : null);
 
   return (
@@ -28,6 +28,9 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         </span>
       }
     >
+      {profil === "iztrit" && (
+        <FormAlert severity="success">Профилът ти е изтрит. Благодарим, че беше част от общността!</FormAlert>
+      )}
       {greshka === "link" && (
         <FormAlert severity="error">
           Линкът е невалиден или е изтекъл. Влез с паролата си или{" "}

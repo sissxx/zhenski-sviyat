@@ -31,7 +31,6 @@ export function RegisterForm({ next }: { next: string }) {
       email: "",
       phone: "",
       password: "",
-      confirmPassword: "",
       consent: false,
       marketingConsent: false,
       next,
@@ -99,12 +98,6 @@ export function RegisterForm({ next }: { next: string }) {
         helperText="Поне 8 знака, с поне една буква и една цифра."
         registration={register("password")}
         error={errors.password}
-      />
-      <PasswordField
-        label="Повтори паролата"
-        autoComplete="new-password"
-        registration={register("confirmPassword")}
-        error={errors.confirmPassword}
       />
       <Box>
         <ConsentCheckbox registration={register("consent")} error={errors.consent} />

@@ -422,6 +422,7 @@ export const teamMemberForm: EntityForm = {
     bio: optText(),
     photo_path: optText(500),
     member_group: z.enum(["founder", "team", "ambassador"]),
+    specialist_id: z.string().refine((v) => v === "" || /^[0-9a-f-]{36}$/i.test(v), "Избери специалист от списъка."),
     is_published: bool,
   }) as unknown as EntityForm["schema"],
   sections: [
@@ -430,6 +431,13 @@ export const teamMemberForm: EntityForm = {
         { name: "full_name", label: "Име и фамилия", type: "text" },
         slugField("full_name"),
         { name: "member_group", label: "Група", type: "select", options: toOptions(teamGroupLabels), span: 2 },
+        {
+          name: "specialist_id",
+          label: "Същият човек е и специалист",
+          type: "select",
+          // The options (the specialists) are filled in by the page.
+          helperText: "Ако го свържеш, празните роля, представяне и снимка се взимат от профила на специалиста, а картата води към записване на час.",
+        },
         { name: "role_title", label: "Роля", type: "text" },
         { name: "bio", label: "Представяне", type: "textarea" },
         { name: "photo_path", label: "Снимка", type: "image", folder: "team" },

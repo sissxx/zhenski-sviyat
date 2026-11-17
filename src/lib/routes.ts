@@ -5,13 +5,11 @@
 export const routes = {
   home: "/",
   about: "/za-nas",
-  founders: "/uchrediteli",
-  goals: "/tseli-i-sabitiya",
-  community: "/nashata-obshtnost",
+  /** Sections of the За нас page (they used to be pages of their own, which now redirect here). */
+  aboutGoals: "/za-nas#tseli",
+  aboutTeam: "/za-nas#ekip",
   events: "/sabitiya",
   consultations: "/konsultatsii",
-  beautyClub: "/klub-krasota-stil-estetika",
-  viber: "/viber-obshtnost",
   membership: "/chlenstvo",
   packages: "/paketi-i-promotsii",
   faq: "/chesto-zadavani-vaprosi",
@@ -24,8 +22,10 @@ export const routes = {
   authConfirm: "/auth/confirm",
   account: "/profil",
   accountDetails: "/profil/danni",
-  accountEvents: "/profil/sabitiya",
-  accountConsultations: "/profil/konsultatsii",
+  /** Events and consultations together; the two older addresses redirect here. */
+  accountBookings: "/profil/zapisvaniya",
+  accountEvents: "/profil/zapisvaniya#sabitiya",
+  accountConsultations: "/profil/zapisvaniya#konsultatsii",
   accountSubscriptions: "/profil/abonamenti",
   accountSpecialist: "/profil/spetsialist",
   privacy: "/poveritelnost",
@@ -37,9 +37,12 @@ export const routes = {
 export const eventPath = (slug: string) => `${routes.events}/${slug}`;
 export const eventRegistrationPath = (slug: string) => `${eventPath(slug)}/zapisvane`;
 export const eventConfirmationPath = (slug: string) => `${eventPath(slug)}/potvarzhdenie`;
+/** Calendar file (.ics) for an event, and for one of the member's own consultations. */
+export const eventCalendarPath = (slug: string) => `${eventPath(slug)}/kalendar`;
+export const consultationCalendarPath = (bookingId: string) => `/profil/konsultatsii/${bookingId}/kalendar`;
 
 export const consultationConfirmationPath = (bookingId: string) => `${routes.consultations}/potvarzhdenie?zapis=${bookingId}`;
-export const consultationReschedulePath = (bookingId: string) => `${routes.accountConsultations}/${bookingId}/premesti`;
+export const consultationReschedulePath = (bookingId: string) => `/profil/konsultatsii/${bookingId}/premesti`;
 
 /**
  * "Стани член" for one plan: a visitor signs up and then lands on their subscriptions with the plan picked;
@@ -72,12 +75,12 @@ export function safeNextPath(next: string | null | undefined, fallback: string =
 
 export const accountNav: NavItem[] = [
   { label: "Моите данни", href: routes.accountDetails },
-  { label: "Моите събития", href: routes.accountEvents },
-  { label: "Моите консултации", href: routes.accountConsultations },
+  { label: "Моите записвания", href: routes.accountBookings, activeFor: ["/profil/konsultatsii", "/profil/sabitiya"] },
   { label: "Моите абонаменти", href: routes.accountSubscriptions },
 ];
 
-export type NavItem = { label: string; href: string };
+/** `activeFor`: other paths whose pages count as this section (e.g. moving a consultation). */
+export type NavItem = { label: string; href: string; activeFor?: string[] };
 
 /** Extra account section for people linked to a specialist profile. */
 export const specialistNavItem: NavItem = { label: "Моят график", href: routes.accountSpecialist };
@@ -85,41 +88,43 @@ export const specialistNavItem: NavItem = { label: "Моят график", href
 /** The logo links home, so the desktop menu leaves "Начало" out; only the mobile menu shows it. */
 export const homeNavItem: NavItem = { label: "Начало", href: routes.home };
 
+/** Five links keep the header calm; Въпроси and Подкрепи ни live in the footer and on the homepage. */
 export const mainNav: NavItem[] = [
   { label: "За нас", href: routes.about },
-  { label: "Нашата общност", href: routes.community },
   { label: "Събития", href: routes.events },
   { label: "Консултации", href: routes.consultations },
   { label: "Членство", href: routes.membership },
+  { label: "Контакти", href: routes.contacts },
+];
+
+/** Pages the short desktop menu leaves to the footer; the phone menu lists them too, since the footer is far down. */
+export const mobileExtraNav: NavItem[] = [
   { label: "Въпроси", href: routes.faq },
   { label: "Подкрепи ни", href: routes.support },
-  { label: "Контакти", href: routes.contacts },
 ];
 
 export const footerNav: { title: NavItem; links: NavItem[] }[] = [
   {
     title: { label: "За сдружението", href: routes.about },
     links: [
-      { label: "Обща информация", href: routes.about },
-      { label: "Учредители", href: routes.founders },
-      { label: "Нашите цели", href: routes.goals },
+      { label: "За нас", href: routes.about },
+      { label: "Нашите цели", href: routes.aboutGoals },
+      { label: "Учредители и екип", href: routes.aboutTeam },
     ],
   },
   {
-    title: { label: "Нашата общност", href: routes.community },
+    title: { label: "Участвай", href: routes.membership },
     links: [
       { label: "Събития", href: routes.events },
       { label: "Консултации", href: routes.consultations },
       { label: "Членство", href: routes.membership },
-      { label: "Клуб „Красота, стил и естетика“", href: routes.beautyClub },
-      { label: "Viber общност", href: routes.viber },
+      { label: "Пакети и промоции", href: routes.packages },
     ],
   },
   {
     title: { label: "Полезно", href: routes.faq },
     links: [
       { label: "Често задавани въпроси", href: routes.faq },
-      { label: "Пакети и промоции", href: routes.packages },
       { label: "Подкрепи ни", href: routes.support },
       { label: "Контакти", href: routes.contacts },
     ],

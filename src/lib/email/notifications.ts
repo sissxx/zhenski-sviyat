@@ -1,7 +1,7 @@
 import "server-only";
 import { after } from "next/server";
 import { adminRoutes } from "@/lib/admin/routes";
-import { eventPath, routes } from "@/lib/routes";
+import { consultationCalendarPath, eventCalendarPath, eventPath, routes } from "@/lib/routes";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { formatDate } from "@/lib/locale";
 import { absoluteUrl, sendEmail } from "./send";
@@ -71,6 +71,103 @@ async function pendingBankPayment(db: Admin, column: "event_registration_id" | "
   return data;
 }
 
+// --- Admins -----------------------------------------------------------------------------------------------
+
+/** Active admins with an email address: the people who get the admin notices. */
+async function adminRecipients(db: Admin) {
+  const { data: roles } = await db.from("user_roles").select("user_id").eq("role", "admin");
+  const adminIds = (roles ?? []).map((r) => r.user_id);
+  if (adminIds.length === 0) return [];
+  const { data: admins } = await db.from("profiles").select("id, email, first_name, last_name").in("id", adminIds).eq("status", "active");
+  return (admins ?? [])
+    .filter((admin) => admin.email)
+    .map((admin) => ({ id: admin.id, email: admin.email!, name: [admin.first_name, admin.last_name].filter(Boolean).join(" ") || null }));
+}
+
+/** Tells every admin about a new bank-transfer request, so it doesn't wait unnoticed until someone opens the panel. */
+async function notifyAdminsBankTransfer(
+  db: Admin,
+  input: {
+    forWhat: string;
+    person: { email: string | null; first_name: string | null; last_name: string | null };
+    payment: { amount_cents: number; bank_reference: string | null; expires_at: string | null };
+    related: { table: string; id: string };
+  },
+) {
+  const content = t.bankTransferRequested({
+    forWhat: input.forWhat,
+    personName: [input.person.first_name, input.person.last_name].filter(Boolean).join(" ") || "Потребител",
+    personEmail: input.person.email ?? "",
+    amountCents: input.payment.amount_cents,
+    reference: input.payment.bank_reference,
+    deadline: input.payment.expires_at,
+    paymentsUrl: absoluteUrl(`${adminRoutes.payments}?filtar=prevodi`),
+  });
+  const admins = await adminRecipients(db);
+  await Promise.all(
+    admins.map((admin) =>
+      sendEmail({
+        template: "admin_bank_transfer",
+        to: { email: admin.email, name: admin.name },
+        userId: admin.id,
+        dedupeKey: `admin_bank_transfer:${input.related.table}:${input.related.id}:${admin.id}`,
+        related: input.related,
+        content,
+      }),
+    ),
+  );
+}
+
+/**
+ * The morning summary for admins: new sign-ups, bookings, members and messages in the last 24 hours, plus what
+ * still waits (transfers, Viber requests, unread messages). Sent by the hourly reminder run from 8:00 Sofia time,
+ * at most once a day (the date is in the dedupe key), and only when there is something to report.
+ */
+export async function sendAdminDailySummary(now: Date = new Date()): Promise<"sent" | "skipped"> {
+  const sofiaHour = Number(new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Sofia", hour: "2-digit", hourCycle: "h23" }).format(now));
+  if (sofiaHour < 8) return "skipped";
+  const db = adminClient();
+  if (!db) return "skipped";
+  const since = new Date(now.getTime() - 24 * 3600 * 1000).toISOString();
+  const count = { count: "exact", head: true } as const;
+  const [registrations, bookings, members, newMessages, transfers, viber, unread] = await Promise.all([
+    db.from("event_registrations").select("id", count).gte("created_at", since).in("status", ["confirmed", "pending_payment"]),
+    db.from("consultation_bookings").select("id", count).gte("created_at", since).in("status", ["confirmed", "pending_payment"]),
+    db.from("subscriptions").select("id", count).gte("created_at", since),
+    db.from("contact_messages").select("id", count).gte("created_at", since),
+    db.from("payments").select("id", count).eq("provider", "bank_transfer").eq("status", "pending"),
+    db.from("viber_access_actions").select("user_id", count),
+    db.from("contact_messages").select("id", count).is("handled_at", null),
+  ]);
+  const rows = [
+    { label: "Нови записвания за събития", value: registrations.count ?? 0 },
+    { label: "Нови консултации", value: bookings.count ?? 0 },
+    { label: "Нови членства", value: members.count ?? 0 },
+    { label: "Нови съобщения", value: newMessages.count ?? 0 },
+    { label: "Чакащи банкови преводи", value: transfers.count ?? 0 },
+    { label: "Viber задачи", value: viber.count ?? 0 },
+    { label: "Непрочетени съобщения", value: unread.count ?? 0 },
+  ];
+  if (rows.every((r) => r.value === 0)) return "skipped";
+
+  const day = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Sofia" }).format(now);
+  const content = t.adminDailySummary({ rows, dashboardUrl: absoluteUrl(adminRoutes.home) });
+  const admins = await adminRecipients(db);
+  await Promise.all(
+    admins.map((admin) =>
+      sendEmail({
+        template: "admin_daily_summary",
+        to: { email: admin.email, name: admin.name },
+        userId: admin.id,
+        dedupeKey: `admin_daily_summary:${day}:${admin.id}`,
+        content,
+      }),
+    ),
+  );
+  return "sent";
+}
+
+
 // --- Events -----------------------------------------------------------------------------------------------
 
 type EventRow = {
@@ -112,6 +209,7 @@ function eventData(event: EventRow, firstName: string | null): t.EventRegistrati
     endsAt: event.ends_at,
     place: eventPlace(event),
     eventUrl: absoluteUrl(eventPath(event.slug)),
+    calendarUrl: absoluteUrl(eventCalendarPath(event.slug)),
     accountUrl: absoluteUrl(routes.accountEvents),
   };
 }
@@ -157,6 +255,11 @@ export async function notifyEventRegistration(registrationId: string) {
     template: "event_registration_bank_transfer",
     dedupeKey: `event_registration_bank_transfer:${reg.id}`,
     content: t.eventRegistrationPendingPayment({ ...data, bank: await bankInstructions(db, payment) }),
+  });  await notifyAdminsBankTransfer(db, {
+    forWhat: `Събитие: ${loaded.event.title}`,
+    person,
+    payment,
+    related: { table: "event_registrations", id: reg.id },
   });
 }
 
@@ -210,7 +313,7 @@ export async function notifyPaymentConfirmed(paymentId: string) {
           { label: "Къде", value: booking.service.location_info },
         ],
         url: absoluteUrl(routes.accountConsultations),
-        urlLabel: "Моите консултации",
+        urlLabel: "Моите записвания",
       };
     }
   } else if (payment.subscription_id) {
@@ -295,6 +398,11 @@ export async function notifySubscriptionBankTransfer(paymentId: string) {
       accountUrl: absoluteUrl(routes.accountSubscriptions),
       bank: await bankInstructions(db, payment),
     }),
+  });  await notifyAdminsBankTransfer(db, {
+    forWhat: `Членство: ${plan.name}`,
+    person,
+    payment,
+    related: { table: "payments", id: payment.id },
   });
 }
 
@@ -333,6 +441,7 @@ function clientData(b: Booking): t.ConsultationData {
     locationInfo: b.service.location_info,
     priceCents: b.price_cents,
     accountUrl: absoluteUrl(routes.accountConsultations),
+    calendarUrl: absoluteUrl(consultationCalendarPath(b.id)),
   };
 }
 
@@ -390,6 +499,12 @@ export async function notifyConsultationBooked(bookingId: string) {
           template: "consultation_bank_transfer",
           dedupeKey: `consultation_bank_transfer:${b.id}:client`,
           content: t.consultationPendingPayment({ ...clientData(b), bank: await bankInstructions(db, payment) }),
+        }),
+        notifyAdminsBankTransfer(db, {
+          forWhat: `Консултация: ${b.service.name}`,
+          person: b.client,
+          payment,
+          related: { table: "consultation_bookings", id: b.id },
         }),
       );
     }
@@ -559,19 +674,15 @@ export async function notifyContactMessage(messageId: string) {
   if (!db) return;
   const { data: message } = await db.from("contact_messages").select("id, name, email, subject, message").eq("id", messageId).maybeSingle();
   if (!message) return;
-  const { data: roles } = await db.from("user_roles").select("user_id").eq("role", "admin");
-  const adminIds = (roles ?? []).map((r) => r.user_id);
-  if (adminIds.length === 0) return;
-  const { data: admins } = await db.from("profiles").select("id, email, first_name, last_name").in("id", adminIds).eq("status", "active");
+  const admins = await adminRecipients(db);
+  if (admins.length === 0) return;
 
   const content = t.contactMessageReceived({ ...message, inboxUrl: absoluteUrl(adminRoutes.messages) });
   await Promise.all(
-    (admins ?? [])
-      .filter((admin) => admin.email)
-      .map((admin) =>
+    admins.map((admin) =>
         sendEmail({
           template: "contact_message",
-          to: { email: admin.email!, name: [admin.first_name, admin.last_name].filter(Boolean).join(" ") || null },
+          to: { email: admin.email, name: admin.name },
           userId: admin.id,
           dedupeKey: `contact_message:${message.id}:${admin.id}`,
           related: { table: "contact_messages", id: message.id },

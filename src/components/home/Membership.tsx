@@ -2,14 +2,10 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { Section } from "@/components/ui/Section";
-import { membershipPlans } from "@/content/plans";
 import { formatPrice } from "@/lib/locale";
 import { routes } from "@/lib/routes";
 import { perInterval } from "@/lib/subscriptions/plans";
 import { listPublicPlans } from "@/lib/subscriptions/queries";
-
-/** Plans that have their own page, with the button text that leads there. */
-const planPages = new Map<string, { href: string; label: string }>(Object.values(membershipPlans).map((plan) => [plan.slug, { href: plan.href, label: plan.ctaLabel }]));
 
 export async function Membership() {
   const { plans } = await listPublicPlans();
@@ -21,9 +17,8 @@ export async function Membership() {
       <Typography sx={{ fontSize: 14, color: "text.secondary", mb: 2.5 }}>
         Срещай се, учи, споделяй и получавай подкрепа в среда, създадена за жени.
       </Typography>
-      <Box sx={{ display: "grid", gap: 2.25, gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" } }}>
+      <Box sx={{ display: "grid", gap: 2.25, gridTemplateColumns: { xs: "1fr", md: `repeat(${Math.min(plans.length, 3)}, 1fr)` } }}>
         {plans.map((plan) => {
-          const page = planPages.get(plan.slug) ?? { href: routes.membership, label: "Научи повече" };
           return (
             <Box
               key={plan.slug}
@@ -42,11 +37,10 @@ export async function Membership() {
                   </Typography>
                 </Typography>
                 <Box sx={{ flexGrow: 1 }} />
-                <Button variant="contained" href={page.href}>
-                  {page.label}
+                <Button variant="contained" href={`${routes.membership}#plan-${plan.slug}`} aria-label={`Виж повече: ${plan.name}`}>
+                  Виж повече
                 </Button>
               </Box>
-              <Typography variant="caption">{plan.allowBankTransfer ? "Плащане с карта или по банков път" : "Плащане с карта"}</Typography>
             </Box>
           );
         })}

@@ -111,3 +111,37 @@ describe("emails", () => {
     );
   });
 });
+
+describe("admin notices", () => {
+  it("names who asked for a bank transfer, for what and how much", async () => {
+    const { bankTransferRequested } = await import("@/lib/email/templates");
+    const content = bankTransferRequested({
+      forWhat: "Събитие: Женска сила",
+      personName: "Мария Иванова",
+      personEmail: "maria@example.bg",
+      amountCents: 2500,
+      reference: "ZS-1234",
+      deadline: null,
+      paymentsUrl: "https://example.bg/admin/plashtaniya?filtar=prevodi",
+    });
+    expect(content.subject).toContain("банков превод");
+    expect(content.subject).toContain("25");
+    const html = renderEmail(content, { siteName: "Женски свят", siteUrl: "https://example.bg", footerNote: "" }).html;
+    expect(html).toContain("Мария Иванова (maria@example.bg)");
+    expect(html).toContain("ZS-1234");
+    expect(html).toContain("filtar=prevodi");
+  });
+
+  it("lists every count in the daily summary and only the non-zero ones in the preview line", async () => {
+    const { adminDailySummary } = await import("@/lib/email/templates");
+    const content = adminDailySummary({
+      rows: [
+        { label: "Нови консултации", value: 2 },
+        { label: "Нови съобщения", value: 0 },
+      ],
+      dashboardUrl: "https://example.bg/admin",
+    });
+    expect(content.preheader).toBe("Нови консултации: 2");
+    expect(renderEmail(content, { siteName: "Женски свят", siteUrl: "https://example.bg", footerNote: "" }).html).toContain("Нови съобщения");
+  });
+});

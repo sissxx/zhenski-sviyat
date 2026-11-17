@@ -35,7 +35,7 @@ export function AccountNav({ extraItems = [], attention = {} }: AccountNavProps)
       >
         {[...accountNav, ...extraItems].map((item) => {
           // Sub-pages (e.g. moving a consultation) keep their section highlighted.
-          const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+          const active = [item.href, ...(item.activeFor ?? [])].some((href) => pathname === href || pathname.startsWith(`${href}/`));
           const count = attention[item.href] ?? 0;
           return (
             <li key={item.href}>
